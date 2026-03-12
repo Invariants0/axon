@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  frontend:
+    image: oven/bun:1
+    working_dir: /app/frontend
+    volumes:
+      - ./:/app
+    command: sh -c "bun install && bun dev"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+  backend:
+    image: ghcr.io/astral-sh/uv:python3.11-bookworm
+    working_dir: /app/backend
+    volumes:
+      - ./:/app
+    command: sh -c "uv sync && uv run uvicorn main:app --app-dir src --host 0.0.0.0 --port 8000 --reload"
+    ports:
+      - "8000:8000"
