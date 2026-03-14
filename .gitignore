@@ -19,10 +19,12 @@ backend/.pytest_cache/
 backend/*.egg-info/
 backend/.mypy_cache/
 backend/.ruff_cache/
+.chroma/
+backend/.chroma/
 
 # Env
 .env
-.env.*
+
 
 # IDE
 .vscode/

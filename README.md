@@ -22,10 +22,12 @@ Frontend runs on http://localhost:3000.
 ```bash
 cd backend
 uv sync
-uv run uvicorn main:app --app-dir src --reload
+uv run start.py
 ```
 
 Backend runs on http://127.0.0.1:8000.
+
+The startup script runs database migrations before booting the API.
 
 ## Health Check
 

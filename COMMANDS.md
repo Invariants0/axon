@@ -70,7 +70,7 @@ uv sync
 ### Run Backend
 ```bash
 cd backend
-uv run uvicorn src.main:app --reload
+uv run start.py
 ```
 
 ## Testing
