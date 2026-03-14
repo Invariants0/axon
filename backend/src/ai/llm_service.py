@@ -81,6 +81,13 @@ class LLMService:
             logger.info("llm_call", provider="test-mode")
             return self._test_mode_response(messages)
 
+        if self.settings.axon_mode == "real":
+            logger.warning(
+                "llm_direct_call_in_real_mode",
+                message="Backend LLM should not be called in real mode. All reasoning must go through ADK agents.",
+            )
+            return "ERROR: Direct LLM calls disabled in real mode. Use ADK agents."
+
         if self.settings.gradient_api_key:
             try:
                 response = await self._retry_call(self.gradient.chat, messages, False)
