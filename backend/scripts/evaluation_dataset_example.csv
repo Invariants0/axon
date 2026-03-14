@@ -1,0 +1,5 @@
+query,expected_response
+"Create a plan for building a REST API","steps"
+"Research best practices for FastAPI","fastapi"
+"Evaluate the strategy for microservices","microservices"
+"Build a user authentication system","authentication"
