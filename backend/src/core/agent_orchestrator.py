@@ -9,9 +9,11 @@ from src.agents.planning_agent import PlanningAgent
 from src.agents.reasoning_agent import ReasoningAgent
 from src.agents.research_agent import ResearchAgent
 from src.ai.llm_service import LLMService
+from src.config.config import get_settings
 from src.core.event_bus import EventBus
 from src.db.models import AgentExecution, MemoryRecord, Task
 from src.memory.vector_store import VectorStore
+from src.providers.digitalocean.digitalocean_agent_router import DigitalOceanAgentRouter
 from src.skills.executor import SkillExecutor
 from src.utils.logger import get_logger
 
@@ -27,11 +29,17 @@ class AgentOrchestrator:
         event_bus: EventBus,
     ) -> None:
         self.event_bus = event_bus
+        settings = get_settings()
+        
+        digitalocean_router = None
+        if settings.axon_mode == "real":
+            digitalocean_router = DigitalOceanAgentRouter()
+        
         self.agents = {
-            "planning": PlanningAgent(llm_service, skill_executor, vector_store, event_bus),
-            "research": ResearchAgent(llm_service, skill_executor, vector_store, event_bus),
-            "reasoning": ReasoningAgent(llm_service, skill_executor, vector_store, event_bus),
-            "builder": BuilderAgent(llm_service, skill_executor, vector_store, event_bus),
+            "planning": PlanningAgent(llm_service, skill_executor, vector_store, event_bus, digitalocean_router),
+            "research": ResearchAgent(llm_service, skill_executor, vector_store, event_bus, digitalocean_router),
+            "reasoning": ReasoningAgent(llm_service, skill_executor, vector_store, event_bus, digitalocean_router),
+            "builder": BuilderAgent(llm_service, skill_executor, vector_store, event_bus, digitalocean_router),
         }
 
     async def _record_step(
