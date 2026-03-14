@@ -1,9 +1,25 @@
-import logging
+import sys
+
+from loguru import logger
+
+_configured = False
 
 
-def get_logger(name: str) -> logging.Logger:
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+def configure_logging() -> None:
+    global _configured
+    if _configured:
+        return
+    logger.remove()
+    logger.add(
+        sys.stdout,
+        serialize=True,
+        level="INFO",
+        backtrace=False,
+        diagnose=False,
     )
-    return logging.getLogger(name)
+    _configured = True
+
+
+def get_logger(name: str):
+    configure_logging()
+    return logger.bind(module=name)

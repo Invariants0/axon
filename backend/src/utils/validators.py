@@ -1,2 +1,9 @@
+from src.schemas.task import TaskCreate
+
+
 def validate_task_payload(payload: dict) -> bool:
-    return isinstance(payload, dict)
+    try:
+        TaskCreate.model_validate(payload)
+        return True
+    except Exception:  # noqa: BLE001
+        return False
