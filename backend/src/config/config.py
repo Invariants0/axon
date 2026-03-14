@@ -36,6 +36,15 @@ class Settings(BaseSettings):
     vector_db_path: str = Field(default="./.chroma", alias="VECTOR_DB_PATH")
     cors_origins: list[str] = Field(default_factory=lambda: ["*"], alias="CORS_ORIGINS")
     request_rate_limit_per_minute: int = Field(default=120, alias="RATE_LIMIT_PER_MIN")
+    axon_mode: str = Field(default="mock", alias="AXON_MODE")
+    digitalocean_api_token: str = Field(default="", alias="DIGITALOCEAN_API_TOKEN")
+    gradient_model_access_key: str = Field(default="", alias="GRADIENT_MODEL_ACCESS_KEY")
+    digitalocean_kb_uuid: str = Field(default="", alias="DIGITALOCEAN_KB_UUID")
+    axon_agent_timeout: int = Field(default=120, alias="AXON_AGENT_TIMEOUT")
+    axon_planner_agent_url: str = Field(default="", alias="AXON_PLANNER_AGENT_URL")
+    axon_research_agent_url: str = Field(default="", alias="AXON_RESEARCH_AGENT_URL")
+    axon_reasoning_agent_url: str = Field(default="", alias="AXON_REASONING_AGENT_URL")
+    axon_builder_agent_url: str = Field(default="", alias="AXON_BUILDER_AGENT_URL")
 
 
 @lru_cache(maxsize=1)
