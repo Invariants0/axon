@@ -1,10 +1,14 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
-from api.controllers.skill_controller import list_skills
+from src.api.controllers.skill_controller import list_skills
+from src.config.dependencies import get_skill_service, rate_limit_hook, require_api_key
+from src.schemas.skill import SkillListResponse, SkillResponse
+from src.services.skill_service import SkillService
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(require_api_key), Depends(rate_limit_hook)])
 
 
-@router.get("/")
-async def get_skills() -> dict:
-    return await list_skills()
+@router.get("/", response_model=SkillListResponse)
+async def get_skills(skill_service: SkillService = Depends(get_skill_service)) -> SkillListResponse:
+    skills = await list_skills(skill_service)
+    return SkillListResponse(items=[SkillResponse.model_validate(skill) for skill in skills])
