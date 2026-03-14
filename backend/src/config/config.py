@@ -1,4 +1,5 @@
 from functools import lru_cache
+from pathlib import Path
 
 from dotenv import load_dotenv
 from pydantic import Field
@@ -45,6 +46,14 @@ class Settings(BaseSettings):
     axon_research_agent_url: str = Field(default="", alias="AXON_RESEARCH_AGENT_URL")
     axon_reasoning_agent_url: str = Field(default="", alias="AXON_REASONING_AGENT_URL")
     axon_builder_agent_url: str = Field(default="", alias="AXON_BUILDER_AGENT_URL")
+
+    def model_post_init(self, __context) -> None:
+        """Resolve relative vector DB paths against backend root, not shell cwd."""
+        vector_path = Path(self.vector_db_path).expanduser()
+        if not vector_path.is_absolute():
+            backend_root = Path(__file__).resolve().parents[2]
+            vector_path = (backend_root / vector_path).resolve()
+        object.__setattr__(self, "vector_db_path", str(vector_path))
 
 
 @lru_cache(maxsize=1)
