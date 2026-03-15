@@ -1,0 +1,768 @@
+{
+  "metadata": {
+    "project": "AXON",
+    "generated": "2026-03-14",
+    "language": "Python",
+    "framework": "FastAPI",
+    "status": "comprehensive_architecture_index"
+  },
+  "core_components": {
+    "agent_orchestrator": {
+      "file": "backend/src/core/agent_orchestrator.py",
+      "class": "AgentOrchestrator",
+      "purpose": "Sequential execution of 4-stage agent pipeline",
+      "methods": [
+        {
+          "name": "__init__",
+          "params": ["llm_service", "skill_executor", "vector_store", "event_bus"],
+          "returns": "None"
+        },
+        {
+          "name": "run_pipeline",
+          "async": true,
+          "params": ["task", "session"],
+          "returns": "dict",
+          "purpose": "Execute planning → research → reasoning → builder agents sequentially"
+        },
+        {
+          "name": "_record_step",
+          "async": true,
+          "params": ["session", "task", "agent_name", "input_payload", "output_payload"],
+          "returns": "None",
+          "purpose": "Persist agent execution steps to database"
+        }
+      ],
+      "imports": [
+        "PlanningAgent",
+        "ResearchAgent",
+        "ReasoningAgent",
+        "BuilderAgent",
+        "LLMService",
+        "VectorStore",
+        "EventBus",
+        "SkillExecutor",
+        "DigitalOceanAgentRouter",
+        "AgentExecution",
+        "MemoryRecord",
+        "Task"
+      ],
+      "event_bus_integration": [
+        "task.progress (orchestrating)",
+        "agent.step (after each agent)",
+        "task.result (final completion)"
+      ],
+      "database_models": [
+        "Task (read)",
+        "AgentExecution (create)",
+        "MemoryRecord (create)"
+      ],
+      "execution_flow": [
+        "Planning stage: task → plan",
+        "Research stage: plan + task → research",
+        "Reasoning stage: plan + research + task → analysis",
+        "Builder stage: all previous → final build"
+      ],
+      "routing_modes": {
+        "mock": "Uses SkillExecutor + LLMService",
+        "real": "Routes to DigitalOcean ADK agents via DigitalOceanAgentRouter"
+      }
+    },
+    "task_manager": {
+      "file": "backend/src/core/task_manager.py",
+      "class": "TaskManager",
+      "purpose": "Manages task lifecycle, queue (FIFO), and background worker",
+      "methods": [
+        {
+          "name": "start",
+          "async": true,
+          "purpose": "Start background worker task"
+        },
+        {
+          "name": "stop",
+          "async": true,
+          "purpose": "Gracefully stop worker"
+        },
+        {
+          "name": "create_task",
+          "async": true,
+          "params": ["session", "title", "description"],
+          "returns": "Task",
+          "purpose": "Create and queue task"
+        },
+        {
+          "name": "list_tasks",
+          "async": true,
+          "returns": "list[Task]",
+          "purpose": "List all tasks ordered by created_at DESC"
+        },
+        {
+          "name": "get_task",
+          "async": true,
+          "params": ["session", "task_id"],
+          "returns": "Task | None"
+        },
+        {
+          "name": "run",
+          "async": true,
+          "purpose": "Main worker loop (infinite while not stopping)"
+        },
+        {
+          "name": "queue_size",
+          "returns": "int",
+          "purpose": "Current number of queued tasks"
+        },
+        {
+          "name": "status",
+          "returns": "str",
+          "purpose": "Returns 'running' or 'stopped'"
+        }
+      ],
+      "queue_structure": {
+        "type": "asyncio.Queue[str]",
+        "ordering": "FIFO",
+        "capacity": "Unlimited"
+      },
+      "error_handling": {
+        "try_catch": true,
+        "patterns": [
+          "Orchestrator exception caught",
+          "Session rollback on error",
+          "Task marked failed with error string",
+          "task.error event published"
+        ]
+      },
+      "event_bus_integration": [
+        "task.created",
+        "task.progress (running, completed)",
+        "task.error"
+      ],
+      "database_interactions": [
+        "INSERT Task",
+        "SELECT Task by ID",
+        "SELECT Task list",
+        "UPDATE Task status/result"
+      ]
+    },
+    "event_bus": {
+      "file": "backend/src/core/event_bus.py",
+      "class": "EventBus",
+      "purpose": "Publish-subscribe event distribution for real-time updates",
+      "methods": [
+        {
+          "name": "subscribe",
+          "async": true,
+          "params": ["callback"],
+          "purpose": "Register async callback for events"
+        },
+        {
+          "name": "unsubscribe",
+          "async": true,
+          "params": ["callback"],
+          "purpose": "Unregister callback"
+        },
+        {
+          "name": "publish",
+          "async": true,
+          "params": ["event"],
+          "purpose": "Publish event to all subscribers concurrently"
+        }
+      ],
+      "subscriber_type": "Callable[[dict], Awaitable[None]]",
+      "concurrency": {
+        "model": "asyncio.gather() with return_exceptions=True",
+        "thread_safety": "asyncio.Lock on subscriber list modifications"
+      },
+      "event_types": [
+        "task.created",
+        "task.progress",
+        "task.error",
+        "task.result",
+        "agent.step",
+        "evolution.generated",
+        "connected"
+      ]
+    },
+    "evolution_engine": {
+      "file": "backend/src/core/evolution_engine.py",
+      "class": "EvolutionEngine",
+      "purpose": "Auto-generate recovery skills when tasks fail",
+      "methods": [
+        {
+          "name": "evolve",
+          "async": true,
+          "params": ["session"],
+          "returns": "dict",
+          "purpose": "Generate skill if failed tasks exist, returns status"
+        },
+        {
+          "name": "get_status",
+          "async": true,
+          "params": ["session"],
+          "returns": "dict",
+          "purpose": "Return evolution status (count, last_run, etc)"
+        }
+      ],
+      "skill_generation_process": [
+        "Count failed tasks",
+        "If count > 0: Generate recovery skill",
+        "Use LLM to generate skill description",
+        "Write skill code to generated_skills/{name}.py",
+        "Invalidate python import cache",
+        "Discover skills via SkillRegistry",
+        "Persist Skill record to DB",
+        "Publish evolution.generated event"
+      ],
+      "generated_skill_template": {
+        "fields": ["name", "description", "parameters", "version"],
+        "execute_function": "async def execute(payload: dict) -> dict"
+      },
+      "state": {
+        "last_run": "datetime | None",
+        "generated_count": "int"
+      }
+    },
+    "vector_store": {
+      "file": "backend/src/memory/vector_store.py",
+      "class": "VectorStore",
+      "purpose": "Semantic memory persistence via Chroma vector database",
+      "methods": [
+        {
+          "name": "add_embedding",
+          "async": true,
+          "params": ["content", "memory_type", "task_id", "metadata"],
+          "returns": "str (memory_id)",
+          "purpose": "Embed content and store in Chroma"
+        },
+        {
+          "name": "similarity_search",
+          "async": true,
+          "params": ["query", "limit", "task_id"],
+          "returns": "list[dict]",
+          "purpose": "Find similar memories by vector similarity"
+        },
+        {
+          "name": "retrieve_context",
+          "async": true,
+          "params": ["task_prompt", "task_id", "limit"],
+          "returns": "str",
+          "purpose": "Get context for task (joined memory strings)"
+        }
+      ],
+      "storage": {
+        "backend": "Chroma (SQLite persistent)",
+        "fallback": "EphemeralClient (in-memory)",
+        "collection": "axon_memory",
+        "single_collection": true
+      },
+      "async_pattern": "asyncio.to_thread() for all sync Chroma operations",
+      "memory_types": [
+        "agent_output",
+        "agent_thought",
+        "research",
+        "reasoning",
+        "build_output"
+      ]
+    },
+    "digitalocean_agent_router": {
+      "file": "backend/src/providers/digitalocean/digitalocean_agent_router.py",
+      "class": "DigitalOceanAgentRouter",
+      "purpose": "Routes agent requests to external DigitalOcean ADK agents (real mode)",
+      "methods": [
+        {
+          "name": "route_to_agent",
+          "async": true,
+          "params": ["agent_name", "prompt", "context", "trace_id", "session_id", "stream"],
+          "returns": "AgentResponse"
+        },
+        {
+          "name": "route_to_agent_stream",
+          "async": true,
+          "yields": "str chunks"
+        },
+        {
+          "name": "health_check_all",
+          "async": true,
+          "returns": "dict[str, Any]"
+        }
+      ],
+      "agent_urls_config": {
+        "planning": "AXON_PLANNER_AGENT_URL",
+        "research": "AXON_RESEARCH_AGENT_URL",
+        "reasoning": "AXON_REASONING_AGENT_URL",
+        "builder": "AXON_BUILDER_AGENT_URL"
+      },
+      "usage_condition": "Only initialized when settings.axon_mode == 'real'",
+      "http_endpoint": "POST {agent_url}/run"
+    },
+    "digitalocean_agent_client": {
+      "file": "backend/src/providers/digitalocean/digitalocean_agent_client.py",
+      "class": "DigitalOceanAgentClient",
+      "purpose": "HTTP client for external agents with retry logic",
+      "methods": [
+        {
+          "name": "call_agent",
+          "async": true,
+          "params": ["agent_url", "request", "trace_id", "session_id", "stream"],
+          "returns": "AgentResponse",
+          "retry": "3 attempts, 1-10s exponential backoff"
+        },
+        {
+          "name": "call_agent_stream",
+          "async": true,
+          "yields": "str chunks"
+        },
+        {
+          "name": "health_check",
+          "async": true,
+          "params": ["agent_url"],
+          "returns": "dict"
+        }
+      ],
+      "http_headers": {
+        "Authorization": "Bearer {api_token}",
+        "Content-Type": "application/json",
+        "X-Trace-ID": "optional",
+        "X-AXON-SESSION": "optional"
+      },
+      "timeout": "AXON_AGENT_TIMEOUT (default 120s)",
+      "retry_strategy": {
+        "library": "tenacity",
+        "attempts": 3,
+        "backoff": "exponential (min=1s, max=10s)",
+        "triggers": ["httpx.HTTPError", "httpx.TimeoutException"]
+      }
+    },
+    "llm_service": {
+      "file": "backend/src/ai/llm_service.py",
+      "class": "LLMService",
+      "purpose": "Unified LLM interface with fallback chain and retry",
+      "methods": [
+        {
+          "name": "complete",
+          "async": true,
+          "params": ["prompt"],
+          "returns": "str",
+          "purpose": "Single-turn completion"
+        },
+        {
+          "name": "chat",
+          "async": true,
+          "params": ["messages"],
+          "returns": "str",
+          "purpose": "Multi-turn conversation"
+        },
+        {
+          "name": "stream",
+          "async": true,
+          "yields": "str",
+          "purpose": "Token streaming"
+        }
+      ],
+      "fallback_chain": [
+        {
+          "layer": 1,
+          "provider": "test_mode",
+          "condition": "settings.test_mode == True",
+          "response": "Deterministic mock"
+        },
+        {
+          "layer": 2,
+          "provider": "real_mode_warning",
+          "condition": "settings.axon_mode == 'real'",
+          "behavior": "Disables direct calls, logs warning"
+        },
+        {
+          "layer": 3,
+          "provider": "Gradient API",
+          "condition": "settings.gradient_api_key set",
+          "retry": "3 attempts, 1-8s exponential backoff"
+        },
+        {
+          "layer": 4,
+          "provider": "HuggingFace",
+          "condition": "settings.huggingface_api_key set",
+          "retry": "3 attempts, 1-8s exponential backoff"
+        },
+        {
+          "layer": 5,
+          "provider": "Local Pipeline",
+          "library": "transformers",
+          "model": "distilgpt2",
+          "lazy_load": true
+        },
+        {
+          "layer": 6,
+          "provider": "String Fallback",
+          "behavior": "Echo last message content[:500]"
+        }
+      ],
+      "test_mode_responses": {
+        "refine_plan": {"steps": ["analyze task", "research context", "generate solution"]},
+        "summarize_research": {"notes": "mock research context"},
+        "evaluate_strategy": {"evaluation": "mock evaluation of strategy"},
+        "produce_solution": {"solution": "mock generated solution"}
+      }
+    }
+  },
+  "agent_implementations": {
+    "planning_agent": {
+      "file": "backend/src/agents/planning_agent.py",
+      "class": "PlanningAgent",
+      "extends": "BaseAgent",
+      "execution_modes": {
+        "mock": [
+          "VectorStore.retrieve_context()",
+          "SkillExecutor.execute('planning')",
+          "LLMService.complete() refinement"
+        ],
+        "real": [
+          "VectorStore.retrieve_context()",
+          "DigitalOceanAgentRouter.route_to_agent('planning')"
+        ]
+      }
+    },
+    "research_agent": {
+      "file": "backend/src/agents/research_agent.py",
+      "class": "ResearchAgent",
+      "extends": "BaseAgent",
+      "execution_modes": {
+        "mock": [
+          "SkillExecutor.execute('web_search')",
+          "LLMService.complete() synthesis"
+        ],
+        "real": [
+          "DigitalOceanAgentRouter.route_to_agent('research')"
+        ]
+      }
+    },
+    "reasoning_agent": {
+      "file": "backend/src/agents/reasoning_agent.py",
+      "class": "ReasoningAgent",
+      "extends": "BaseAgent",
+      "execution_modes": {
+        "mock": [
+          "SkillExecutor.execute('reasoning')",
+          "LLMService.complete() rationale"
+        ],
+        "real": [
+          "DigitalOceanAgentRouter.route_to_agent('reasoning')"
+        ]
+      }
+    },
+    "builder_agent": {
+      "file": "backend/src/agents/builder_agent.py",
+      "class": "BuilderAgent",
+      "extends": "BaseAgent",
+      "execution_modes": {
+        "mock": [
+          "SkillExecutor.execute('coding')",
+          "LLMService.complete() solution"
+        ],
+        "real": [
+          "DigitalOceanAgentRouter.route_to_agent('builder')"
+        ]
+      }
+    }
+  },
+  "dependencies": {
+    "circular_dependencies": "NO CIRCULAR DEPENDENCIES DETECTED",
+    "dependency_injection": "All major components instancedvia dependencies.py",
+    "singleton_pattern": "Settings uses LRU cache",
+    "forward_references": "TYPE_CHECKING used for type hints"
+  },
+  "async_patterns": {
+    "patterns": [
+      {
+        "name": "asyncio.Queue",
+        "usage": "TaskManager work queue (FIFO)",
+        "component": "TaskManager"
+      },
+      {
+        "name": "asyncio.gather()",
+        "usage": "Parallel subscriber delivery",
+        "component": "EventBus"
+      },
+      {
+        "name": "asyncio.to_thread()",
+        "usage": "Sync → async bridge for Chroma and embeddings",
+        "component": "VectorStore"
+      },
+      {
+        "name": "asyncio.create_task()",
+        "usage": "Background worker task",
+        "component": "TaskManager"
+      },
+      {
+        "name": "asyncio.CancelledError",
+        "usage": "Graceful shutdown",
+        "component": "TaskManager.stop()"
+      },
+      {
+        "name": "async context manager",
+        "usage": "FastAPI lifespan control",
+        "component": "main.py"
+      },
+      {
+        "name": "async generators",
+        "usage": "Event streaming, token yielding",
+        "components": ["WebSocket event_stream", "LLMService.stream()"]
+      }
+    ]
+  },
+  "retry_mechanisms": [
+    {
+      "component": "LLMService",
+      "library": "tenacity",
+      "attempts": 3,
+      "backoff": "exponential (1-8s)",
+      "triggers": ["Any Exception"]
+    },
+    {
+      "component": "DigitalOceanAgentClient",
+      "library": "tenacity",
+      "attempts": 3,
+      "backoff": "exponential (1-10s)",
+      "triggers": ["httpx.HTTPError", "httpx.TimeoutException"]
+    },
+    {
+      "component": "TaskManager",
+      "approach": "No retry",
+      "error_handling": "Persist error, mark failed"
+    }
+  ],
+  "logging": {
+    "library": "loguru",
+    "json_mode": "Enabled for production (ENV=prod or LOG_JSON=true)",
+    "level": "Configurable via LOG_LEVEL",
+    "fields": {
+      "module": "Automatically bound from logger name",
+      "timestamp": "Auto",
+      "level": "Auto"
+    },
+    "events": [
+      "http_request (method, path, status, duration_ms)",
+      "task.* (created, started, completed, failed)",
+      "agent.* (agent_name.started, agent_name.completed)",
+      "llm_call (provider, token_counts)",
+      "digitalocean_agent_call (agent_url, latency)",
+      "skill_generated (name)",
+      "orchestrator_* (start, complete)"
+    ]
+  },
+  "error_handling_levels": {
+    "level_1_api": "HTTP 404, 401, ValidationError",
+    "level_2_services": "Pass to controller",
+    "level_3_task_manager": "Try/catch, rollback, persist error, publish event",
+    "level_4_agents": "Exceptions propagate to task_manager",
+    "level_5_llm": "Tenacity retry, fallback chain, never raises",
+    "level_6_external_http": "Retry 3x, raise on final failure"
+  },
+  "database": {
+    "engine": "SQLAlchemy async with asyncpg",
+    "backend": "PostgreSQL (or mock in test mode)",
+    "pool_config": {
+      "size": 10,
+      "max_overflow": 20,
+      "timeout": 30,
+      "pre_ping": true
+    },
+    "models": [
+      {
+        "name": "Task",
+        "fields": ["id (UUID)", "title", "description", "status", "result", "created_at", "updated_at"],
+        "relationships": ["executions (AgentExecution)", "artifacts (Artifact)", "memories (MemoryRecord)"]
+      },
+      {
+        "name": "Skill",
+        "fields": ["id (UUID)", "name (unique)", "description", "source_code", "version", "created_at", "updated_at"]
+      },
+      {
+        "name": "AgentExecution",
+        "fields": ["id (UUID)", "task_id (FK)", "agent_name", "status", "input_payload (JSON)", "output_payload (JSON)", "created_at", "updated_at"],
+        "indexes": ["task_id", "agent_name"]
+      },
+      {
+        "name": "Artifact",
+        "fields": ["id (UUID)", "task_id (FK)", "name", "content_type", "storage_path", "metadata_json (JSON)", "created_at", "updated_at"]
+      },
+      {
+        "name": "MemoryRecord",
+        "fields": ["id (UUID)", "task_id (FK, nullable)", "memory_type", "content", "embedding_ref", "metadata_json (JSON)", "created_at", "updated_at"],
+        "indexes": ["task_id"]
+      }
+    ]
+  },
+  "configuration": {
+    "source": "Pydantic Settings with .env loading",
+    "key_settings": [
+      {
+        "name": "APP_NAME",
+        "default": "AXON"
+      },
+      {
+        "name": "ENV",
+        "default": "development",
+        "options": ["development", "production"]
+      },
+      {
+        "name": "TEST_MODE",
+        "default": true,
+        "purpose": "Deterministic responses for testing"
+      },
+      {
+        "name": "AXON_MODE",
+        "default": "mock",
+        "options": ["mock", "real"],
+        "purpose": "Local skills vs external DigitalOcean agents"
+      },
+      {
+        "name": "DATABASE_URL",
+        "default": "postgresql+asyncpg://postgres:postgres@localhost:5432/axon"
+      },
+      {
+        "name": "VECTOR_DB_PATH",
+        "default": "./.chroma",
+        "note": "Resolved relative to backend root"
+      },
+      {
+        "name": "GRADIENT_API_KEY",
+        "env_var": "GRADIENT_API_KEY"
+      },
+      {
+        "name": "HUGGINGFACE_API_KEY",
+        "env_var": "HUGGINGFACE_API_KEY"
+      },
+      {
+        "name": "DIGITALOCEAN_API_TOKEN",
+        "env_var": "DIGITALOCEAN_API_TOKEN"
+      },
+      {
+        "name": "AXON_AGENT_TIMEOUT",
+        "default": 120,
+        "unit": "seconds"
+      },
+      {
+        "name": "REQUEST_RATE_LIMIT_PER_MINUTE",
+        "default": 120
+      }
+    ]
+  },
+  "api_routes": {
+    "tasks": [
+      {
+        "method": "GET",
+        "path": "/tasks",
+        "handler": "list_tasks",
+        "auth": "required",
+        "rate_limit": "yes"
+      },
+      {
+        "method": "GET",
+        "path": "/tasks/{task_id}",
+        "handler": "get_task",
+        "errors": ["404 Not Found"]
+      },
+      {
+        "method": "POST",
+        "path": "/tasks",
+        "handler": "create_task",
+        "request": "TaskCreate (title, description)",
+        "response": "TaskResponse"
+      }
+    ],
+    "evolution": [
+      {
+        "method": "GET",
+        "path": "/evolution",
+        "handler": "get_evolution_status",
+        "response": "EvolutionStatus"
+      },
+      {
+        "method": "POST",
+        "path": "/evolution/run",
+        "handler": "trigger_evolution",
+        "purpose": "Manually trigger evolution engine"
+      }
+    ],
+    "skills": [
+      {
+        "method": "GET",
+        "path": "/skills",
+        "handler": "list_skills",
+        "response": "SkillListResponse"
+      }
+    ],
+    "system": [
+      {
+        "method": "GET",
+        "path": "/system",
+        "handler": "get_system_status",
+        "response": "SystemStatusResponse",
+        "checks": ["database", "vector_store", "skills", "agents", "event_bus", "task_queue"]
+      }
+    ],
+    "health": [
+      {
+        "method": "GET",
+        "path": "/health",
+        "response": "{\"status\": \"ok\"}"
+      }
+    ],
+    "websocket": [
+      {
+        "method": "WS",
+        "path": "/ws/events",
+        "purpose": "Real-time event stream",
+        "events": [
+          "task.created",
+          "task.progress",
+          "task.error",
+          "task.result",
+          "agent.step"
+        ]
+      }
+    ]
+  },
+  "identified_risks": [
+    {
+      "risk": "Circular Imports",
+      "status": "CLEAR",
+      "mitigation": "Clean dependency injection, TYPE_CHECKING usage"
+    },
+    {
+      "risk": "AsyncIO Thread Safety",
+      "status": "HANDLED",
+      "mitigation": "asyncio.Lock in EventBus, single TaskManager worker"
+    },
+    {
+      "risk": "Database Pool Exhaustion",
+      "status": "CONFIGURED",
+      "mitigation": "pool_size=10, max_overflow=20, pre_ping=True"
+    },
+    {
+      "risk": "No Auto-Evolution on Task Failure",
+      "status": "INCOMPLETE",
+      "note": "Evolution only on manual /evolution/run trigger"
+    },
+    {
+      "risk": "LLM Provider Unavailability",
+      "status": "MITIGATED",
+      "mitigation": "6-layer fallback chain, always returns string"
+    },
+    {
+      "risk": "Vector Store Persistence",
+      "status": "HANDLED",
+      "mitigation": "Fallback to EphemeralClient if PersistentClient fails"
+    },
+    {
+      "risk": "External Agent Timeout",
+      "status": "HANDLED",
+      "mitigation": "3x retry, exponential backoff, configurable timeout"
+    },
+    {
+      "risk": "Rate Limiting",
+      "status": "IMPLEMENTED",
+      "mitigation": "Per-IP per-minute limit in rate_limit_hook()"
+    }
+  ]
+}
