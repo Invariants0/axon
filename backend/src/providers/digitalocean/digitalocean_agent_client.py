@@ -5,6 +5,7 @@ import httpx
 from tenacity import AsyncRetrying, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from src.config.config import get_settings
+from src.providers.digitalocean.circuit_breaker import CircuitBreaker, CircuitBreakerOpen
 from src.providers.digitalocean.digitalocean_agent_types import AgentRequest, AgentResponse
 from src.utils.logger import get_logger
 
@@ -16,6 +17,15 @@ class DigitalOceanAgentClient:
         self.settings = get_settings()
         self.api_token = self.settings.digitalocean_api_token
         self.timeout = float(self.settings.axon_agent_timeout)
+        
+        # PHASE-2: Circuit breaker for resilience
+        # Protects against cascading failures when ADK agents are unavailable
+        self._breaker = CircuitBreaker(
+            name="digitalocean_agents",
+            failure_threshold=5,
+            recovery_timeout=60.0,
+            half_open_max_calls=3,
+        )
 
     def _get_headers(self, trace_id: str | None = None, session_id: str | None = None) -> dict[str, str]:
         headers = {
@@ -46,6 +56,39 @@ class DigitalOceanAgentClient:
         session_id: str | None = None,
         stream: bool = False,
     ) -> AgentResponse:
+        """
+        Call external ADK agent with circuit breaker protection.
+        
+        PHASE-2: Wrapped in circuit breaker to prevent cascading failures.
+        """
+        try:
+            # Execute through circuit breaker
+            return await self._breaker.call(
+                self._call_agent_impl,
+                agent_url=agent_url,
+                request=request,
+                trace_id=trace_id,
+                session_id=session_id,
+                stream=stream,
+            )
+        except CircuitBreakerOpen as exc:
+            logger.warning(
+                "agent_call_rejected_circuit_open",
+                agent_url=agent_url,
+                trace_id=trace_id,
+                error=str(exc),
+            )
+            raise
+
+    async def _call_agent_impl(
+        self,
+        agent_url: str,
+        request: AgentRequest,
+        trace_id: str | None = None,
+        session_id: str | None = None,
+        stream: bool = False,
+    ) -> AgentResponse:
+        """Implementation of agent call (wrapped by circuit breaker)."""
         started_at = perf_counter()
         payload = {
             "prompt": request.prompt,
@@ -125,3 +168,16 @@ class DigitalOceanAgentClient:
         except Exception as exc:
             logger.warning("agent_health_check_failed", agent_url=agent_url, error=str(exc))
             return {"status": "unhealthy", "url": agent_url, "error": str(exc)}
+
+    async def breaker_status(self) -> dict:
+        """
+        Get circuit breaker status (PHASE-2/3).
+        
+        Phase-3: Now async to support distributed backends.
+        """
+        return await self._breaker.status()
+
+    async def reset_breaker(self) -> None:
+        """Manually reset circuit breaker (PHASE-2)."""
+        await self._breaker.reset()
+        logger.info("circuit_breaker_reset_manually")
