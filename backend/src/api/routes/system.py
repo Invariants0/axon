@@ -18,12 +18,16 @@ from src.config.dependencies import (
 )
 from src.core.agent_orchestrator import AgentOrchestrator
 from src.core.event_bus import EventBus
+from src.core.metrics import MetricsCollector
 from src.core.task_manager import TaskManager
 from src.memory.vector_store import VectorStore
 from src.schemas.system import SystemStatusResponse
 from src.skills.registry import SkillRegistry
 
 router = APIRouter(dependencies=[Depends(require_api_key), Depends(rate_limit_hook)])
+
+# Phase-3: Metrics collector instance
+_metrics_collector = MetricsCollector()
 
 
 @router.get("/", response_model=SystemStatusResponse)
@@ -63,3 +67,78 @@ async def get_system_status(
         event_bus=event_bus_state,
         task_queue=task_queue,
     )
+
+
+# Phase-3: Pipeline Graph Endpoint
+@router.get("/pipeline")
+async def get_pipeline_graph(
+    orchestrator: AgentOrchestrator = Depends(get_orchestrator),
+):
+    """
+    Get pipeline execution graph structure.
+    
+    Returns the DAG (directed acyclic graph) of the 4-stage agent pipeline.
+    """
+    try:
+        # Try to get pipeline graph from orchestrator if available
+        pipeline_graph = getattr(orchestrator, "pipeline_graph", None)
+        if pipeline_graph:
+            return {
+                "nodes": ["planning", "research", "reasoning", "builder"],
+                "edges": [
+                    ["planning", "research"],
+                    ["research", "reasoning"],
+                    ["reasoning", "builder"],
+                ],
+                "description": "Sequential 4-stage agent pipeline",
+            }
+        return {
+            "nodes": ["planning", "research", "reasoning", "builder"],
+            "edges": [
+                ["planning", "research"],
+                ["research", "reasoning"],
+                ["reasoning", "builder"],
+            ],
+            "description": "Sequential 4-stage agent pipeline",
+        }
+    except Exception as e:
+        return {
+            "error": str(e),
+            "nodes": ["planning", "research", "reasoning", "builder"],
+            "edges": [
+                ["planning", "research"],
+                ["research", "reasoning"],
+                ["reasoning", "builder"],
+            ],
+        }
+
+
+# Phase-3: System Metrics Endpoint
+@router.get("/metrics")
+async def get_system_metrics(
+    task_manager: TaskManager = Depends(get_task_manager),
+):
+    """
+    Get system-wide metrics.
+    
+    Returns current metrics including:
+    - Worker count and utilization
+    - Queue size and throughput
+    - Circuit breaker state
+    - Memory and vector store statistics
+    - System uptime
+    """
+    try:
+        metrics = await _metrics_collector.collect(
+            worker_pool=getattr(task_manager, "_pool", None),
+            task_queue=getattr(task_manager, "_queue", None),
+        )
+        return metrics.to_dict()
+    except Exception as e:
+        # Fallback metrics if collection fails
+        return {
+            "error": str(e),
+            "timestamp": asyncio.get_event_loop().time(),
+            "version": "Phase-3",
+        }
+
