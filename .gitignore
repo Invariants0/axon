@@ -5,11 +5,7 @@ Thumbs.db
 # Logs
 *.log
 
-# Node / Next / Bun
-frontend/node_modules/
-frontend/.next/
-frontend/out/
-frontend/.turbo/
+# Node / Next / Bun (no longer used; kept for historical reference)
 
 # Python / UV
 backend/.venv/
