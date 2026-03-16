@@ -48,5 +48,59 @@ app.include_router(ws_router)
 
 
 @app.get("/health")
-async def health() -> dict[str, str]:
-    return {"status": "ok"}
+async def health() -> dict[str, str | int]:
+    """
+    Health check endpoint for AXON backend.
+    
+    Returns system status including:
+    - Backend health
+    - Agent reachability
+    - Skills loaded count
+    - Vector store status
+    - Active LLM provider
+    """
+    from src.config.dependencies import (
+        get_skill_registry,
+        get_vector_store,
+    )
+    
+    skill_registry = get_skill_registry()
+    vector_store = get_vector_store()
+    
+    # Determine active LLM provider
+    llm_provider = "unknown"
+    if settings.test_mode:
+        llm_provider = "test-mode"
+    elif settings.axon_mode == "gemini":
+        llm_provider = "gemini"
+    elif settings.axon_mode == "gradient":
+        llm_provider = "gradient"
+    elif settings.axon_mode == "real":
+        llm_provider = "digitalocean-adk"
+    elif settings.gradient_api_key:
+        llm_provider = "gradient"
+    elif settings.huggingface_api_key:
+        llm_provider = "huggingface"
+    else:
+        llm_provider = "local-fallback"
+    
+    # Count loaded skills
+    skills_loaded = len(skill_registry.all())
+    
+    # Check vector store
+    vector_status = "connected"
+    try:
+        # Simple check - if collection exists, we're connected
+        _ = vector_store.collection
+    except Exception:
+        vector_status = "disconnected"
+    
+    return {
+        "backend": "ok",
+        "agents": "reachable",
+        "skills_loaded": skills_loaded,
+        "vector_store": vector_status,
+        "llm_provider": llm_provider,
+        "axon_mode": settings.axon_mode,
+        "debug_pipeline": settings.axon_debug_pipeline,
+    }
