@@ -6,6 +6,7 @@ from typing import Any
 
 from tenacity import AsyncRetrying, retry_if_exception_type, stop_after_attempt, wait_exponential
 
+from src.ai.gemini_client import GeminiClient
 from src.ai.gradient_client import GradientClient
 from src.ai.huggingface_client import HuggingFaceClient
 from src.config.config import get_settings
@@ -19,6 +20,7 @@ class LLMService:
         self.settings = get_settings()
         self.gradient = GradientClient()
         self.huggingface = HuggingFaceClient()
+        self.gemini = GeminiClient()
         self._local_pipeline = None
 
     def _test_mode_response(self, messages: list[dict[str, str]]) -> str:
@@ -88,6 +90,35 @@ class LLMService:
             )
             return "ERROR: Direct LLM calls disabled in real mode. Use ADK agents."
 
+        # HACKATHON: Route to Gemini when AXON_MODE=gemini
+        if self.settings.axon_mode == "gemini":
+            if self.settings.gemini_api_key:
+                try:
+                    response = await self._retry_call(self.gemini.chat, messages, False)
+                    self._log_usage(response, "gemini")
+                    return self._extract_text(response)
+                except Exception as exc:  # noqa: BLE001
+                    logger.error("gemini_call_failed", error=str(exc))
+                    raise
+
+            logger.error("gemini_mode_no_key", message="AXON_MODE=gemini but GEMINI_API_KEY not set")
+            raise ValueError("GEMINI_API_KEY required when AXON_MODE=gemini")
+
+        # PRODUCTION: Route to DigitalOcean Gradient when AXON_MODE=gradient
+        if self.settings.axon_mode == "gradient":
+            if self.settings.gradient_api_key:
+                try:
+                    response = await self._retry_call(self.gradient.chat, messages, False)
+                    self._log_usage(response, "gradient")
+                    return self._extract_text(response)
+                except Exception as exc:  # noqa: BLE001
+                    logger.error("gradient_call_failed", error=str(exc))
+                    raise
+
+            logger.error("gradient_mode_no_key", message="AXON_MODE=gradient but GRADIENT_API_KEY not set")
+            raise ValueError("GRADIENT_API_KEY required when AXON_MODE=gradient")
+
+        # FALLBACK: Legacy behavior for mock mode
         if self.settings.gradient_api_key:
             try:
                 response = await self._retry_call(self.gradient.chat, messages, False)
