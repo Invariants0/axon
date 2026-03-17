@@ -39,7 +39,7 @@ class AuthService:
         """
         # Create header
         header = {"alg": self.algorithm, "typ": "JWT"}
-        header_encoded = self._base64url_encode(json.dumps(header))
+        header_encoded = self._base64url_encode(json.dumps(header, separators=(',', ':'), sort_keys=True))
         
         # Create payload
         now = datetime.now(timezone.utc)
@@ -49,7 +49,7 @@ class AuthService:
             "iat": int(now.timestamp()),
             "exp": int(expires.timestamp()),
         }
-        payload_encoded = self._base64url_encode(json.dumps(payload))
+        payload_encoded = self._base64url_encode(json.dumps(payload, separators=(',', ':'), sort_keys=True))
         
         # Create signature
         message = f"{header_encoded}.{payload_encoded}".encode()
