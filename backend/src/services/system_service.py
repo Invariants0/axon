@@ -111,10 +111,21 @@ class SystemService:
             worker_pool = getattr(self.task_manager, "_pool", None)
             task_queue = getattr(self.task_manager, "_queue", None)
 
+            workers = 0
+            if worker_pool:
+                try:
+                    status = worker_pool.status()
+                    if isinstance(status, dict):
+                        workers = status.get("worker_count", 0)
+                    else:
+                        workers = getattr(status, "worker_count", 0)
+                except Exception:
+                    workers = 0
+
             return {
                 "timestamp": asyncio.get_event_loop().time(),
                 "version": "Phase-3",
-                "workers": worker_pool.size if worker_pool else 0,
+                "workers": workers,
                 "queued_tasks": task_queue.qsize() if task_queue else 0,
             }
         except Exception as e:
