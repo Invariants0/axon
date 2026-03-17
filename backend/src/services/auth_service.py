@@ -9,6 +9,7 @@ import json
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
+from passlib.context import CryptContext
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.config.config import Settings
@@ -23,14 +24,15 @@ class AuthService:
         self.secret_key = settings.secret_key or "default-secret-key-change-in-production"
         self.algorithm = "HS256"
         self.token_expiry_hours = 24
+        self._pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     
     def hash_password(self, password: str) -> str:
-        """Hash a password using SHA-256"""
-        return hashlib.sha256(password.encode()).hexdigest()
+        """Hash a password using bcrypt (includes per-user salt)"""
+        return self._pwd_context.hash(password)
     
     def verify_password(self, password: str, password_hash: str) -> bool:
-        """Verify a password against its hash"""
-        return hashlib.sha256(password.encode()).hexdigest() == password_hash
+        """Verify a password against its bcrypt hash (constant-time comparison)"""
+        return self._pwd_context.verify(password, password_hash)
     
     def generate_token(self, user_id: str) -> str:
         """
