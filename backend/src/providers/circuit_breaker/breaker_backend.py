@@ -99,3 +99,44 @@ def get_breaker_backend(backend_type: str) -> BreakerBackend:
         from src.providers.circuit_breaker.memory_backend import MemoryBreaker
 
         return MemoryBreaker()
+
+
+try:
+    from src.providers.circuit_breaker.memory_backend import (
+        MemoryBreaker as InMemoryBreakerBackend,
+    )
+except Exception:
+    class InMemoryBreakerBackend(BreakerBackend):
+        """Compatibility alias for MemoryBreaker.
+
+        Lazily delegates construction in case import order is still resolving.
+        """
+
+        def __new__(cls, *args, **kwargs):
+            from src.providers.circuit_breaker.memory_backend import MemoryBreaker
+
+            return MemoryBreaker(*args, **kwargs)
+
+        async def get_state(self, name: str) -> BreakerState:
+            raise NotImplementedError()
+
+        async def set_state(self, name: str, state: BreakerState) -> None:
+            raise NotImplementedError()
+
+        async def increment_failure(self, name: str) -> int:
+            raise NotImplementedError()
+
+        async def increment_success(self, name: str) -> int:
+            raise NotImplementedError()
+
+        async def reset(self, name: str) -> None:
+            raise NotImplementedError()
+
+        async def get_snapshot(self, name: str) -> BreakerSnapshot:
+            raise NotImplementedError()
+
+        async def health_check(self) -> bool:
+            raise NotImplementedError()
+
+        async def close(self) -> None:
+            raise NotImplementedError()
