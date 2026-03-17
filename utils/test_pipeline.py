@@ -25,6 +25,7 @@ from pathlib import Path
 backend_root = Path(__file__).resolve().parents[1] / "backend"
 sys.path.insert(0, str(backend_root))
 
+from sqlalchemy.exc import OperationalError
 from src.ai.llm_service import LLMService
 from src.config.config import get_settings
 from src.core.agent_orchestrator import AgentOrchestrator
@@ -243,7 +244,7 @@ async def test_evolution_system():
             
             print("\n✅ EVOLUTION SYSTEM VALIDATED")
             return True
-    except Exception as e:
+    except OperationalError:
         print(f"\n⚠️  Database connection unavailable - skipping evolution status check")
         print(f"  (This is expected if PostgreSQL is not running)")
         print(f"\n✓ Evolution system components initialized successfully")
@@ -253,6 +254,10 @@ async def test_evolution_system():
         print(f"  - Evolution Engine: OK")
         print(f"\n✅ EVOLUTION SYSTEM COMPONENTS VALIDATED")
         return True
+    except Exception as e:
+        print(f"\n❌ Unexpected error while validating evolution system")
+        print(f"  Error: {e}")
+        return False
 
 
 async def main():
