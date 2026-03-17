@@ -1,0 +1,17 @@
+fastapi
+passlib[bcrypt]
+uvicorn
+sqlalchemy>=2
+asyncpg
+alembic
+python-dotenv
+pydantic-settings
+pydantic[email]
+httpx
+tenacity
+orjson
+loguru
+chromadb
+sentence-transformers
+qdrant-client>=1.7.0
+aioredis

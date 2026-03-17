@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 
 from src.api.controllers.task_controller import create_task, get_task, list_tasks
 from src.config.dependencies import get_task_service, rate_limit_hook, require_api_key
@@ -15,8 +15,11 @@ router = APIRouter(dependencies=[Depends(require_api_key), Depends(rate_limit_ho
 
 
 @router.get("/", response_model=TaskListResponse)
-async def get_tasks(task_service: TaskService = Depends(get_task_service)) -> TaskListResponse:
-    tasks = await list_tasks(task_service)
+async def get_tasks(
+    chat_id: str | None = Query(default=None),
+    task_service: TaskService = Depends(get_task_service),
+) -> TaskListResponse:
+    tasks = await list_tasks(task_service, chat_id=chat_id)
     return TaskListResponse(items=[TaskResponse.model_validate(task) for task in tasks])
 
 

@@ -9,8 +9,10 @@ async def create_task(payload: TaskCreate, task_service: TaskService):
     return task
 
 
-async def list_tasks(task_service: TaskService):
-    return await task_service.list_tasks()
+async def list_tasks(task_service: TaskService, chat_id: str | None = None):
+    if chat_id is None:
+        return await task_service.list_tasks()
+    return await task_service.list_tasks(chat_id=chat_id)
 
 
 async def get_task(task_id: str, task_service: TaskService):

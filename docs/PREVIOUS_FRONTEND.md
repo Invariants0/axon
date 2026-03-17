@@ -531,7 +531,7 @@ Tracks the current agent version string. Intended to be updated from a backend v
 
 ### 9.1 `frontend.Dockerfile`
 
-**File:** `infra/docker/frontend.Dockerfile`
+**File:** `docker/frontend.Dockerfile`
 
 ```dockerfile
 # Stage 1: Build stage
@@ -572,7 +572,7 @@ This was the standalone frontend Dockerfile for running the Next.js production s
 
 ### 9.2 `nginx.Dockerfile` (two-stage variant)
 
-**File:** `infra/docker/nginx.Dockerfile` (before migration)
+**File:** `docker/nginx.Dockerfile` (before migration)
 
 ```dockerfile
 # Stage 1: Build the Next.js static files
@@ -597,7 +597,7 @@ RUN bun run build
 FROM nginx:alpine
 
 COPY --from=builder /app/out /usr/share/nginx/html
-COPY infra/nginx/nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 ```

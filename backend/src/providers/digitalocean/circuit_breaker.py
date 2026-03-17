@@ -24,7 +24,7 @@ Features:
 
 from __future__ import annotations
 
-from time import perf_counter
+from datetime import datetime
 from typing import Any, Optional
 
 from src.config.config import get_settings
@@ -213,7 +213,7 @@ class CircuitBreaker:
         """
         if snapshot.last_failure_time is None:
             return True
-        elapsed = perf_counter() - snapshot.last_failure_time
+        elapsed = (datetime.utcnow() - snapshot.last_failure_time).total_seconds()
         return elapsed >= self.recovery_timeout
 
     async def reset(self) -> None:

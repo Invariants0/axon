@@ -1,0 +1,99 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: deploy-main
+  cancel-in-progress: true
+
+jobs:
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install backend dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+          pip install pytest pytest-asyncio
+
+      - name: Run unit tests
+        run: |
+          pytest -q backend/tests
+
+  ct:
+    name: CT Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install backend dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: Validate Python syntax
+        run: |
+          python -m compileall backend/src agents utils
+
+      - name: Run CT smoke scripts
+        env:
+          TEST_MODE: "true"
+          AXON_MODE: "mock"
+        run: |
+          python utils/validate_setup.py
+          python utils/test_health_endpoint.py
+          python utils/test_llm_routing.py
+          python utils/analysis/analyze_dependencies.py
+
+      - name: Validate Docker Compose config
+        run: docker compose config
+
+  deploy:
+    name: Deploy to Server
+    runs-on: ubuntu-latest
+    needs:
+      - unit-tests
+      - ct
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment: production
+
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: ${{ secrets.DEPLOY_PORT || '22' }}
+          script_stop: true
+          script: |
+            set -e
+            cd "${{ secrets.DEPLOY_PATH }}"
+            git fetch --all
+            git checkout main
+            git reset --hard origin/main
+            docker compose up -d --build --remove-orphans
+            docker image prune -f

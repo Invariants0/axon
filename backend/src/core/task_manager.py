@@ -7,6 +7,7 @@ from time import perf_counter
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import IntegrityError
 
 from src.core.agent_orchestrator import AgentOrchestrator
 from src.core.event_bus import EventBus
@@ -45,14 +46,21 @@ class TaskManager:
         self._stopping = True
         await self._pool.stop()
 
-    async def create_task(self, session: AsyncSession, title: str, description: str) -> Task:
+    async def create_task(
+        self,
+        session: AsyncSession,
+        title: str,
+        description: str,
+        chat_id: str | None = None,
+    ) -> Task:
         started_at = perf_counter()
-        
+
         # Generate trace_id for this task
         trace_id = TraceContext.generate_trace_id()
         TraceContext.set_trace_id(trace_id)
-        
+
         task = Task(
+            chat_id=chat_id,
             title=title,
             description=description,
             status="queued",
@@ -60,27 +68,32 @@ class TaskManager:
             trace_id=trace_id,
         )
         session.add(task)
-        await session.flush()
-        
-        # Set task context for all downstream operations
-        TraceContext.set_task_id(task.id)
-        
+        try:
+            await session.flush()
+        except IntegrityError as exc:
+            # Likely caused by an invalid foreign key value (e.g., unknown chat_id)
+            logger.warning(
+                "task.create_failed_invalid_chat",
+                chat_id=chat_id,
+                error=str(exc),
+            )
+            # Let the caller translate this into an appropriate HTTP error (e.g., 400/404)
+            raise ValueError(f"Invalid chat_id: {chat_id}") from exc
         await self._queue.put(task.id)
-        
+
         # Emit event using new event structure
         event = TraceContext.create_event(
             "task.created",
             data={
                 "task_id": task.id,
+                "chat_id": task.chat_id,
                 "title": task.title,
                 "status": task.status,
-                "trace_id": trace_id,
             },
             trace_id=trace_id,
             task_id=task.id,
         )
         await self.event_bus.publish(event)
-        
         logger.info(
             "task.created",
             task_id=task.id,
@@ -91,8 +104,11 @@ class TaskManager:
         )
         return task
 
-    async def list_tasks(self, session: AsyncSession) -> list[Task]:
-        result = await session.execute(select(Task).order_by(Task.created_at.desc()))
+    async def list_tasks(self, session: AsyncSession, chat_id: str | None = None) -> list[Task]:
+        stmt = select(Task)
+        if chat_id:
+            stmt = stmt.where(Task.chat_id == chat_id)
+        result = await session.execute(stmt.order_by(Task.created_at.desc()))
         return list(result.scalars().all())
 
     async def get_task(self, session: AsyncSession, task_id: str) -> Task | None:

@@ -5,10 +5,10 @@ from src.services.task_service import TaskService
 
 
 class FakeTaskManager:
-    async def create_task(self, session, title: str, description: str):
+    async def create_task(self, session, title: str, description: str, chat_id=None, *args, **kwargs):
         return {"id": "1", "title": title, "description": description, "status": "queued", "result": ""}
 
-    async def list_tasks(self, session):
+    async def list_tasks(self, session, chat_id=None, *args, **kwargs):
         return [{"id": "1", "title": "a", "description": "b", "status": "completed", "result": "ok"}]
 
     async def get_task(self, session, task_id: str):

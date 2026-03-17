@@ -1,8 +1,8 @@
-"""initial schema
+"""consolidated initial schema
 
 Revision ID: 0001_initial
 Revises:
-Create Date: 2026-03-12
+Create Date: 2026-03-17
 """
 
 from collections.abc import Sequence
@@ -19,16 +19,30 @@ depends_on: Sequence[str] | None = None
 
 def upgrade() -> None:
     op.create_table(
-        "tasks",
+        "chat_sessions",
         sa.Column("title", sa.String(length=255), nullable=False),
-        sa.Column("description", sa.Text(), nullable=False),
-        sa.Column("status", sa.String(length=50), nullable=False),
-        sa.Column("result", sa.Text(), nullable=False),
         sa.Column("id", sa.String(length=36), nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.PrimaryKeyConstraint("id"),
     )
+
+    op.create_table(
+        "tasks",
+        sa.Column("chat_id", sa.String(length=36), nullable=True),
+        sa.Column("title", sa.String(length=255), nullable=False),
+        sa.Column("description", sa.Text(), nullable=False),
+        sa.Column("status", sa.String(length=50), nullable=False),
+        sa.Column("result", sa.Text(), nullable=False),
+        sa.Column("trace_id", sa.String(length=36), nullable=False, server_default=sa.text("gen_random_uuid()::text")),
+        sa.Column("id", sa.String(length=36), nullable=False),
+        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.ForeignKeyConstraint(["chat_id"], ["chat_sessions.id"], ondelete="SET NULL"),
+        sa.PrimaryKeyConstraint("id"),
+    )
+    op.create_index(op.f("ix_tasks_chat_id"), "tasks", ["chat_id"], unique=False)
+    op.create_index(op.f("ix_tasks_trace_id"), "tasks", ["trace_id"], unique=False)
 
     op.create_table(
         "skills",
@@ -44,12 +58,29 @@ def upgrade() -> None:
     op.create_index(op.f("ix_skills_name"), "skills", ["name"], unique=True)
 
     op.create_table(
+        "users",
+        sa.Column("name", sa.String(length=255), nullable=False),
+        sa.Column("email", sa.String(length=255), nullable=False),
+        sa.Column("password_hash", sa.String(length=255), nullable=False),
+        sa.Column("is_active", sa.Boolean(), nullable=False),
+        sa.Column("id", sa.String(length=36), nullable=False),
+        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.PrimaryKeyConstraint("id"),
+    )
+    op.create_index(op.f("ix_users_email"), "users", ["email"], unique=True)
+
+    op.create_table(
         "agent_executions",
         sa.Column("task_id", sa.String(length=36), nullable=False),
         sa.Column("agent_name", sa.String(length=100), nullable=False),
         sa.Column("status", sa.String(length=50), nullable=False),
         sa.Column("input_payload", sa.JSON(), nullable=False),
         sa.Column("output_payload", sa.JSON(), nullable=False),
+        sa.Column("start_time", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("end_time", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("duration_ms", sa.Integer(), nullable=True),
+        sa.Column("error_message", sa.Text(), nullable=True),
         sa.Column("id", sa.String(length=36), nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
@@ -96,6 +127,11 @@ def downgrade() -> None:
     op.drop_table("artifacts")
     op.drop_index(op.f("ix_agent_executions_task_id"), table_name="agent_executions")
     op.drop_table("agent_executions")
+    op.drop_index(op.f("ix_users_email"), table_name="users")
+    op.drop_table("users")
     op.drop_index(op.f("ix_skills_name"), table_name="skills")
     op.drop_table("skills")
+    op.drop_index(op.f("ix_tasks_trace_id"), table_name="tasks")
+    op.drop_index(op.f("ix_tasks_chat_id"), table_name="tasks")
     op.drop_table("tasks")
+    op.drop_table("chat_sessions")

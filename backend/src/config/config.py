@@ -6,9 +6,8 @@ from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Load .env from backend root directory
-backend_root = Path(__file__).resolve().parents[2]
-env_file = backend_root / ".env"
-load_dotenv(env_file)
+_backend_root = Path(__file__).resolve().parents[2]
+load_dotenv(_backend_root / ".env")
 
 
 class Settings(BaseSettings):
@@ -18,6 +17,7 @@ class Settings(BaseSettings):
     env: str = "development"
     test_mode: bool = Field(default=True, alias="TEST_MODE")
     api_key: str = Field(default="", alias="API_KEY")
+    secret_key: str = Field(default="change-me-in-production", alias="SECRET_KEY")
     gradient_api_key: str = Field(default="", alias="GRADIENT_API_KEY")
     gradient_model: str = Field(default="gpt-4.1-mini", alias="GRADIENT_MODEL")
     gradient_base_url: str = Field(

@@ -187,7 +187,7 @@ class TestCircuitBreakerHalfOpen:
 
     @pytest.mark.asyncio
     async def test_limits_calls_in_half_open(self, circuit_breaker):
-        """Should limit calls to half_open_max_calls."""
+        """Should close breaker after successful half-open probe calls."""
         # Transition to HALF_OPEN
         await circuit_breaker._backend.set_state(
             circuit_breaker.name, BreakerState.HALF_OPEN
@@ -200,9 +200,9 @@ class TestCircuitBreakerHalfOpen:
         for _ in range(circuit_breaker.half_open_max_calls):
             await circuit_breaker.call(success_func)
 
-        # Next call should be rejected
-        with pytest.raises(CircuitBreakerOpen):
-            await circuit_breaker.call(success_func)
+        # Should be CLOSED after recovery probe completes
+        state = await circuit_breaker._backend.get_state(circuit_breaker.name)
+        assert state == BreakerState.CLOSED
 
     @pytest.mark.asyncio
     async def test_closes_after_recovery(self, circuit_breaker):

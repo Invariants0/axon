@@ -7,7 +7,7 @@ from src.schemas.task import TaskCreate
 
 
 class FakeTaskService:
-    async def create_task(self, payload: TaskCreate):
+    async def create_task(self, payload: TaskCreate, chat_id=None, *args, **kwargs):
         return {
             "id": "task-1",
             "title": payload.title,
@@ -18,7 +18,7 @@ class FakeTaskService:
             "updated_at": "2026-03-12T00:00:00Z",
         }
 
-    async def list_tasks(self):
+    async def list_tasks(self, chat_id=None, *args, **kwargs):
         return [
             {
                 "id": "task-1",

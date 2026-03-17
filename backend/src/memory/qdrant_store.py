@@ -24,6 +24,9 @@ from qdrant_client.http.models import (
     VectorParams,
     KeywordIndexParams,
     KeywordIndexType,
+    Filter,
+    FieldCondition,
+    MatchValue,
 )
 from src.config.config import get_settings
 from src.memory.embeddings import embed
@@ -82,9 +85,11 @@ class QdrantStore:
                 field_name="task_id",
                 field_schema=KeywordIndexParams(type=KeywordIndexType.KEYWORD),
             )
-        except Exception:
-            # Index might already exist, that's ok
-            pass
+        except Exception as exc:
+            # Index might already exist; ignore that case but surface other errors
+            if "already exists" in str(exc).lower():
+                return
+            raise
 
     async def add_embedding(
         self,
@@ -122,7 +127,7 @@ class QdrantStore:
         
         # Create point and upsert to Qdrant
         point = PointStruct(
-            id=hash(memory_id) & 0x7FFFFFFF,  # Convert UUID to positive integer
+            id=memory_id,  # Use stable UUID string as point ID
             vector=vector,
             payload=merged_metadata,
         )
@@ -186,7 +191,8 @@ class QdrantStore:
         for scored_point in search_result.points:
             output.append(
                 {
-                    "id": str(scored_point.id),
+                    # Return the logical memory identifier when available to match VectorStore interface
+                    "id": str(scored_point.payload.get("memory_id", scored_point.id)),
                     "content": scored_point.payload.get("content", ""),
                     "metadata": {
                         k: v
@@ -231,11 +237,17 @@ class QdrantStore:
         Args:
             memory_id: Memory ID to delete
         """
-        point_id = hash(memory_id) & 0x7FFFFFFF
         await asyncio.to_thread(
             self.client.delete,
             collection_name=self.collection_name,
-            points_selector=point_id,
+            points_selector=Filter(
+                must=[
+                    FieldCondition(
+                        key="memory_id",
+                        match=MatchValue(value=memory_id),
+                    )
+                ]
+            ),
         )
 
     async def get_collection_stats(self) -> dict:

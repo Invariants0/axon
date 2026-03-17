@@ -1,69 +1,240 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AXON</title>
-    <meta name="description" content="Self-evolving AI agent system" />
-    <link rel="stylesheet" href="/css/styles.css" />
-  </head>
-  <body>
-    <div class="layout">
-      <header class="header">
-        <h1>AXON Dashboard</h1>
-        <span id="status-badge" class="badge badge-idle">idle</span>
-      </header>
+    <script>
+        (function () {
+            var root = document.documentElement;
+            root.classList.add('theme-preload');
 
-      <main class="main">
-        <!-- Task Input -->
-        <section class="card" id="task-section">
-          <h2 class="card-title">Task Input</h2>
-          <div class="task-form">
-            <textarea
-              id="task-input"
-              class="textarea"
-              rows="3"
-              placeholder="Describe the task for AXON…"
-            ></textarea>
-            <button id="submit-task" class="btn btn-primary">Submit Task</button>
-          </div>
-          <p id="task-feedback" class="feedback"></p>
-        </section>
+            var mode = 'light';
+            var color = '#5f7dff';
+            var tint = 5;
 
-        <!-- Brain Logs -->
-        <section class="card" id="brain-logs-section">
-          <h2 class="card-title">Brain Logs</h2>
-          <div id="brain-logs" class="log-container">
-            <p class="placeholder">No logs yet.</p>
-          </div>
-        </section>
+            try {
+                var raw = localStorage.getItem('axon.themeSettings');
+                if (raw) {
+                    var parsed = JSON.parse(raw);
+                    mode = parsed && parsed.mode === 'dark' ? 'dark' : 'light';
+                    if (parsed && typeof parsed.color === 'string' && /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(parsed.color.trim())) {
+                        var c = parsed.color.trim();
+                        if (c.length === 4) {
+                            color = '#' + c[1] + c[1] + c[2] + c[2] + c[3] + c[3];
+                        } else {
+                            color = c;
+                        }
+                    }
+                    if (parsed && Number.isFinite(parsed.tint)) {
+                        var clampedTint = Math.max(5, Math.min(25, parsed.tint));
+                        tint = Math.round(clampedTint / 5) * 5;
+                    }
+                }
+            } catch (_) {
+                // Keep defaults if storage is unavailable.
+            }
 
-        <!-- Code Viewer -->
-        <section class="card" id="code-viewer-section">
-          <h2 class="card-title">Code Viewer</h2>
-          <pre id="code-viewer" class="code-block"><code class="placeholder">No code to display.</code></pre>
-        </section>
+            root.setAttribute('data-theme', mode);
+            root.style.setProperty('--theme-color', color);
+            root.style.setProperty('--theme-tint', tint + '%');
+        })();
+    </script>
+    <link rel="stylesheet" href="/css/axon.css">
+</head>
+<body>
+    <!-- Login Modal -->
+    <div id="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
+        <div class="settings-modal-card">
+            <div class="settings-modal-header">
+                <h2 id="login-modal-title">AXON</h2>
+            </div>
+            <div class="settings-modal-body">
+                <div id="login-form-container">
+                    <div class="settings-section-title">Sign in to your account</div>
+                    <form id="login-form">
+                        <div class="settings-modal-body">
+                            <label class="settings-field" for="login-email">
+                                <span>Email</span>
+                                <input id="login-email" type="email" autocomplete="email" placeholder="your@email.com" required>
+                            </label>
+                            <label class="settings-field" for="login-password">
+                                <span>Password</span>
+                                <input id="login-password" type="password" autocomplete="current-password" placeholder="••••••••" required>
+                            </label>
+                            <div class="modal-actions">
+                                <button id="login-submit-btn" class="primary-btn" type="submit">Sign In</button>
+                            </div>
+                            <p id="login-error-msg" class="profile-modal-status is-hidden" role="alert" aria-live="polite"></p>
+                        </div>
+                    </form>
+                    <button id="toggle-signup-btn" class="profile-menu-item" type="button">Create an account</button>
+                </div>
 
-        <!-- Evolution Timeline -->
-        <section class="card" id="evolution-section">
-          <h2 class="card-title">Evolution Timeline</h2>
-          <div id="evolution-timeline" class="timeline">
-            <p class="placeholder">No evolution events yet.</p>
-          </div>
-        </section>
+                <div id="signup-form-container" class="is-hidden">
+                    <div class="settings-section-title">Create a new account</div>
+                    <form id="signup-form">
+                        <div class="settings-modal-body">
+                            <label class="settings-field" for="signup-name">
+                                <span>Full Name</span>
+                                <input id="signup-name" type="text" autocomplete="name" placeholder="John Doe" required>
+                            </label>
+                            <label class="settings-field" for="signup-email">
+                                <span>Email</span>
+                                <input id="signup-email" type="email" autocomplete="email" placeholder="your@email.com" required>
+                            </label>
+                            <label class="settings-field" for="signup-password">
+                                <span>Password</span>
+                                <input id="signup-password" type="password" autocomplete="new-password" placeholder="••••••••" required>
+                            </label>
+                            <label class="settings-field" for="signup-confirm">
+                                <span>Confirm Password</span>
+                                <input id="signup-confirm" type="password" autocomplete="new-password" placeholder="••••••••" required>
+                            </label>
+                            <div class="modal-actions">
+                                <button id="signup-submit-btn" class="primary-btn" type="submit">Create Account</button>
+                            </div>
+                            <p id="signup-error-msg" class="profile-modal-status is-hidden" role="alert" aria-live="polite"></p>
+                        </div>
+                    </form>
+                    <button id="toggle-login-btn" class="profile-menu-item" type="button">Sign in instead</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        <!-- Capability Graph -->
-        <section class="card" id="capability-section">
-          <h2 class="card-title">Capability Graph</h2>
-          <div id="capability-graph" class="graph-container">
-            <p class="placeholder">No capabilities registered.</p>
-          </div>
-        </section>
-      </main>
+    <div id="main-container">
+        <div id="left-panel">
+            <button id="dashboard-btn" class="chat-history-item" type="button">Dashboard</button>
+            <hr class="divider">
+            <button id="new-chat-btn" class="chat-history-item" type="button">New Chat</button>
+            <div id="chat-history">
+            </div>
+            <div id="account-box">
+                <button id="profile-btn" type="button" aria-haspopup="menu" aria-expanded="false">
+                    <img id="profile-avatar" alt="Profile avatar">
+                    <span id="profile-name"></span>
+                </button>
+                <div id="profile-menu" class="is-hidden" role="menu">
+                    <button class="profile-menu-item" id="profile-menu-profile" type="button" role="menuitem">Profile</button>
+                    <button class="profile-menu-item" id="profile-menu-settings" type="button" role="menuitem">Settings</button>
+                    <button class="profile-menu-item" id="profile-menu-signout" type="button" role="menuitem">Sign out</button>
+                </div>
+            </div>
+        </div>
+        <div id="middle-panel">
+            <div id="dashboard-main" class="is-hidden">
+                <div class="branding-strip">
+                    <span class="app-name">AXON</span>
+                </div>
+                <div class="dashboard-main-content">Dashboard panel</div>
+            </div>
+            <div id="chat-panel">
+                <div class="branding-strip">
+                    <span class="app-name">AXON</span>
+                </div>
+                <div id="chat-messages">
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" class="chat-input" id="chat-input" placeholder="Type your message...">
+                    <button class="send-btn" id="send-btn">Send</button>
+                </div>
+            </div>
+        </div>
+        <div id="thought-panel">
+            <div id="thought-process">
+            </div>
+        </div>
+    </div>
+    <div id="bottom-strip">
+        <span id="model-stats"></span>
+    </div>
+
+    <div id="settings-modal" class="is-hidden" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
+        <div class="settings-modal-card">
+            <div class="settings-modal-header">
+                <h2 id="settings-modal-title">Settings</h2>
+                <button id="settings-close-btn" type="button" aria-label="Close settings">Close</button>
+            </div>
+            <div class="settings-modal-body">
+                <label class="settings-toggle-row" for="settings-dark-mode">
+                    <span>Dark Mode</span>
+                    <span class="settings-switch">
+                        <input id="settings-dark-mode" type="checkbox" role="switch" aria-label="Dark mode">
+                        <span class="settings-switch-line" aria-hidden="true"></span>
+                        <span class="settings-switch-thumb" aria-hidden="true"></span>
+                    </span>
+                </label>
+                <div class="settings-inline-row">
+                    <label class="settings-inline-label" for="settings-theme-hue">Theme Color</label>
+                    <div id="settings-hue-control" class="settings-hue-control is-collapsed">
+                        <input id="settings-theme-hue" class="settings-hue-slider" type="range" min="0" max="360" step="1" value="226" aria-label="Theme hue">
+                        <button id="settings-theme-hue-swatch" class="settings-hue-swatch" type="button" aria-label="Show or hide hue slider" aria-controls="settings-theme-hue" aria-expanded="false"></button>
+                    </div>
+                </div>
+                <div class="settings-inline-row">
+                    <span class="settings-inline-label">Theme Tint</span>
+                    <div id="settings-theme-tint-group" class="settings-tint-group" role="group" aria-label="Theme tint level">
+                        <button type="button" class="settings-tint-btn" data-tint="5" aria-pressed="false">5%</button>
+                        <button type="button" class="settings-tint-btn" data-tint="10" aria-pressed="false">10%</button>
+                        <button type="button" class="settings-tint-btn" data-tint="15" aria-pressed="false">15%</button>
+                        <button type="button" class="settings-tint-btn" data-tint="20" aria-pressed="false">20%</button>
+                        <button type="button" class="settings-tint-btn" data-tint="25" aria-pressed="false">25%</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="profile-modal" class="is-hidden" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
+        <div class="settings-modal-card">
+            <div class="settings-modal-header">
+                <h2 id="profile-modal-title">Profile</h2>
+                <button id="profile-close-btn" type="button" aria-label="Close profile">Close</button>
+            </div>
+
+            <form id="profile-form" class="settings-modal-body">
+                <label class="settings-field" for="profile-name-input">
+                    <span>Name</span>
+                    <input id="profile-name-input" type="text" autocomplete="name" required>
+                </label>
+                <label class="settings-field" for="profile-email-input">
+                    <span>Email</span>
+                    <input id="profile-email-input" type="email" autocomplete="email" required>
+                </label>
+                <div class="modal-actions">
+                    <button id="profile-save-btn" class="primary-btn" type="submit">Save Profile</button>
+                </div>
+            </form>
+
+            <hr class="divider">
+
+            <form id="password-form" class="settings-modal-body">
+                <div class="settings-section-title">Reset Password</div>
+                <label class="settings-field" for="profile-current-password">
+                    <span>Current Password</span>
+                    <input id="profile-current-password" type="password" autocomplete="current-password" required>
+                </label>
+                <label class="settings-field" for="profile-new-password">
+                    <span>New Password</span>
+                    <input id="profile-new-password" type="password" autocomplete="new-password" required>
+                </label>
+                <label class="settings-field" for="profile-confirm-password">
+                    <span>Confirm New Password</span>
+                    <input id="profile-confirm-password" type="password" autocomplete="new-password" required>
+                </label>
+                <div class="modal-actions">
+                    <button id="profile-reset-btn" class="danger-btn" type="submit">Reset Password</button>
+                </div>
+            </form>
+
+            <p id="profile-modal-status" class="profile-modal-status" role="status" aria-live="polite"></p>
+        </div>
     </div>
 
     <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
     <script src="/js/websocket.js"></script>
-    <script src="/js/app.js"></script>
-  </body>
+    <script src="/js/axon.js"></script>
+</body>
 </html>

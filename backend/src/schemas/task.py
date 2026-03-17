@@ -6,12 +6,14 @@ from pydantic import BaseModel, ConfigDict, Field
 class TaskCreate(BaseModel):
     title: str = Field(min_length=1, max_length=255)
     description: str = ""
+    chat_id: str | None = None
 
 
 class TaskResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: str
+    chat_id: str | None = None
     title: str
     description: str
     status: str

@@ -1,0 +1,1823 @@
+{
+  "metadata": {
+    "project": "AXON",
+    "analysis_version": "1.0",
+    "total_modules": 72
+  },
+  "metrics": {
+    "total_modules": 72,
+    "total_lines": 3825,
+    "total_classes": 26,
+    "total_functions": 78,
+    "avg_lines_per_module": 53,
+    "avg_classes_per_module": 0,
+    "avg_deps_per_module": 2.2916666666666665,
+    "circular_dependencies": 0
+  },
+  "architecture": {
+    "layers": {
+      "layers": {
+        "__init__": {
+          "modules": [
+            "src.__init__"
+          ],
+          "count": 1
+        },
+        "agents": {
+          "modules": [
+            "src.agents.__init__"
+          ],
+          "count": 1
+        },
+        "ai": {
+          "modules": [
+            "src.ai.__init__",
+            "src.ai.gemini_client",
+            "src.ai.gradient_client",
+            "src.ai.huggingface_client",
+            "src.ai.llm_service"
+          ],
+          "count": 5
+        },
+        "api": {
+          "modules": [
+            "src.api.__init__",
+            "src.api.controllers.__init__",
+            "src.api.controllers.chat_controller",
+            "src.api.controllers.evolution_controller",
+            "src.api.controllers.skill_controller",
+            "src.api.controllers.task_controller",
+            "src.api.middleware.__init__",
+            "src.api.routes.__init__",
+            "src.api.routes.auth",
+            "src.api.routes.chats",
+            "src.api.routes.evolution",
+            "src.api.routes.skills",
+            "src.api.routes.system",
+            "src.api.routes.tasks",
+            "src.api.websocket.__init__",
+            "src.api.websocket.event_stream"
+          ],
+          "count": 16
+        },
+        "config": {
+          "modules": [
+            "src.config.__init__",
+            "src.config.agents_config",
+            "src.config.dependencies"
+          ],
+          "count": 3
+        },
+        "core": {
+          "modules": [
+            "src.core.__init__",
+            "src.core.agent_orchestrator",
+            "src.core.debug_tools",
+            "src.core.event_bus",
+            "src.core.evolution_engine",
+            "src.core.metrics",
+            "src.core.queue_backends.__init__",
+            "src.core.task_manager",
+            "src.core.version_manager",
+            "src.core.worker_pool"
+          ],
+          "count": 10
+        },
+        "db": {
+          "modules": [
+            "src.db.__init__",
+            "src.db.session"
+          ],
+          "count": 2
+        },
+        "main": {
+          "modules": [
+            "src.main"
+          ],
+          "count": 1
+        },
+        "memory": {
+          "modules": [
+            "src.memory.__init__",
+            "src.memory.context_manager",
+            "src.memory.embeddings",
+            "src.memory.vector_store"
+          ],
+          "count": 4
+        },
+        "providers": {
+          "modules": [
+            "src.providers.__init__",
+            "src.providers.circuit_breaker.__init__",
+            "src.providers.digitalocean.__init__",
+            "src.providers.digitalocean.digitalocean_agent_client",
+            "src.providers.digitalocean.digitalocean_agent_router"
+          ],
+          "count": 5
+        },
+        "schemas": {
+          "modules": [
+            "src.schemas.__init__"
+          ],
+          "count": 1
+        },
+        "services": {
+          "modules": [
+            "src.services.__init__",
+            "src.services.auth_service",
+            "src.services.chat_service",
+            "src.services.evolution_service",
+            "src.services.skill_service",
+            "src.services.task_service"
+          ],
+          "count": 6
+        },
+        "skills": {
+          "modules": [
+            "src.skills.__init__",
+            "src.skills.core_skills.__init__",
+            "src.skills.core_skills.coding",
+            "src.skills.core_skills.planning",
+            "src.skills.core_skills.reasoning",
+            "src.skills.generated_skills.__init__",
+            "src.skills.generated_skills.web_search",
+            "src.skills.registry",
+            "src.skills.templates.__init__",
+            "src.skills.templates.skill_template"
+          ],
+          "count": 10
+        },
+        "storage": {
+          "modules": [
+            "src.storage.__init__",
+            "src.storage.artifact_store"
+          ],
+          "count": 2
+        },
+        "utils": {
+          "modules": [
+            "src.utils.__init__",
+            "src.utils.audit_logger",
+            "src.utils.code_parser",
+            "src.utils.logger",
+            "src.utils.validators"
+          ],
+          "count": 5
+        }
+      },
+      "dependencies": {
+        "ai": [
+          "config",
+          "utils"
+        ],
+        "api": [
+          "config",
+          "core",
+          "db",
+          "memory",
+          "schemas",
+          "services",
+          "skills"
+        ],
+        "config": [
+          "ai",
+          "core",
+          "db",
+          "memory",
+          "services",
+          "skills"
+        ],
+        "core": [
+          "agents",
+          "ai",
+          "config",
+          "db",
+          "memory",
+          "providers",
+          "skills",
+          "utils"
+        ],
+        "db": [
+          "config"
+        ],
+        "main": [
+          "api",
+          "config",
+          "db",
+          "utils"
+        ],
+        "memory": [
+          "config",
+          "utils"
+        ],
+        "providers": [
+          "config",
+          "utils"
+        ],
+        "services": [
+          "config",
+          "core",
+          "db",
+          "schemas",
+          "skills"
+        ],
+        "storage": [
+          "db"
+        ],
+        "utils": [
+          "config",
+          "db",
+          "schemas"
+        ]
+      }
+    }
+  },
+  "modules": {
+    "src.__init__": {
+      "path": "backend/src/__init__.py",
+      "lines": 1,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.agents.__init__": {
+      "path": "backend/src/agents/__init__.py",
+      "lines": 13,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [
+        "src.agents.base_agent",
+        "src.agents.builder_agent",
+        "src.agents.planning_agent",
+        "src.agents.reasoning_agent",
+        "src.agents.research_agent"
+      ],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.ai.__init__": {
+      "path": "backend/src/ai/__init__.py",
+      "lines": 3,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [
+        "src.ai.llm_service"
+      ],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.ai.gemini_client": {
+      "path": "backend/src/ai/gemini_client.py",
+      "lines": 188,
+      "classes": 1,
+      "functions": 3,
+      "dependencies": [
+        "src.config.config",
+        "src.utils.logger"
+      ],
+      "external_deps": [
+        "__future__",
+        "asyncio",
+        "httpx",
+        "tenacity",
+        "typing"
+      ],
+      "exports": {
+        "classes": [
+          "GeminiClient"
+        ],
+        "functions": []
+      }
+    },
+    "src.ai.gradient_client": {
+      "path": "backend/src/ai/gradient_client.py",
+      "lines": 35,
+      "classes": 1,
+      "functions": 1,
+      "dependencies": [
+        "src.config.config"
+      ],
+      "external_deps": [
+        "httpx",
+        "typing"
+      ],
+      "exports": {
+        "classes": [
+          "GradientClient"
+        ],
+        "functions": []
+      }
+    },
+    "src.ai.huggingface_client": {
+      "path": "backend/src/ai/huggingface_client.py",
+      "lines": 38,
+      "classes": 1,
+      "functions": 1,
+      "dependencies": [
+        "src.config.config"
+      ],
+      "external_deps": [
+        "httpx",
+        "typing"
+      ],
+      "exports": {
+        "classes": [
+          "HuggingFaceClient"
+        ],
+        "functions": []
+      }
+    },
+    "src.ai.llm_service": {
+      "path": "backend/src/ai/llm_service.py",
+      "lines": 163,
+      "classes": 1,
+      "functions": 4,
+      "dependencies": [
+        "src.ai.gemini_client",
+        "src.ai.gradient_client",
+        "src.ai.huggingface_client",
+        "src.config.config",
+        "src.utils.logger"
+      ],
+      "external_deps": [
+        "__future__",
+        "collections",
+        "json",
+        "tenacity",
+        "transformers",
+        "typing"
+      ],
+      "exports": {
+        "classes": [
+          "LLMService"
+        ],
+        "functions": []
+      }
+    },
+    "src.api.__init__": {
+      "path": "backend/src/api/__init__.py",
+      "lines": 1,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.api.controllers.__init__": {
+      "path": "backend/src/api/controllers/__init__.py",
+      "lines": 12,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [
+        "src.api.controllers.evolution_controller",
+        "src.api.controllers.skill_controller",
+        "src.api.controllers.task_controller"
+      ],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.api.controllers.chat_controller": {
+      "path": "backend/src/api/controllers/chat_controller.py",
+      "lines": 40,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [
+        "src.schemas.chat",
+        "src.services.chat_service"
+      ],
+      "external_deps": [
+        "fastapi"
+      ],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.api.controllers.evolution_controller": {
+      "path": "backend/src/api/controllers/evolution_controller.py",
+      "lines": 9,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [
+        "src.services.evolution_service"
+      ],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.api.controllers.skill_controller": {
+      "path": "backend/src/api/controllers/skill_controller.py",
+      "lines": 5,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [
+        "src.services.skill_service"
+      ],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.api.controllers.task_controller": {
+      "path": "backend/src/api/controllers/task_controller.py",
+      "lines": 20,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [
+        "src.schemas.task",
+        "src.services.task_service"
+      ],
+      "external_deps": [
+        "fastapi"
+      ],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.api.middleware.__init__": {
+      "path": "backend/src/api/middleware/__init__.py",
+      "lines": 3,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [
+        "src.api.middleware.logging_middleware"
+      ],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.api.routes.__init__": {
+      "path": "backend/src/api/routes/__init__.py",
+      "lines": 3,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [
+        "src.api.routes"
+      ],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.api.routes.auth": {
+      "path": "backend/src/api/routes/auth.py",
+      "lines": 139,
+      "classes": 0,
+      "functions": 1,
+      "dependencies": [
+        "src.config.config",
+        "src.config.dependencies",
+        "src.db.models",
+        "src.db.session",
+        "src.schemas.auth",
+        "src.services.auth_service"
+      ],
+      "external_deps": [
+        "datetime",
+        "fastapi",
+        "sqlalchemy",
+        "typing"
+      ],
+      "exports": {
+        "classes": [],
+        "functions": [
+          "get_auth_service"
+        ]
+      }
+    },
+    "src.api.routes.chats": {
+      "path": "backend/src/api/routes/chats.py",
+      "lines": 57,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [
+        "src.api.controllers.chat_controller",
+        "src.config.dependencies",
+        "src.schemas.chat",
+        "src.schemas.task",
+        "src.services.chat_service"
+      ],
+      "external_deps": [
+        "fastapi"
+      ],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.api.routes.evolution": {
+      "path": "backend/src/api/routes/evolution.py",
+      "lines": 24,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [
+        "src.api.controllers.evolution_controller",
+        "src.config.dependencies",
+        "src.schemas.evolution",
+        "src.services.evolution_service"
+      ],
+      "external_deps": [
+        "fastapi"
+      ],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.api.routes.skills": {
+      "path": "backend/src/api/routes/skills.py",
+      "lines": 14,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [
+        "src.api.controllers.skill_controller",
+        "src.config.dependencies",
+        "src.schemas.skill",
+        "src.services.skill_service"
+      ],
+      "external_deps": [
+        "fastapi"
+      ],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.api.routes.system": {
+      "path": "backend/src/api/routes/system.py",
+      "lines": 144,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [
+        "src.config.config",
+        "src.config.dependencies",
+        "src.core.agent_orchestrator",
+        "src.core.event_bus",
+        "src.core.metrics",
+        "src.core.task_manager",
+        "src.memory.vector_store",
+        "src.schemas.system",
+        "src.skills.registry"
+      ],
+      "external_deps": [
+        "asyncio",
+        "fastapi",
+        "sqlalchemy"
+      ],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.api.routes.tasks": {
+      "path": "backend/src/api/routes/tasks.py",
+      "lines": 88,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [
+        "src.api.controllers.task_controller",
+        "src.config.dependencies",
+        "src.schemas.task",
+        "src.services.task_service"
+      ],
+      "external_deps": [
+        "fastapi"
+      ],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.api.websocket.__init__": {
+      "path": "backend/src/api/websocket/__init__.py",
+      "lines": 3,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [
+        "src.api.websocket.event_stream"
+      ],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.api.websocket.event_stream": {
+      "path": "backend/src/api/websocket/event_stream.py",
+      "lines": 29,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [
+        "src.config.dependencies",
+        "src.core.event_bus"
+      ],
+      "external_deps": [
+        "asyncio",
+        "fastapi"
+      ],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.config.__init__": {
+      "path": "backend/src/config/__init__.py",
+      "lines": 3,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [
+        "src.config.config"
+      ],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.config.agents_config": {
+      "path": "backend/src/config/agents_config.py",
+      "lines": 16,
+      "classes": 0,
+      "functions": 2,
+      "dependencies": [
+        "src.config.config"
+      ],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": [
+          "get_agent_urls",
+          "is_real_mode"
+        ]
+      }
+    },
+    "src.config.dependencies": {
+      "path": "backend/src/config/dependencies.py",
+      "lines": 154,
+      "classes": 0,
+      "functions": 9,
+      "dependencies": [
+        "src.ai.llm_service",
+        "src.config.config",
+        "src.core.agent_orchestrator",
+        "src.core.event_bus",
+        "src.core.evolution_engine",
+        "src.core.task_manager",
+        "src.db.session",
+        "src.memory.vector_store",
+        "src.services.chat_service",
+        "src.services.evolution_service",
+        "src.services.skill_service",
+        "src.services.task_service",
+        "src.skills.executor",
+        "src.skills.registry"
+      ],
+      "external_deps": [
+        "collections",
+        "fastapi",
+        "sqlalchemy",
+        "time"
+      ],
+      "exports": {
+        "classes": [],
+        "functions": [
+          "get_app_settings",
+          "get_event_bus",
+          "get_skill_registry",
+          "get_llm_service",
+          "get_vector_store",
+          "get_task_manager",
+          "get_orchestrator",
+          "get_evolution_engine",
+          "get_skill_executor"
+        ]
+      }
+    },
+    "src.core.__init__": {
+      "path": "backend/src/core/__init__.py",
+      "lines": 23,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [
+        "src.core.agent_orchestrator",
+        "src.core.event_bus",
+        "src.core.evolution_engine",
+        "src.core.metrics",
+        "src.core.pipeline_graph",
+        "src.core.task_manager",
+        "src.core.task_queue",
+        "src.core.worker_pool"
+      ],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.core.agent_orchestrator": {
+      "path": "backend/src/core/agent_orchestrator.py",
+      "lines": 243,
+      "classes": 1,
+      "functions": 1,
+      "dependencies": [
+        "src.agents.builder_agent",
+        "src.agents.planning_agent",
+        "src.agents.reasoning_agent",
+        "src.agents.research_agent",
+        "src.ai.llm_service",
+        "src.config.config",
+        "src.core.event_bus",
+        "src.db.models",
+        "src.memory.vector_store",
+        "src.providers.digitalocean.digitalocean_agent_router",
+        "src.skills.executor",
+        "src.utils.logger"
+      ],
+      "external_deps": [
+        "__future__",
+        "sqlalchemy",
+        "time"
+      ],
+      "exports": {
+        "classes": [
+          "AgentOrchestrator"
+        ],
+        "functions": []
+      }
+    },
+    "src.core.debug_tools": {
+      "path": "backend/src/core/debug_tools.py",
+      "lines": 41,
+      "classes": 0,
+      "functions": 1,
+      "dependencies": [
+        "src.config.dependencies"
+      ],
+      "external_deps": [
+        "__future__"
+      ],
+      "exports": {
+        "classes": [],
+        "functions": [
+          "verify_pipeline"
+        ]
+      }
+    },
+    "src.core.event_bus": {
+      "path": "backend/src/core/event_bus.py",
+      "lines": 36,
+      "classes": 1,
+      "functions": 2,
+      "dependencies": [],
+      "external_deps": [
+        "__future__",
+        "asyncio",
+        "collections"
+      ],
+      "exports": {
+        "classes": [
+          "EventBus"
+        ],
+        "functions": []
+      }
+    },
+    "src.core.evolution_engine": {
+      "path": "backend/src/core/evolution_engine.py",
+      "lines": 288,
+      "classes": 1,
+      "functions": 4,
+      "dependencies": [
+        "src.ai.llm_service",
+        "src.core.event_bus",
+        "src.db.models",
+        "src.skills.registry",
+        "src.utils.logger"
+      ],
+      "external_deps": [
+        "__future__",
+        "datetime",
+        "importlib",
+        "re",
+        "sqlalchemy"
+      ],
+      "exports": {
+        "classes": [
+          "EvolutionEngine"
+        ],
+        "functions": []
+      }
+    },
+    "src.core.metrics": {
+      "path": "backend/src/core/metrics.py",
+      "lines": 144,
+      "classes": 2,
+      "functions": 4,
+      "dependencies": [
+        "src.config.config",
+        "src.providers.circuit_breaker.breaker_backend",
+        "src.utils.logger"
+      ],
+      "external_deps": [
+        "__future__",
+        "dataclasses",
+        "datetime",
+        "typing"
+      ],
+      "exports": {
+        "classes": [
+          "SystemMetrics",
+          "MetricsCollector"
+        ],
+        "functions": []
+      }
+    },
+    "src.core.queue_backends.__init__": {
+      "path": "backend/src/core/queue_backends/__init__.py",
+      "lines": 6,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [
+        "src.core.queue_backends.in_memory_queue",
+        "src.core.queue_backends.redis_queue"
+      ],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.core.task_manager": {
+      "path": "backend/src/core/task_manager.py",
+      "lines": 173,
+      "classes": 1,
+      "functions": 4,
+      "dependencies": [
+        "src.core.agent_orchestrator",
+        "src.core.event_bus",
+        "src.core.worker_pool",
+        "src.db.models",
+        "src.db.session",
+        "src.utils.logger"
+      ],
+      "external_deps": [
+        "__future__",
+        "asyncio",
+        "collections",
+        "os",
+        "sqlalchemy",
+        "time"
+      ],
+      "exports": {
+        "classes": [
+          "TaskManager"
+        ],
+        "functions": []
+      }
+    },
+    "src.core.version_manager": {
+      "path": "backend/src/core/version_manager.py",
+      "lines": 3,
+      "classes": 1,
+      "functions": 1,
+      "dependencies": [],
+      "external_deps": [],
+      "exports": {
+        "classes": [
+          "VersionManager"
+        ],
+        "functions": []
+      }
+    },
+    "src.core.worker_pool": {
+      "path": "backend/src/core/worker_pool.py",
+      "lines": 195,
+      "classes": 1,
+      "functions": 2,
+      "dependencies": [
+        "src.utils.logger"
+      ],
+      "external_deps": [
+        "__future__",
+        "asyncio",
+        "collections",
+        "time",
+        "typing"
+      ],
+      "exports": {
+        "classes": [
+          "WorkerPool"
+        ],
+        "functions": []
+      }
+    },
+    "src.db.__init__": {
+      "path": "backend/src/db/__init__.py",
+      "lines": 16,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [
+        "src.db.models",
+        "src.db.session"
+      ],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.db.session": {
+      "path": "backend/src/db/session.py",
+      "lines": 46,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [
+        "src.config.config",
+        "src.db.models"
+      ],
+      "external_deps": [
+        "collections",
+        "sqlalchemy"
+      ],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.main": {
+      "path": "backend/src/main.py",
+      "lines": 108,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [
+        "src.api.middleware.logging_middleware",
+        "src.api.routes",
+        "src.api.websocket.event_stream",
+        "src.config.config",
+        "src.config.dependencies",
+        "src.db.session",
+        "src.utils.audit_logger",
+        "src.utils.logger"
+      ],
+      "external_deps": [
+        "contextlib",
+        "fastapi"
+      ],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.memory.__init__": {
+      "path": "backend/src/memory/__init__.py",
+      "lines": 3,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [
+        "src.memory.vector_store"
+      ],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.memory.context_manager": {
+      "path": "backend/src/memory/context_manager.py",
+      "lines": 278,
+      "classes": 2,
+      "functions": 5,
+      "dependencies": [
+        "src.memory.vector_store",
+        "src.utils.logger"
+      ],
+      "external_deps": [
+        "__future__",
+        "dataclasses",
+        "time",
+        "typing"
+      ],
+      "exports": {
+        "classes": [
+          "ContextWindow",
+          "ContextManager"
+        ],
+        "functions": []
+      }
+    },
+    "src.memory.embeddings": {
+      "path": "backend/src/memory/embeddings.py",
+      "lines": 33,
+      "classes": 0,
+      "functions": 2,
+      "dependencies": [
+        "src.config.config"
+      ],
+      "external_deps": [
+        "__future__",
+        "functools",
+        "hashlib",
+        "sentence_transformers"
+      ],
+      "exports": {
+        "classes": [],
+        "functions": [
+          "_load_model",
+          "_fallback_embedding"
+        ]
+      }
+    },
+    "src.memory.vector_store": {
+      "path": "backend/src/memory/vector_store.py",
+      "lines": 86,
+      "classes": 1,
+      "functions": 1,
+      "dependencies": [
+        "src.config.config",
+        "src.memory.embeddings"
+      ],
+      "external_deps": [
+        "__future__",
+        "asyncio",
+        "chromadb",
+        "uuid"
+      ],
+      "exports": {
+        "classes": [
+          "VectorStore"
+        ],
+        "functions": []
+      }
+    },
+    "src.providers.__init__": {
+      "path": "backend/src/providers/__init__.py",
+      "lines": 1,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.providers.circuit_breaker.__init__": {
+      "path": "backend/src/providers/circuit_breaker/__init__.py",
+      "lines": 6,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [
+        "src.providers.circuit_breaker.memory_backend",
+        "src.providers.circuit_breaker.redis_backend"
+      ],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.providers.digitalocean.__init__": {
+      "path": "backend/src/providers/digitalocean/__init__.py",
+      "lines": 10,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [],
+      "external_deps": [
+        "digitalocean_agent_client",
+        "digitalocean_agent_router",
+        "digitalocean_agent_types"
+      ],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.providers.digitalocean.digitalocean_agent_client": {
+      "path": "backend/src/providers/digitalocean/digitalocean_agent_client.py",
+      "lines": 183,
+      "classes": 1,
+      "functions": 2,
+      "dependencies": [
+        "src.config.config",
+        "src.providers.digitalocean.circuit_breaker",
+        "src.providers.digitalocean.digitalocean_agent_types",
+        "src.utils.logger"
+      ],
+      "external_deps": [
+        "httpx",
+        "tenacity",
+        "time",
+        "typing"
+      ],
+      "exports": {
+        "classes": [
+          "DigitalOceanAgentClient"
+        ],
+        "functions": []
+      }
+    },
+    "src.providers.digitalocean.digitalocean_agent_router": {
+      "path": "backend/src/providers/digitalocean/digitalocean_agent_router.py",
+      "lines": 78,
+      "classes": 1,
+      "functions": 1,
+      "dependencies": [
+        "src.config.config",
+        "src.providers.digitalocean.digitalocean_agent_client",
+        "src.providers.digitalocean.digitalocean_agent_types",
+        "src.utils.logger"
+      ],
+      "external_deps": [
+        "typing"
+      ],
+      "exports": {
+        "classes": [
+          "DigitalOceanAgentRouter"
+        ],
+        "functions": []
+      }
+    },
+    "src.schemas.__init__": {
+      "path": "backend/src/schemas/__init__.py",
+      "lines": 19,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [
+        "src.schemas.chat",
+        "src.schemas.evolution",
+        "src.schemas.skill",
+        "src.schemas.system",
+        "src.schemas.task"
+      ],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.services.__init__": {
+      "path": "backend/src/services/__init__.py",
+      "lines": 5,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [
+        "src.services.evolution_service",
+        "src.services.skill_service",
+        "src.services.task_service"
+      ],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.services.auth_service": {
+      "path": "backend/src/services/auth_service.py",
+      "lines": 117,
+      "classes": 1,
+      "functions": 7,
+      "dependencies": [
+        "src.config.config"
+      ],
+      "external_deps": [
+        "base64",
+        "datetime",
+        "hashlib",
+        "hmac",
+        "json",
+        "sqlalchemy",
+        "typing"
+      ],
+      "exports": {
+        "classes": [
+          "AuthService"
+        ],
+        "functions": []
+      }
+    },
+    "src.services.chat_service": {
+      "path": "backend/src/services/chat_service.py",
+      "lines": 46,
+      "classes": 1,
+      "functions": 1,
+      "dependencies": [
+        "src.db.models",
+        "src.schemas.chat"
+      ],
+      "external_deps": [
+        "sqlalchemy"
+      ],
+      "exports": {
+        "classes": [
+          "ChatService"
+        ],
+        "functions": []
+      }
+    },
+    "src.services.evolution_service": {
+      "path": "backend/src/services/evolution_service.py",
+      "lines": 15,
+      "classes": 1,
+      "functions": 1,
+      "dependencies": [
+        "src.core.evolution_engine"
+      ],
+      "external_deps": [
+        "sqlalchemy"
+      ],
+      "exports": {
+        "classes": [
+          "EvolutionService"
+        ],
+        "functions": []
+      }
+    },
+    "src.services.skill_service": {
+      "path": "backend/src/services/skill_service.py",
+      "lines": 32,
+      "classes": 1,
+      "functions": 1,
+      "dependencies": [
+        "src.db.models",
+        "src.skills.registry"
+      ],
+      "external_deps": [
+        "sqlalchemy"
+      ],
+      "exports": {
+        "classes": [
+          "SkillService"
+        ],
+        "functions": []
+      }
+    },
+    "src.services.task_service": {
+      "path": "backend/src/services/task_service.py",
+      "lines": 24,
+      "classes": 1,
+      "functions": 1,
+      "dependencies": [
+        "src.core.task_manager",
+        "src.schemas.task"
+      ],
+      "external_deps": [
+        "sqlalchemy"
+      ],
+      "exports": {
+        "classes": [
+          "TaskService"
+        ],
+        "functions": []
+      }
+    },
+    "src.skills.__init__": {
+      "path": "backend/src/skills/__init__.py",
+      "lines": 4,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [
+        "src.skills.executor",
+        "src.skills.registry"
+      ],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.skills.core_skills.__init__": {
+      "path": "backend/src/skills/core_skills/__init__.py",
+      "lines": 1,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.skills.core_skills.coding": {
+      "path": "backend/src/skills/core_skills/coding.py",
+      "lines": 20,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.skills.core_skills.planning": {
+      "path": "backend/src/skills/core_skills/planning.py",
+      "lines": 26,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.skills.core_skills.reasoning": {
+      "path": "backend/src/skills/core_skills/reasoning.py",
+      "lines": 23,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.skills.generated_skills.__init__": {
+      "path": "backend/src/skills/generated_skills/__init__.py",
+      "lines": 1,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.skills.generated_skills.web_search": {
+      "path": "backend/src/skills/generated_skills/web_search.py",
+      "lines": 19,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.skills.registry": {
+      "path": "backend/src/skills/registry.py",
+      "lines": 87,
+      "classes": 2,
+      "functions": 9,
+      "dependencies": [],
+      "external_deps": [
+        "__future__",
+        "dataclasses",
+        "importlib",
+        "inspect",
+        "pathlib",
+        "pkgutil",
+        "types",
+        "typing"
+      ],
+      "exports": {
+        "classes": [
+          "SkillDefinition",
+          "SkillRegistry"
+        ],
+        "functions": []
+      }
+    },
+    "src.skills.templates.__init__": {
+      "path": "backend/src/skills/templates/__init__.py",
+      "lines": 1,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.skills.templates.skill_template": {
+      "path": "backend/src/skills/templates/skill_template.py",
+      "lines": 5,
+      "classes": 1,
+      "functions": 0,
+      "dependencies": [],
+      "external_deps": [],
+      "exports": {
+        "classes": [
+          "SkillTemplate"
+        ],
+        "functions": []
+      }
+    },
+    "src.storage.__init__": {
+      "path": "backend/src/storage/__init__.py",
+      "lines": 1,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.storage.artifact_store": {
+      "path": "backend/src/storage/artifact_store.py",
+      "lines": 37,
+      "classes": 1,
+      "functions": 1,
+      "dependencies": [
+        "src.db.models"
+      ],
+      "external_deps": [
+        "__future__",
+        "pathlib",
+        "sqlalchemy"
+      ],
+      "exports": {
+        "classes": [
+          "ArtifactStore"
+        ],
+        "functions": []
+      }
+    },
+    "src.utils.__init__": {
+      "path": "backend/src/utils/__init__.py",
+      "lines": 1,
+      "classes": 0,
+      "functions": 0,
+      "dependencies": [],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": []
+      }
+    },
+    "src.utils.audit_logger": {
+      "path": "backend/src/utils/audit_logger.py",
+      "lines": 94,
+      "classes": 0,
+      "functions": 2,
+      "dependencies": [
+        "src.config.dependencies",
+        "src.db.models"
+      ],
+      "external_deps": [
+        "__future__",
+        "fastapi",
+        "pathlib",
+        "typing"
+      ],
+      "exports": {
+        "classes": [],
+        "functions": [
+          "_route_paths",
+          "generate_audit_log"
+        ]
+      }
+    },
+    "src.utils.code_parser": {
+      "path": "backend/src/utils/code_parser.py",
+      "lines": 2,
+      "classes": 0,
+      "functions": 1,
+      "dependencies": [],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": [
+          "parse_code"
+        ]
+      }
+    },
+    "src.utils.logger": {
+      "path": "backend/src/utils/logger.py",
+      "lines": 31,
+      "classes": 0,
+      "functions": 2,
+      "dependencies": [],
+      "external_deps": [
+        "loguru",
+        "os",
+        "sys"
+      ],
+      "exports": {
+        "classes": [],
+        "functions": [
+          "configure_logging",
+          "get_logger"
+        ]
+      }
+    },
+    "src.utils.validators": {
+      "path": "backend/src/utils/validators.py",
+      "lines": 9,
+      "classes": 0,
+      "functions": 1,
+      "dependencies": [
+        "src.schemas.task"
+      ],
+      "external_deps": [],
+      "exports": {
+        "classes": [],
+        "functions": [
+          "validate_task_payload"
+        ]
+      }
+    }
+  },
+  "dependency_graph": {
+    "reverse_dependencies": {
+      "src.agents.base_agent": [
+        "src.agents.__init__"
+      ],
+      "src.agents.builder_agent": [
+        "src.agents.__init__",
+        "src.core.agent_orchestrator"
+      ],
+      "src.agents.planning_agent": [
+        "src.agents.__init__",
+        "src.core.agent_orchestrator"
+      ],
+      "src.agents.reasoning_agent": [
+        "src.agents.__init__",
+        "src.core.agent_orchestrator"
+      ],
+      "src.agents.research_agent": [
+        "src.agents.__init__",
+        "src.core.agent_orchestrator"
+      ],
+      "src.ai.gemini_client": [
+        "src.ai.llm_service"
+      ],
+      "src.ai.gradient_client": [
+        "src.ai.llm_service"
+      ],
+      "src.ai.huggingface_client": [
+        "src.ai.llm_service"
+      ],
+      "src.ai.llm_service": [
+        "src.ai.__init__",
+        "src.config.dependencies",
+        "src.core.agent_orchestrator",
+        "src.core.evolution_engine"
+      ],
+      "src.api.controllers.chat_controller": [
+        "src.api.routes.chats"
+      ],
+      "src.api.controllers.evolution_controller": [
+        "src.api.controllers.__init__",
+        "src.api.routes.evolution"
+      ],
+      "src.api.controllers.skill_controller": [
+        "src.api.controllers.__init__",
+        "src.api.routes.skills"
+      ],
+      "src.api.controllers.task_controller": [
+        "src.api.controllers.__init__",
+        "src.api.routes.tasks"
+      ],
+      "src.api.middleware.logging_middleware": [
+        "src.api.middleware.__init__",
+        "src.main"
+      ],
+      "src.api.websocket.event_stream": [
+        "src.api.websocket.__init__",
+        "src.main"
+      ],
+      "src.config.config": [
+        "src.ai.gemini_client",
+        "src.ai.gradient_client",
+        "src.ai.huggingface_client",
+        "src.ai.llm_service",
+        "src.api.routes.auth",
+        "src.api.routes.system",
+        "src.config.__init__",
+        "src.config.agents_config",
+        "src.config.dependencies",
+        "src.core.agent_orchestrator",
+        "src.core.metrics",
+        "src.db.session",
+        "src.main",
+        "src.memory.embeddings",
+        "src.memory.vector_store",
+        "src.providers.digitalocean.digitalocean_agent_client",
+        "src.providers.digitalocean.digitalocean_agent_router",
+        "src.services.auth_service"
+      ],
+      "src.config.dependencies": [
+        "src.api.routes.auth",
+        "src.api.routes.chats",
+        "src.api.routes.evolution",
+        "src.api.routes.skills",
+        "src.api.routes.system",
+        "src.api.routes.tasks",
+        "src.api.websocket.event_stream",
+        "src.core.debug_tools",
+        "src.main",
+        "src.utils.audit_logger"
+      ],
+      "src.core.agent_orchestrator": [
+        "src.api.routes.system",
+        "src.config.dependencies",
+        "src.core.__init__",
+        "src.core.task_manager"
+      ],
+      "src.core.event_bus": [
+        "src.api.routes.system",
+        "src.api.websocket.event_stream",
+        "src.config.dependencies",
+        "src.core.__init__",
+        "src.core.agent_orchestrator",
+        "src.core.evolution_engine",
+        "src.core.task_manager"
+      ],
+      "src.core.evolution_engine": [
+        "src.config.dependencies",
+        "src.core.__init__",
+        "src.services.evolution_service"
+      ],
+      "src.core.metrics": [
+        "src.api.routes.system",
+        "src.core.__init__"
+      ],
+      "src.core.pipeline_graph": [
+        "src.core.__init__"
+      ],
+      "src.core.queue_backends.in_memory_queue": [
+        "src.core.queue_backends.__init__"
+      ],
+      "src.core.queue_backends.redis_queue": [
+        "src.core.queue_backends.__init__"
+      ],
+      "src.core.task_manager": [
+        "src.api.routes.system",
+        "src.config.dependencies",
+        "src.core.__init__",
+        "src.services.task_service"
+      ],
+      "src.core.task_queue": [
+        "src.core.__init__"
+      ],
+      "src.core.worker_pool": [
+        "src.core.__init__",
+        "src.core.task_manager"
+      ],
+      "src.db.models": [
+        "src.api.routes.auth",
+        "src.core.agent_orchestrator",
+        "src.core.evolution_engine",
+        "src.core.task_manager",
+        "src.db.__init__",
+        "src.db.session",
+        "src.services.chat_service",
+        "src.services.skill_service",
+        "src.storage.artifact_store",
+        "src.utils.audit_logger"
+      ],
+      "src.db.session": [
+        "src.api.routes.auth",
+        "src.config.dependencies",
+        "src.core.task_manager",
+        "src.db.__init__",
+        "src.main"
+      ],
+      "src.memory.embeddings": [
+        "src.memory.vector_store"
+      ],
+      "src.memory.vector_store": [
+        "src.api.routes.system",
+        "src.config.dependencies",
+        "src.core.agent_orchestrator",
+        "src.memory.__init__",
+        "src.memory.context_manager"
+      ],
+      "src.providers.circuit_breaker.breaker_backend": [
+        "src.core.metrics"
+      ],
+      "src.providers.circuit_breaker.memory_backend": [
+        "src.providers.circuit_breaker.__init__"
+      ],
+      "src.providers.circuit_breaker.redis_backend": [
+        "src.providers.circuit_breaker.__init__"
+      ],
+      "src.providers.digitalocean.circuit_breaker": [
+        "src.providers.digitalocean.digitalocean_agent_client"
+      ],
+      "src.providers.digitalocean.digitalocean_agent_client": [
+        "src.providers.digitalocean.digitalocean_agent_router"
+      ],
+      "src.providers.digitalocean.digitalocean_agent_router": [
+        "src.core.agent_orchestrator"
+      ],
+      "src.providers.digitalocean.digitalocean_agent_types": [
+        "src.providers.digitalocean.digitalocean_agent_client",
+        "src.providers.digitalocean.digitalocean_agent_router"
+      ],
+      "src.schemas.auth": [
+        "src.api.routes.auth"
+      ],
+      "src.schemas.chat": [
+        "src.api.controllers.chat_controller",
+        "src.api.routes.chats",
+        "src.schemas.__init__",
+        "src.services.chat_service"
+      ],
+      "src.schemas.evolution": [
+        "src.api.routes.evolution",
+        "src.schemas.__init__"
+      ],
+      "src.schemas.skill": [
+        "src.api.routes.skills",
+        "src.schemas.__init__"
+      ],
+      "src.schemas.system": [
+        "src.api.routes.system",
+        "src.schemas.__init__"
+      ],
+      "src.schemas.task": [
+        "src.api.controllers.task_controller",
+        "src.api.routes.chats",
+        "src.api.routes.tasks",
+        "src.schemas.__init__",
+        "src.services.task_service",
+        "src.utils.validators"
+      ],
+      "src.services.auth_service": [
+        "src.api.routes.auth"
+      ],
+      "src.services.chat_service": [
+        "src.api.controllers.chat_controller",
+        "src.api.routes.chats",
+        "src.config.dependencies"
+      ],
+      "src.services.evolution_service": [
+        "src.api.controllers.evolution_controller",
+        "src.api.routes.evolution",
+        "src.config.dependencies",
+        "src.services.__init__"
+      ],
+      "src.services.skill_service": [
+        "src.api.controllers.skill_controller",
+        "src.api.routes.skills",
+        "src.config.dependencies",
+        "src.services.__init__"
+      ],
+      "src.services.task_service": [
+        "src.api.controllers.task_controller",
+        "src.api.routes.tasks",
+        "src.config.dependencies",
+        "src.services.__init__"
+      ],
+      "src.skills.executor": [
+        "src.config.dependencies",
+        "src.core.agent_orchestrator",
+        "src.skills.__init__"
+      ],
+      "src.skills.registry": [
+        "src.api.routes.system",
+        "src.config.dependencies",
+        "src.core.evolution_engine",
+        "src.services.skill_service",
+        "src.skills.__init__"
+      ],
+      "src.utils.audit_logger": [
+        "src.main"
+      ],
+      "src.utils.logger": [
+        "src.ai.gemini_client",
+        "src.ai.llm_service",
+        "src.core.agent_orchestrator",
+        "src.core.evolution_engine",
+        "src.core.metrics",
+        "src.core.task_manager",
+        "src.core.worker_pool",
+        "src.main",
+        "src.memory.context_manager",
+        "src.providers.digitalocean.digitalocean_agent_client",
+        "src.providers.digitalocean.digitalocean_agent_router"
+      ]
+    }
+  }
+}

@@ -43,7 +43,26 @@ class SystemService:
     async def check_vector_store(self) -> str:
         """Check vector store connectivity"""
         try:
-            await asyncio.to_thread(self.vector_store.collection.count)
+            # Prefer a provider-agnostic health/statistics method if available,
+            # and fall back to backend-specific attributes only when present.
+            check_callable = None
+
+            # Common pattern: a stats or health method on the vector_store itself.
+            if hasattr(self.vector_store, "get_collection_stats"):
+                check_callable = getattr(self.vector_store, "get_collection_stats")
+            # Some implementations may expose a direct `count` method.
+            elif hasattr(self.vector_store, "count"):
+                check_callable = getattr(self.vector_store, "count")
+            # Fallback to the original pattern, but guard attribute access.
+            elif hasattr(self.vector_store, "collection") and hasattr(
+                self.vector_store.collection, "count"
+            ):
+                check_callable = self.vector_store.collection.count
+
+            # If we found a suitable callable, run it in a thread to avoid blocking.
+            if check_callable is not None:
+                await asyncio.to_thread(check_callable)
+
             return "ok"
         except Exception:
             return "error"
@@ -111,10 +130,21 @@ class SystemService:
             worker_pool = getattr(self.task_manager, "_pool", None)
             task_queue = getattr(self.task_manager, "_queue", None)
 
+            workers = 0
+            if worker_pool:
+                try:
+                    status = worker_pool.status()
+                    if isinstance(status, dict):
+                        workers = status.get("worker_count", 0)
+                    else:
+                        workers = getattr(status, "worker_count", 0)
+                except Exception:
+                    workers = 0
+
             return {
                 "timestamp": asyncio.get_event_loop().time(),
                 "version": "Phase-3",
-                "workers": worker_pool.size if worker_pool else 0,
+                "workers": workers,
                 "queued_tasks": task_queue.qsize() if task_queue else 0,
             }
         except Exception as e:
@@ -213,7 +243,7 @@ class SystemService:
                 "test_mode": self.settings.test_mode,
                 "debug_mode": self.settings.axon_debug_pipeline,
                 "vector_store_provider": self.settings.vector_db_provider,
-                "llm_provider": "gemini" if self.settings.axon_mode == "gemini" else "gradient" if self.settings.axon_mode == "gradient" else "digital-ocean" if self.settings.axon_mode == "real" else "mock",
+                "llm_provider": self.settings.axon_mode,
                 "evolution_enabled": True,
                 "version": "Phase-4",
             }

@@ -1,0 +1,301 @@
+{
+  "nodes": [
+    {
+      "id": "__init__",
+      "label": "__INIT__",
+      "type": "layer",
+      "count": 1
+    },
+    {
+      "id": "agents",
+      "label": "AGENTS",
+      "type": "layer",
+      "count": 1
+    },
+    {
+      "id": "ai",
+      "label": "AI",
+      "type": "layer",
+      "count": 5
+    },
+    {
+      "id": "api",
+      "label": "API",
+      "type": "layer",
+      "count": 16
+    },
+    {
+      "id": "config",
+      "label": "CONFIG",
+      "type": "layer",
+      "count": 3
+    },
+    {
+      "id": "core",
+      "label": "CORE",
+      "type": "layer",
+      "count": 10
+    },
+    {
+      "id": "db",
+      "label": "DB",
+      "type": "layer",
+      "count": 2
+    },
+    {
+      "id": "main",
+      "label": "MAIN",
+      "type": "layer",
+      "count": 1
+    },
+    {
+      "id": "memory",
+      "label": "MEMORY",
+      "type": "layer",
+      "count": 4
+    },
+    {
+      "id": "providers",
+      "label": "PROVIDERS",
+      "type": "layer",
+      "count": 5
+    },
+    {
+      "id": "schemas",
+      "label": "SCHEMAS",
+      "type": "layer",
+      "count": 1
+    },
+    {
+      "id": "services",
+      "label": "SERVICES",
+      "type": "layer",
+      "count": 6
+    },
+    {
+      "id": "skills",
+      "label": "SKILLS",
+      "type": "layer",
+      "count": 10
+    },
+    {
+      "id": "storage",
+      "label": "STORAGE",
+      "type": "layer",
+      "count": 2
+    },
+    {
+      "id": "utils",
+      "label": "UTILS",
+      "type": "layer",
+      "count": 5
+    }
+  ],
+  "edges": [
+    {
+      "source": "ai",
+      "target": "config",
+      "type": "dependency"
+    },
+    {
+      "source": "ai",
+      "target": "utils",
+      "type": "dependency"
+    },
+    {
+      "source": "api",
+      "target": "config",
+      "type": "dependency"
+    },
+    {
+      "source": "api",
+      "target": "core",
+      "type": "dependency"
+    },
+    {
+      "source": "api",
+      "target": "db",
+      "type": "dependency"
+    },
+    {
+      "source": "api",
+      "target": "memory",
+      "type": "dependency"
+    },
+    {
+      "source": "api",
+      "target": "schemas",
+      "type": "dependency"
+    },
+    {
+      "source": "api",
+      "target": "services",
+      "type": "dependency"
+    },
+    {
+      "source": "api",
+      "target": "skills",
+      "type": "dependency"
+    },
+    {
+      "source": "config",
+      "target": "ai",
+      "type": "dependency"
+    },
+    {
+      "source": "config",
+      "target": "core",
+      "type": "dependency"
+    },
+    {
+      "source": "config",
+      "target": "db",
+      "type": "dependency"
+    },
+    {
+      "source": "config",
+      "target": "memory",
+      "type": "dependency"
+    },
+    {
+      "source": "config",
+      "target": "services",
+      "type": "dependency"
+    },
+    {
+      "source": "config",
+      "target": "skills",
+      "type": "dependency"
+    },
+    {
+      "source": "core",
+      "target": "agents",
+      "type": "dependency"
+    },
+    {
+      "source": "core",
+      "target": "ai",
+      "type": "dependency"
+    },
+    {
+      "source": "core",
+      "target": "config",
+      "type": "dependency"
+    },
+    {
+      "source": "core",
+      "target": "db",
+      "type": "dependency"
+    },
+    {
+      "source": "core",
+      "target": "memory",
+      "type": "dependency"
+    },
+    {
+      "source": "core",
+      "target": "providers",
+      "type": "dependency"
+    },
+    {
+      "source": "core",
+      "target": "skills",
+      "type": "dependency"
+    },
+    {
+      "source": "core",
+      "target": "utils",
+      "type": "dependency"
+    },
+    {
+      "source": "db",
+      "target": "config",
+      "type": "dependency"
+    },
+    {
+      "source": "main",
+      "target": "api",
+      "type": "dependency"
+    },
+    {
+      "source": "main",
+      "target": "config",
+      "type": "dependency"
+    },
+    {
+      "source": "main",
+      "target": "db",
+      "type": "dependency"
+    },
+    {
+      "source": "main",
+      "target": "utils",
+      "type": "dependency"
+    },
+    {
+      "source": "memory",
+      "target": "config",
+      "type": "dependency"
+    },
+    {
+      "source": "memory",
+      "target": "utils",
+      "type": "dependency"
+    },
+    {
+      "source": "providers",
+      "target": "config",
+      "type": "dependency"
+    },
+    {
+      "source": "providers",
+      "target": "utils",
+      "type": "dependency"
+    },
+    {
+      "source": "services",
+      "target": "config",
+      "type": "dependency"
+    },
+    {
+      "source": "services",
+      "target": "core",
+      "type": "dependency"
+    },
+    {
+      "source": "services",
+      "target": "db",
+      "type": "dependency"
+    },
+    {
+      "source": "services",
+      "target": "schemas",
+      "type": "dependency"
+    },
+    {
+      "source": "services",
+      "target": "skills",
+      "type": "dependency"
+    },
+    {
+      "source": "storage",
+      "target": "db",
+      "type": "dependency"
+    },
+    {
+      "source": "utils",
+      "target": "config",
+      "type": "dependency"
+    },
+    {
+      "source": "utils",
+      "target": "db",
+      "type": "dependency"
+    },
+    {
+      "source": "utils",
+      "target": "schemas",
+      "type": "dependency"
+    }
+  ]
+}
