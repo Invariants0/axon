@@ -1,5 +1,6 @@
 from collections.abc import AsyncGenerator
 from time import monotonic
+from typing import Any
 
 from fastapi import Depends, Header, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -58,7 +59,7 @@ def get_llm_service() -> LLMService:
     return _llm_service
 
 
-def get_vector_store() -> VectorStore:
+def get_vector_store() -> Any:
     return _vector_store
 
 
