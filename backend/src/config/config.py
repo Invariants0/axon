@@ -26,6 +26,8 @@ class Settings(BaseSettings):
         default="HuggingFaceH4/zephyr-7b-beta",
         alias="HUGGINGFACE_MODEL",
     )
+    gemini_api_key: str = Field(default="", alias="GEMINI_API_KEY")
+    gemini_model: str = Field(default="gemini-2.5-flash", alias="GEMINI_MODEL")
     database_url: str = Field(
         default="postgresql+asyncpg://postgres:postgres@localhost:5432/axon",
         alias="DATABASE_URL",
@@ -52,6 +54,11 @@ class Settings(BaseSettings):
     axon_redis_url: str = Field(default="redis://localhost:6379", alias="AXON_REDIS_URL")
     axon_redis_queue_name: str = Field(default="axon:tasks", alias="AXON_REDIS_QUEUE_NAME")
     axon_breaker_backend: str = Field(default="memory", alias="AXON_BREAKER_BACKEND")
+    
+    # Hackathon Testing
+    axon_api_key: str = Field(default="", alias="AXON_API_KEY")
+    axon_debug_pipeline: bool = Field(default=False, alias="AXON_DEBUG_PIPELINE")
+    skill_execution_timeout: int = Field(default=20, alias="SKILL_EXECUTION_TIMEOUT")
 
     def model_post_init(self, __context) -> None:
         """Resolve relative vector DB paths against backend root, not shell cwd."""

@@ -6,6 +6,7 @@ Maintains backward compatibility with Phase-2 CircuitBreaker.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from datetime import datetime
 
 from src.providers.circuit_breaker.breaker_backend import (

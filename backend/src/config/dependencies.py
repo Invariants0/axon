@@ -35,6 +35,10 @@ _evolution_engine = EvolutionEngine(
     skill_registry=_skill_registry,
     event_bus=_event_bus,
 )
+
+# Connect evolution engine to skill executor for automatic skill generation
+_skill_executor.set_evolution_engine(_evolution_engine)
+
 _rate_state: dict[str, tuple[int, float]] = {}
 
 
@@ -70,6 +74,10 @@ def get_evolution_engine() -> EvolutionEngine:
     return _evolution_engine
 
 
+def get_skill_executor() -> SkillExecutor:
+    return _skill_executor
+
+
 async def get_task_service(
     session: AsyncSession = Depends(get_db_session),
 ) -> AsyncGenerator[TaskService, None]:
@@ -89,16 +97,33 @@ async def get_evolution_service(
 
 
 async def require_api_key(
-    x_api_key: str = Header(default=""),
+    x_axon_key: str = Header(default="", alias="X-AXON-KEY"),
     app_settings: Settings = Depends(get_app_settings),
 ) -> None:
-    if not app_settings.api_key:
+    """
+    Hackathon API key authentication.
+    
+    Checks for AXON_API_KEY environment variable.
+    If set, requests must include X-AXON-KEY header with matching value.
+    """
+    # Check new AXON_API_KEY first (hackathon mode)
+    if app_settings.axon_api_key:
+        if x_axon_key != app_settings.axon_api_key:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid or missing X-AXON-KEY header",
+            )
         return
-    if x_api_key != app_settings.api_key:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid API key",
-        )
+    
+    # Fallback to legacy API_KEY for backward compatibility
+    if app_settings.api_key:
+        # Check both X-AXON-KEY and X-API-KEY for backward compatibility
+        x_api_key = x_axon_key  # X-AXON-KEY takes precedence
+        if x_api_key != app_settings.api_key:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid API key",
+            )
 
 
 async def rate_limit_hook(
