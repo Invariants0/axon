@@ -75,13 +75,22 @@ class ConfigValidator:
         
         # ===== VECTOR STORE VALIDATION =====
         valid_vector_providers = {"chroma", "qdrant"}
-        if settings.vector_db_provider not in valid_vector_providers:
+        # Normalize provider to match vector_store_provider behavior:
+        # - lowercased
+        # - stripped of surrounding whitespace
+        # - empty or missing value defaults to "chroma"
+        raw_vector_provider = settings.vector_db_provider or ""
+        normalized_vector_provider = raw_vector_provider.strip().lower()
+        if normalized_vector_provider == "":
+            normalized_vector_provider = "chroma"
+
+        if normalized_vector_provider not in valid_vector_providers:
             issues.append(
                 f"Invalid VECTOR_DB_PROVIDER: {settings.vector_db_provider}. "
                 f"Must be one of: {', '.join(valid_vector_providers)}"
             )
         
-        if settings.vector_db_provider == "qdrant":
+        if normalized_vector_provider == "qdrant":
             if not settings.qdrant_url:
                 issues.append(
                     "VECTOR_DB_PROVIDER=qdrant requires QDRANT_URL to be set"
