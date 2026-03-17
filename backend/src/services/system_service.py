@@ -43,7 +43,26 @@ class SystemService:
     async def check_vector_store(self) -> str:
         """Check vector store connectivity"""
         try:
-            await asyncio.to_thread(self.vector_store.collection.count)
+            # Prefer a provider-agnostic health/statistics method if available,
+            # and fall back to backend-specific attributes only when present.
+            check_callable = None
+
+            # Common pattern: a stats or health method on the vector_store itself.
+            if hasattr(self.vector_store, "get_collection_stats"):
+                check_callable = getattr(self.vector_store, "get_collection_stats")
+            # Some implementations may expose a direct `count` method.
+            elif hasattr(self.vector_store, "count"):
+                check_callable = getattr(self.vector_store, "count")
+            # Fallback to the original pattern, but guard attribute access.
+            elif hasattr(self.vector_store, "collection") and hasattr(
+                self.vector_store.collection, "count"
+            ):
+                check_callable = self.vector_store.collection.count
+
+            # If we found a suitable callable, run it in a thread to avoid blocking.
+            if check_callable is not None:
+                await asyncio.to_thread(check_callable)
+
             return "ok"
         except Exception:
             return "error"
