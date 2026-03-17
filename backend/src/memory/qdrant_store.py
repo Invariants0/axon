@@ -124,7 +124,7 @@ class QdrantStore:
         
         # Create point and upsert to Qdrant
         point = PointStruct(
-            id=hash(memory_id) & 0x7FFFFFFF,  # Convert UUID to positive integer
+            id=memory_id,  # Use stable UUID string as point ID
             vector=vector,
             payload=merged_metadata,
         )
