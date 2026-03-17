@@ -213,7 +213,7 @@ class SystemService:
                 "test_mode": self.settings.test_mode,
                 "debug_mode": self.settings.axon_debug_pipeline,
                 "vector_store_provider": self.settings.vector_db_provider,
-                "llm_provider": "gemini" if self.settings.axon_mode == "gemini" else "gradient" if self.settings.axon_mode == "gradient" else "digital-ocean" if self.settings.axon_mode == "real" else "mock",
+                "llm_provider": self.settings.axon_mode,
                 "evolution_enabled": True,
                 "version": "Phase-4",
             }
