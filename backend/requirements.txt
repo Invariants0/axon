@@ -12,3 +12,4 @@ orjson
 loguru
 chromadb
 sentence-transformers
+aioredis
