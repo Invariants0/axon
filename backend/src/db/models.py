@@ -51,6 +51,7 @@ class Task(Base, TimestampMixin):
     description: Mapped[str] = mapped_column(Text, default="", nullable=False)
     status: Mapped[str] = mapped_column(String(50), default="queued", nullable=False)
     result: Mapped[str] = mapped_column(Text, default="", nullable=False)
+    trace_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True, default=lambda: str(uuid.uuid4()))
 
     chat_session: Mapped[ChatSession | None] = relationship(back_populates="tasks")
 
@@ -84,6 +85,14 @@ class AgentExecution(Base, TimestampMixin):
     status: Mapped[str] = mapped_column(String(50), default="started", nullable=False)
     input_payload: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
     output_payload: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+
+    # Timeline tracking (Phase-4)
+    start_time: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    end_time: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    duration_ms: Mapped[int | None] = mapped_column(nullable=True)
+
+    # Error tracking
+    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     task: Mapped[Task] = relationship(back_populates="executions")
 

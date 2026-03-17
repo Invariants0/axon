@@ -1,5 +1,6 @@
 from collections.abc import AsyncGenerator
 from time import monotonic
+from typing import Any
 
 from fastapi import Depends, Header, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -11,9 +12,9 @@ from src.core.evolution_engine import EvolutionEngine
 from src.core.event_bus import EventBus
 from src.core.task_manager import TaskManager
 from src.db.session import get_db_session
-from src.memory.vector_store import VectorStore
-from src.services.evolution_service import EvolutionService
+from src.providers.vector_store_provider import create_vector_store
 from src.services.chat_service import ChatService
+from src.services.evolution_service import EvolutionService
 from src.services.skill_service import SkillService
 from src.services.task_service import TaskService
 from src.skills.executor import SkillExecutor
@@ -22,7 +23,7 @@ from src.skills.registry import SkillRegistry
 _event_bus = EventBus()
 _skill_registry = SkillRegistry()
 _skill_executor = SkillExecutor(_skill_registry)
-_vector_store = VectorStore()
+_vector_store = create_vector_store()  # Uses factory to select Chroma or Qdrant
 _llm_service = LLMService()
 _orchestrator = AgentOrchestrator(
     llm_service=_llm_service,
@@ -59,7 +60,7 @@ def get_llm_service() -> LLMService:
     return _llm_service
 
 
-def get_vector_store() -> VectorStore:
+def get_vector_store() -> Any:
     return _vector_store
 
 

@@ -34,6 +34,7 @@ def upgrade() -> None:
         sa.Column("description", sa.Text(), nullable=False),
         sa.Column("status", sa.String(length=50), nullable=False),
         sa.Column("result", sa.Text(), nullable=False),
+        sa.Column("trace_id", sa.String(length=36), nullable=False, server_default=sa.text("gen_random_uuid()::text")),
         sa.Column("id", sa.String(length=36), nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
@@ -41,6 +42,7 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_index(op.f("ix_tasks_chat_id"), "tasks", ["chat_id"], unique=False)
+    op.create_index(op.f("ix_tasks_trace_id"), "tasks", ["trace_id"], unique=False)
 
     op.create_table(
         "skills",
@@ -75,6 +77,10 @@ def upgrade() -> None:
         sa.Column("status", sa.String(length=50), nullable=False),
         sa.Column("input_payload", sa.JSON(), nullable=False),
         sa.Column("output_payload", sa.JSON(), nullable=False),
+        sa.Column("start_time", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("end_time", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("duration_ms", sa.Integer(), nullable=True),
+        sa.Column("error_message", sa.Text(), nullable=True),
         sa.Column("id", sa.String(length=36), nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
@@ -125,6 +131,7 @@ def downgrade() -> None:
     op.drop_table("users")
     op.drop_index(op.f("ix_skills_name"), table_name="skills")
     op.drop_table("skills")
+    op.drop_index(op.f("ix_tasks_trace_id"), table_name="tasks")
     op.drop_index(op.f("ix_tasks_chat_id"), table_name="tasks")
     op.drop_table("tasks")
     op.drop_table("chat_sessions")

@@ -12,3 +12,4 @@ orjson
 loguru
 chromadb
 sentence-transformers
+qdrant-client>=1.7.0
