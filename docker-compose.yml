@@ -1,14 +1,12 @@
 version: "3.9"
 
 services:
-  frontend:
-    image: oven/bun:1
-    working_dir: /app/frontend
-    volumes:
-      - ./:/app
-    command: sh -c "bun install && bun dev"
+  nginx:
+    build:
+      context: .
+      dockerfile: infra/docker/nginx.Dockerfile
     ports:
-      - "3000:3000"
+      - "80:80"
     depends_on:
       - backend
 
@@ -17,6 +15,6 @@ services:
     working_dir: /app/backend
     volumes:
       - ./:/app
-    command: sh -c "uv sync && uv run uvicorn main:app --app-dir src --host 0.0.0.0 --port 8000 --reload"
+    command: sh -c "uv sync && uv run uvicorn main:app --app-dir src --host 0.0.0.0 --port 8000"
     ports:
       - "8000:8000"
