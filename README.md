@@ -1,6 +1,6 @@
 # AXON
 
-AXON is a self-evolving AI agent platform scaffolded as a monorepo with a Next.js frontend and a FastAPI backend.
+AXON is a self-evolving AI agent platform scaffolded as a monorepo with a vanilla HTML/CSS/JS frontend and a FastAPI backend.
 
 ## Table of Contents
 
@@ -19,22 +19,24 @@ AXON is a self-evolving AI agent platform scaffolded as a monorepo with a Next.j
 
 ## Project Structure
 
-- `frontend/`: Next.js (TypeScript, TailwindCSS, Bun, Biome)
+- `frontend/`: Vanilla HTML, CSS, and JavaScript static files
 - `backend/`: FastAPI (Python 3.11+, UV, async-first skeleton)
+- `infra/`: Docker and Terraform configuration
 - `docs/`: Project documentation
   - [`docs/api/`](docs/api/README.md): REST and WebSocket API reference
 
-## Run Frontend
+## Run with Docker Compose
 
 ```bash
-cd frontend
-bun install
-bun dev
+docker compose up --build
 ```
 
-Frontend runs on http://localhost:3000.
+The app is served by nginx on http://localhost:80.
+- Static frontend files are served directly by nginx.
+- Requests to `/api/*` are proxied to the backend (port 8000).
+- WebSocket connections to `/ws/*` are proxied to the backend.
 
-## Run Backend
+## Run Backend (standalone)
 
 ```bash
 cd backend
