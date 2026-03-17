@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.api.middleware.logging_middleware import LoggingMiddleware
-from src.api.routes import evolution, skills, system, tasks
+from src.api.routes import auth, chats, evolution, skills, system, tasks
 from src.api.websocket.event_stream import router as ws_router
 from src.config.config import get_settings
 from src.config.dependencies import get_task_manager
@@ -40,7 +40,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth.router)
 app.include_router(tasks.router, prefix="/tasks", tags=["tasks"])
+app.include_router(chats.router, prefix="/chats", tags=["chats"])
 app.include_router(evolution.router, prefix="/evolution", tags=["evolution"])
 app.include_router(skills.router, prefix="/skills", tags=["skills"])
 app.include_router(system.router, prefix="/system", tags=["system"])

@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     env: str = "development"
     test_mode: bool = Field(default=True, alias="TEST_MODE")
     api_key: str = Field(default="", alias="API_KEY")
+    secret_key: str = Field(default="change-me-in-production", alias="SECRET_KEY")
     gradient_api_key: str = Field(default="", alias="GRADIENT_API_KEY")
     gradient_model: str = Field(default="gpt-4.1-mini", alias="GRADIENT_MODEL")
     gradient_base_url: str = Field(

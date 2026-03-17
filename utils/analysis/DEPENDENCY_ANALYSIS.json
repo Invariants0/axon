@@ -1,0 +1,1906 @@
+{
+  "modules": {
+    "src.__init__": {
+      "path": "backend/src/__init__.py",
+      "line_count": 1,
+      "imports": [],
+      "internal_imports": [],
+      "external_imports": [],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.agents.__init__": {
+      "path": "backend/src/agents/__init__.py",
+      "line_count": 13,
+      "imports": [
+        "src.agents.base_agent",
+        "src.agents.builder_agent",
+        "src.agents.planning_agent",
+        "src.agents.reasoning_agent",
+        "src.agents.research_agent"
+      ],
+      "internal_imports": [
+        "src.agents.base_agent",
+        "src.agents.builder_agent",
+        "src.agents.planning_agent",
+        "src.agents.reasoning_agent",
+        "src.agents.research_agent"
+      ],
+      "external_imports": [],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.agents.base_agent": {
+      "error": "expected string or bytes-like object, got 'Module'",
+      "path": "backend/src/agents/base_agent.py"
+    },
+    "src.agents.builder_agent": {
+      "error": "expected string or bytes-like object, got 'Module'",
+      "path": "backend/src/agents/builder_agent.py"
+    },
+    "src.agents.planning_agent": {
+      "error": "expected string or bytes-like object, got 'Module'",
+      "path": "backend/src/agents/planning_agent.py"
+    },
+    "src.agents.reasoning_agent": {
+      "error": "expected string or bytes-like object, got 'Module'",
+      "path": "backend/src/agents/reasoning_agent.py"
+    },
+    "src.agents.research_agent": {
+      "error": "expected string or bytes-like object, got 'Module'",
+      "path": "backend/src/agents/research_agent.py"
+    },
+    "src.ai.__init__": {
+      "path": "backend/src/ai/__init__.py",
+      "line_count": 3,
+      "imports": [
+        "src.ai.llm_service"
+      ],
+      "internal_imports": [
+        "src.ai.llm_service"
+      ],
+      "external_imports": [],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.ai.gemini_client": {
+      "path": "backend/src/ai/gemini_client.py",
+      "line_count": 188,
+      "imports": [
+        "src.config.config",
+        "src.utils.logger",
+        "__future__",
+        "asyncio",
+        "httpx",
+        "tenacity",
+        "typing"
+      ],
+      "internal_imports": [
+        "src.config.config",
+        "src.utils.logger"
+      ],
+      "external_imports": [
+        "__future__",
+        "asyncio",
+        "httpx",
+        "tenacity",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "GeminiClient",
+          "lineno": 27,
+          "bases": [],
+          "methods": 3
+        }
+      ],
+      "functions": [],
+      "total_classes": 1,
+      "total_functions": 3
+    },
+    "src.ai.gradient_client": {
+      "path": "backend/src/ai/gradient_client.py",
+      "line_count": 35,
+      "imports": [
+        "src.config.config",
+        "httpx",
+        "typing"
+      ],
+      "internal_imports": [
+        "src.config.config"
+      ],
+      "external_imports": [
+        "httpx",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "GradientClient",
+          "lineno": 8,
+          "bases": [],
+          "methods": 1
+        }
+      ],
+      "functions": [],
+      "total_classes": 1,
+      "total_functions": 1
+    },
+    "src.ai.huggingface_client": {
+      "path": "backend/src/ai/huggingface_client.py",
+      "line_count": 38,
+      "imports": [
+        "src.config.config",
+        "httpx",
+        "typing"
+      ],
+      "internal_imports": [
+        "src.config.config"
+      ],
+      "external_imports": [
+        "httpx",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "HuggingFaceClient",
+          "lineno": 8,
+          "bases": [],
+          "methods": 1
+        }
+      ],
+      "functions": [],
+      "total_classes": 1,
+      "total_functions": 1
+    },
+    "src.ai.llm_service": {
+      "path": "backend/src/ai/llm_service.py",
+      "line_count": 163,
+      "imports": [
+        "src.ai.gemini_client",
+        "src.ai.gradient_client",
+        "src.ai.huggingface_client",
+        "src.config.config",
+        "src.utils.logger",
+        "__future__",
+        "collections",
+        "json",
+        "tenacity",
+        "transformers",
+        "typing"
+      ],
+      "internal_imports": [
+        "src.ai.gemini_client",
+        "src.ai.gradient_client",
+        "src.ai.huggingface_client",
+        "src.config.config",
+        "src.utils.logger"
+      ],
+      "external_imports": [
+        "__future__",
+        "collections",
+        "json",
+        "tenacity",
+        "transformers",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "LLMService",
+          "lineno": 18,
+          "bases": [],
+          "methods": 4
+        }
+      ],
+      "functions": [],
+      "total_classes": 1,
+      "total_functions": 4
+    },
+    "src.api.__init__": {
+      "path": "backend/src/api/__init__.py",
+      "line_count": 1,
+      "imports": [],
+      "internal_imports": [],
+      "external_imports": [],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.api.controllers.__init__": {
+      "path": "backend/src/api/controllers/__init__.py",
+      "line_count": 12,
+      "imports": [
+        "src.api.controllers.evolution_controller",
+        "src.api.controllers.skill_controller",
+        "src.api.controllers.task_controller"
+      ],
+      "internal_imports": [
+        "src.api.controllers.evolution_controller",
+        "src.api.controllers.skill_controller",
+        "src.api.controllers.task_controller"
+      ],
+      "external_imports": [],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.api.controllers.chat_controller": {
+      "path": "backend/src/api/controllers/chat_controller.py",
+      "line_count": 40,
+      "imports": [
+        "src.schemas.chat",
+        "src.services.chat_service",
+        "fastapi"
+      ],
+      "internal_imports": [
+        "src.schemas.chat",
+        "src.services.chat_service"
+      ],
+      "external_imports": [
+        "fastapi"
+      ],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.api.controllers.evolution_controller": {
+      "path": "backend/src/api/controllers/evolution_controller.py",
+      "line_count": 9,
+      "imports": [
+        "src.services.evolution_service"
+      ],
+      "internal_imports": [
+        "src.services.evolution_service"
+      ],
+      "external_imports": [],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.api.controllers.skill_controller": {
+      "path": "backend/src/api/controllers/skill_controller.py",
+      "line_count": 5,
+      "imports": [
+        "src.services.skill_service"
+      ],
+      "internal_imports": [
+        "src.services.skill_service"
+      ],
+      "external_imports": [],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.api.controllers.task_controller": {
+      "path": "backend/src/api/controllers/task_controller.py",
+      "line_count": 20,
+      "imports": [
+        "src.schemas.task",
+        "src.services.task_service",
+        "fastapi"
+      ],
+      "internal_imports": [
+        "src.schemas.task",
+        "src.services.task_service"
+      ],
+      "external_imports": [
+        "fastapi"
+      ],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.api.middleware.__init__": {
+      "path": "backend/src/api/middleware/__init__.py",
+      "line_count": 3,
+      "imports": [
+        "src.api.middleware.logging_middleware"
+      ],
+      "internal_imports": [
+        "src.api.middleware.logging_middleware"
+      ],
+      "external_imports": [],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.api.middleware.logging_middleware": {
+      "error": "expected string or bytes-like object, got 'Module'",
+      "path": "backend/src/api/middleware/logging_middleware.py"
+    },
+    "src.api.routes.__init__": {
+      "path": "backend/src/api/routes/__init__.py",
+      "line_count": 3,
+      "imports": [
+        "src.api.routes"
+      ],
+      "internal_imports": [
+        "src.api.routes"
+      ],
+      "external_imports": [],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.api.routes.auth": {
+      "path": "backend/src/api/routes/auth.py",
+      "line_count": 139,
+      "imports": [
+        "src.config.config",
+        "src.config.dependencies",
+        "src.db.models",
+        "src.db.session",
+        "src.schemas.auth",
+        "src.services.auth_service",
+        "datetime",
+        "fastapi",
+        "sqlalchemy",
+        "typing"
+      ],
+      "internal_imports": [
+        "src.config.config",
+        "src.config.dependencies",
+        "src.db.models",
+        "src.db.session",
+        "src.schemas.auth",
+        "src.services.auth_service"
+      ],
+      "external_imports": [
+        "datetime",
+        "fastapi",
+        "sqlalchemy",
+        "typing"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "name": "get_auth_service",
+          "lineno": 23,
+          "args": 2
+        }
+      ],
+      "total_classes": 0,
+      "total_functions": 1
+    },
+    "src.api.routes.chats": {
+      "path": "backend/src/api/routes/chats.py",
+      "line_count": 57,
+      "imports": [
+        "src.api.controllers.chat_controller",
+        "src.config.dependencies",
+        "src.schemas.chat",
+        "src.schemas.task",
+        "src.services.chat_service",
+        "fastapi"
+      ],
+      "internal_imports": [
+        "src.api.controllers.chat_controller",
+        "src.config.dependencies",
+        "src.schemas.chat",
+        "src.schemas.task",
+        "src.services.chat_service"
+      ],
+      "external_imports": [
+        "fastapi"
+      ],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.api.routes.evolution": {
+      "path": "backend/src/api/routes/evolution.py",
+      "line_count": 24,
+      "imports": [
+        "src.api.controllers.evolution_controller",
+        "src.config.dependencies",
+        "src.schemas.evolution",
+        "src.services.evolution_service",
+        "fastapi"
+      ],
+      "internal_imports": [
+        "src.api.controllers.evolution_controller",
+        "src.config.dependencies",
+        "src.schemas.evolution",
+        "src.services.evolution_service"
+      ],
+      "external_imports": [
+        "fastapi"
+      ],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.api.routes.skills": {
+      "path": "backend/src/api/routes/skills.py",
+      "line_count": 14,
+      "imports": [
+        "src.api.controllers.skill_controller",
+        "src.config.dependencies",
+        "src.schemas.skill",
+        "src.services.skill_service",
+        "fastapi"
+      ],
+      "internal_imports": [
+        "src.api.controllers.skill_controller",
+        "src.config.dependencies",
+        "src.schemas.skill",
+        "src.services.skill_service"
+      ],
+      "external_imports": [
+        "fastapi"
+      ],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.api.routes.system": {
+      "path": "backend/src/api/routes/system.py",
+      "line_count": 144,
+      "imports": [
+        "src.config.config",
+        "src.config.dependencies",
+        "src.core.agent_orchestrator",
+        "src.core.event_bus",
+        "src.core.metrics",
+        "src.core.task_manager",
+        "src.memory.vector_store",
+        "src.schemas.system",
+        "src.skills.registry",
+        "asyncio",
+        "fastapi",
+        "sqlalchemy"
+      ],
+      "internal_imports": [
+        "src.config.config",
+        "src.config.dependencies",
+        "src.core.agent_orchestrator",
+        "src.core.event_bus",
+        "src.core.metrics",
+        "src.core.task_manager",
+        "src.memory.vector_store",
+        "src.schemas.system",
+        "src.skills.registry"
+      ],
+      "external_imports": [
+        "asyncio",
+        "fastapi",
+        "sqlalchemy"
+      ],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.api.routes.tasks": {
+      "path": "backend/src/api/routes/tasks.py",
+      "line_count": 88,
+      "imports": [
+        "src.api.controllers.task_controller",
+        "src.config.dependencies",
+        "src.schemas.task",
+        "src.services.task_service",
+        "fastapi"
+      ],
+      "internal_imports": [
+        "src.api.controllers.task_controller",
+        "src.config.dependencies",
+        "src.schemas.task",
+        "src.services.task_service"
+      ],
+      "external_imports": [
+        "fastapi"
+      ],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.api.websocket.__init__": {
+      "path": "backend/src/api/websocket/__init__.py",
+      "line_count": 3,
+      "imports": [
+        "src.api.websocket.event_stream"
+      ],
+      "internal_imports": [
+        "src.api.websocket.event_stream"
+      ],
+      "external_imports": [],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.api.websocket.event_stream": {
+      "path": "backend/src/api/websocket/event_stream.py",
+      "line_count": 29,
+      "imports": [
+        "src.config.dependencies",
+        "src.core.event_bus",
+        "asyncio",
+        "fastapi"
+      ],
+      "internal_imports": [
+        "src.config.dependencies",
+        "src.core.event_bus"
+      ],
+      "external_imports": [
+        "asyncio",
+        "fastapi"
+      ],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.config.__init__": {
+      "path": "backend/src/config/__init__.py",
+      "line_count": 3,
+      "imports": [
+        "src.config.config"
+      ],
+      "internal_imports": [
+        "src.config.config"
+      ],
+      "external_imports": [],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.config.agents_config": {
+      "path": "backend/src/config/agents_config.py",
+      "line_count": 16,
+      "imports": [
+        "src.config.config"
+      ],
+      "internal_imports": [
+        "src.config.config"
+      ],
+      "external_imports": [],
+      "classes": [],
+      "functions": [
+        {
+          "name": "get_agent_urls",
+          "lineno": 4,
+          "args": 0
+        },
+        {
+          "name": "is_real_mode",
+          "lineno": 14,
+          "args": 0
+        }
+      ],
+      "total_classes": 0,
+      "total_functions": 2
+    },
+    "src.config.config": {
+      "error": "expected string or bytes-like object, got 'Module'",
+      "path": "backend/src/config/config.py"
+    },
+    "src.config.config_validator": {
+      "error": "expected string or bytes-like object, got 'Module'",
+      "path": "backend/src/config/config_validator.py"
+    },
+    "src.config.dependencies": {
+      "path": "backend/src/config/dependencies.py",
+      "line_count": 154,
+      "imports": [
+        "src.ai.llm_service",
+        "src.config.config",
+        "src.core.agent_orchestrator",
+        "src.core.event_bus",
+        "src.core.evolution_engine",
+        "src.core.task_manager",
+        "src.db.session",
+        "src.memory.vector_store",
+        "src.services.chat_service",
+        "src.services.evolution_service",
+        "src.services.skill_service",
+        "src.services.task_service",
+        "src.skills.executor",
+        "src.skills.registry",
+        "collections",
+        "fastapi",
+        "sqlalchemy",
+        "time"
+      ],
+      "internal_imports": [
+        "src.ai.llm_service",
+        "src.config.config",
+        "src.core.agent_orchestrator",
+        "src.core.event_bus",
+        "src.core.evolution_engine",
+        "src.core.task_manager",
+        "src.db.session",
+        "src.memory.vector_store",
+        "src.services.chat_service",
+        "src.services.evolution_service",
+        "src.services.skill_service",
+        "src.services.task_service",
+        "src.skills.executor",
+        "src.skills.registry"
+      ],
+      "external_imports": [
+        "collections",
+        "fastapi",
+        "sqlalchemy",
+        "time"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "name": "get_app_settings",
+          "lineno": 46,
+          "args": 0
+        },
+        {
+          "name": "get_event_bus",
+          "lineno": 50,
+          "args": 0
+        },
+        {
+          "name": "get_skill_registry",
+          "lineno": 54,
+          "args": 0
+        },
+        {
+          "name": "get_llm_service",
+          "lineno": 58,
+          "args": 0
+        },
+        {
+          "name": "get_vector_store",
+          "lineno": 62,
+          "args": 0
+        },
+        {
+          "name": "get_task_manager",
+          "lineno": 66,
+          "args": 0
+        },
+        {
+          "name": "get_orchestrator",
+          "lineno": 70,
+          "args": 0
+        },
+        {
+          "name": "get_evolution_engine",
+          "lineno": 74,
+          "args": 0
+        },
+        {
+          "name": "get_skill_executor",
+          "lineno": 78,
+          "args": 0
+        }
+      ],
+      "total_classes": 0,
+      "total_functions": 9
+    },
+    "src.core.__init__": {
+      "path": "backend/src/core/__init__.py",
+      "line_count": 23,
+      "imports": [
+        "src.core.agent_orchestrator",
+        "src.core.event_bus",
+        "src.core.evolution_engine",
+        "src.core.metrics",
+        "src.core.pipeline_graph",
+        "src.core.task_manager",
+        "src.core.task_queue",
+        "src.core.worker_pool"
+      ],
+      "internal_imports": [
+        "src.core.agent_orchestrator",
+        "src.core.event_bus",
+        "src.core.evolution_engine",
+        "src.core.metrics",
+        "src.core.pipeline_graph",
+        "src.core.task_manager",
+        "src.core.task_queue",
+        "src.core.worker_pool"
+      ],
+      "external_imports": [],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.core.agent_orchestrator": {
+      "path": "backend/src/core/agent_orchestrator.py",
+      "line_count": 243,
+      "imports": [
+        "src.agents.builder_agent",
+        "src.agents.planning_agent",
+        "src.agents.reasoning_agent",
+        "src.agents.research_agent",
+        "src.ai.llm_service",
+        "src.config.config",
+        "src.core.event_bus",
+        "src.db.models",
+        "src.memory.vector_store",
+        "src.providers.digitalocean.digitalocean_agent_router",
+        "src.skills.executor",
+        "src.utils.logger",
+        "__future__",
+        "sqlalchemy",
+        "time"
+      ],
+      "internal_imports": [
+        "src.agents.builder_agent",
+        "src.agents.planning_agent",
+        "src.agents.reasoning_agent",
+        "src.agents.research_agent",
+        "src.ai.llm_service",
+        "src.config.config",
+        "src.core.event_bus",
+        "src.db.models",
+        "src.memory.vector_store",
+        "src.providers.digitalocean.digitalocean_agent_router",
+        "src.skills.executor",
+        "src.utils.logger"
+      ],
+      "external_imports": [
+        "__future__",
+        "sqlalchemy",
+        "time"
+      ],
+      "classes": [
+        {
+          "name": "AgentOrchestrator",
+          "lineno": 23,
+          "bases": [],
+          "methods": 1
+        }
+      ],
+      "functions": [],
+      "total_classes": 1,
+      "total_functions": 1
+    },
+    "src.core.debug_tools": {
+      "path": "backend/src/core/debug_tools.py",
+      "line_count": 41,
+      "imports": [
+        "src.config.dependencies",
+        "__future__"
+      ],
+      "internal_imports": [
+        "src.config.dependencies"
+      ],
+      "external_imports": [
+        "__future__"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "name": "verify_pipeline",
+          "lineno": 13,
+          "args": 0
+        }
+      ],
+      "total_classes": 0,
+      "total_functions": 1
+    },
+    "src.core.event_bus": {
+      "path": "backend/src/core/event_bus.py",
+      "line_count": 36,
+      "imports": [
+        "__future__",
+        "asyncio",
+        "collections"
+      ],
+      "internal_imports": [],
+      "external_imports": [
+        "__future__",
+        "asyncio",
+        "collections"
+      ],
+      "classes": [
+        {
+          "name": "EventBus",
+          "lineno": 9,
+          "bases": [],
+          "methods": 2
+        }
+      ],
+      "functions": [],
+      "total_classes": 1,
+      "total_functions": 2
+    },
+    "src.core.evolution_engine": {
+      "path": "backend/src/core/evolution_engine.py",
+      "line_count": 288,
+      "imports": [
+        "src.ai.llm_service",
+        "src.core.event_bus",
+        "src.db.models",
+        "src.skills.registry",
+        "src.utils.logger",
+        "__future__",
+        "datetime",
+        "importlib",
+        "re",
+        "sqlalchemy"
+      ],
+      "internal_imports": [
+        "src.ai.llm_service",
+        "src.core.event_bus",
+        "src.db.models",
+        "src.skills.registry",
+        "src.utils.logger"
+      ],
+      "external_imports": [
+        "__future__",
+        "datetime",
+        "importlib",
+        "re",
+        "sqlalchemy"
+      ],
+      "classes": [
+        {
+          "name": "EvolutionEngine",
+          "lineno": 19,
+          "bases": [],
+          "methods": 4
+        }
+      ],
+      "functions": [],
+      "total_classes": 1,
+      "total_functions": 4
+    },
+    "src.core.exceptions": {
+      "error": "expected string or bytes-like object, got 'Module'",
+      "path": "backend/src/core/exceptions.py"
+    },
+    "src.core.metrics": {
+      "path": "backend/src/core/metrics.py",
+      "line_count": 144,
+      "imports": [
+        "src.config.config",
+        "src.providers.circuit_breaker.breaker_backend",
+        "src.utils.logger",
+        "__future__",
+        "dataclasses",
+        "datetime",
+        "typing"
+      ],
+      "internal_imports": [
+        "src.config.config",
+        "src.providers.circuit_breaker.breaker_backend",
+        "src.utils.logger"
+      ],
+      "external_imports": [
+        "__future__",
+        "dataclasses",
+        "datetime",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "SystemMetrics",
+          "lineno": 28,
+          "bases": [],
+          "methods": 1
+        },
+        {
+          "name": "MetricsCollector",
+          "lineno": 64,
+          "bases": [],
+          "methods": 3
+        }
+      ],
+      "functions": [],
+      "total_classes": 2,
+      "total_functions": 4
+    },
+    "src.core.pipeline_graph": {
+      "error": "expected string or bytes-like object, got 'Module'",
+      "path": "backend/src/core/pipeline_graph.py"
+    },
+    "src.core.queue_backends.__init__": {
+      "path": "backend/src/core/queue_backends/__init__.py",
+      "line_count": 6,
+      "imports": [
+        "src.core.queue_backends.in_memory_queue",
+        "src.core.queue_backends.redis_queue"
+      ],
+      "internal_imports": [
+        "src.core.queue_backends.in_memory_queue",
+        "src.core.queue_backends.redis_queue"
+      ],
+      "external_imports": [],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.core.queue_backends.in_memory_queue": {
+      "error": "expected string or bytes-like object, got 'Module'",
+      "path": "backend/src/core/queue_backends/in_memory_queue.py"
+    },
+    "src.core.queue_backends.redis_queue": {
+      "error": "expected string or bytes-like object, got 'Module'",
+      "path": "backend/src/core/queue_backends/redis_queue.py"
+    },
+    "src.core.task_manager": {
+      "path": "backend/src/core/task_manager.py",
+      "line_count": 173,
+      "imports": [
+        "src.core.agent_orchestrator",
+        "src.core.event_bus",
+        "src.core.worker_pool",
+        "src.db.models",
+        "src.db.session",
+        "src.utils.logger",
+        "__future__",
+        "asyncio",
+        "collections",
+        "os",
+        "sqlalchemy",
+        "time"
+      ],
+      "internal_imports": [
+        "src.core.agent_orchestrator",
+        "src.core.event_bus",
+        "src.core.worker_pool",
+        "src.db.models",
+        "src.db.session",
+        "src.utils.logger"
+      ],
+      "external_imports": [
+        "__future__",
+        "asyncio",
+        "collections",
+        "os",
+        "sqlalchemy",
+        "time"
+      ],
+      "classes": [
+        {
+          "name": "TaskManager",
+          "lineno": 21,
+          "bases": [],
+          "methods": 4
+        }
+      ],
+      "functions": [],
+      "total_classes": 1,
+      "total_functions": 4
+    },
+    "src.core.task_queue": {
+      "error": "expected string or bytes-like object, got 'Module'",
+      "path": "backend/src/core/task_queue.py"
+    },
+    "src.core.version_manager": {
+      "path": "backend/src/core/version_manager.py",
+      "line_count": 3,
+      "imports": [],
+      "internal_imports": [],
+      "external_imports": [],
+      "classes": [
+        {
+          "name": "VersionManager",
+          "lineno": 1,
+          "bases": [],
+          "methods": 1
+        }
+      ],
+      "functions": [],
+      "total_classes": 1,
+      "total_functions": 1
+    },
+    "src.core.worker_pool": {
+      "path": "backend/src/core/worker_pool.py",
+      "line_count": 195,
+      "imports": [
+        "src.utils.logger",
+        "__future__",
+        "asyncio",
+        "collections",
+        "time",
+        "typing"
+      ],
+      "internal_imports": [
+        "src.utils.logger"
+      ],
+      "external_imports": [
+        "__future__",
+        "asyncio",
+        "collections",
+        "time",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "WorkerPool",
+          "lineno": 33,
+          "bases": [],
+          "methods": 2
+        }
+      ],
+      "functions": [],
+      "total_classes": 1,
+      "total_functions": 2
+    },
+    "src.db.__init__": {
+      "path": "backend/src/db/__init__.py",
+      "line_count": 16,
+      "imports": [
+        "src.db.models",
+        "src.db.session"
+      ],
+      "internal_imports": [
+        "src.db.models",
+        "src.db.session"
+      ],
+      "external_imports": [],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.db.models": {
+      "error": "expected string or bytes-like object, got 'Module'",
+      "path": "backend/src/db/models.py"
+    },
+    "src.db.session": {
+      "path": "backend/src/db/session.py",
+      "line_count": 46,
+      "imports": [
+        "src.config.config",
+        "src.db.models",
+        "collections",
+        "sqlalchemy"
+      ],
+      "internal_imports": [
+        "src.config.config",
+        "src.db.models"
+      ],
+      "external_imports": [
+        "collections",
+        "sqlalchemy"
+      ],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.main": {
+      "path": "backend/src/main.py",
+      "line_count": 108,
+      "imports": [
+        "src.api.middleware.logging_middleware",
+        "src.api.routes",
+        "src.api.websocket.event_stream",
+        "src.config.config",
+        "src.config.dependencies",
+        "src.db.session",
+        "src.utils.audit_logger",
+        "src.utils.logger",
+        "contextlib",
+        "fastapi"
+      ],
+      "internal_imports": [
+        "src.api.middleware.logging_middleware",
+        "src.api.routes",
+        "src.api.websocket.event_stream",
+        "src.config.config",
+        "src.config.dependencies",
+        "src.db.session",
+        "src.utils.audit_logger",
+        "src.utils.logger"
+      ],
+      "external_imports": [
+        "contextlib",
+        "fastapi"
+      ],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.memory.__init__": {
+      "path": "backend/src/memory/__init__.py",
+      "line_count": 3,
+      "imports": [
+        "src.memory.vector_store"
+      ],
+      "internal_imports": [
+        "src.memory.vector_store"
+      ],
+      "external_imports": [],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.memory.context_manager": {
+      "path": "backend/src/memory/context_manager.py",
+      "line_count": 278,
+      "imports": [
+        "src.memory.vector_store",
+        "src.utils.logger",
+        "__future__",
+        "dataclasses",
+        "time",
+        "typing"
+      ],
+      "internal_imports": [
+        "src.memory.vector_store",
+        "src.utils.logger"
+      ],
+      "external_imports": [
+        "__future__",
+        "dataclasses",
+        "time",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "ContextWindow",
+          "lineno": 30,
+          "bases": [],
+          "methods": 0
+        },
+        {
+          "name": "ContextManager",
+          "lineno": 41,
+          "bases": [],
+          "methods": 5
+        }
+      ],
+      "functions": [],
+      "total_classes": 2,
+      "total_functions": 5
+    },
+    "src.memory.embeddings": {
+      "path": "backend/src/memory/embeddings.py",
+      "line_count": 33,
+      "imports": [
+        "src.config.config",
+        "__future__",
+        "functools",
+        "hashlib",
+        "sentence_transformers"
+      ],
+      "internal_imports": [
+        "src.config.config"
+      ],
+      "external_imports": [
+        "__future__",
+        "functools",
+        "hashlib",
+        "sentence_transformers"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "name": "_load_model",
+          "lineno": 12,
+          "args": 0
+        },
+        {
+          "name": "_fallback_embedding",
+          "lineno": 20,
+          "args": 2
+        }
+      ],
+      "total_classes": 0,
+      "total_functions": 2
+    },
+    "src.memory.vector_store": {
+      "path": "backend/src/memory/vector_store.py",
+      "line_count": 86,
+      "imports": [
+        "src.config.config",
+        "src.memory.embeddings",
+        "__future__",
+        "asyncio",
+        "chromadb",
+        "uuid"
+      ],
+      "internal_imports": [
+        "src.config.config",
+        "src.memory.embeddings"
+      ],
+      "external_imports": [
+        "__future__",
+        "asyncio",
+        "chromadb",
+        "uuid"
+      ],
+      "classes": [
+        {
+          "name": "VectorStore",
+          "lineno": 12,
+          "bases": [],
+          "methods": 1
+        }
+      ],
+      "functions": [],
+      "total_classes": 1,
+      "total_functions": 1
+    },
+    "src.providers.__init__": {
+      "path": "backend/src/providers/__init__.py",
+      "line_count": 1,
+      "imports": [],
+      "internal_imports": [],
+      "external_imports": [],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.providers.circuit_breaker.__init__": {
+      "path": "backend/src/providers/circuit_breaker/__init__.py",
+      "line_count": 6,
+      "imports": [
+        "src.providers.circuit_breaker.memory_backend",
+        "src.providers.circuit_breaker.redis_backend"
+      ],
+      "internal_imports": [
+        "src.providers.circuit_breaker.memory_backend",
+        "src.providers.circuit_breaker.redis_backend"
+      ],
+      "external_imports": [],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.providers.circuit_breaker.breaker_backend": {
+      "error": "expected string or bytes-like object, got 'Module'",
+      "path": "backend/src/providers/circuit_breaker/breaker_backend.py"
+    },
+    "src.providers.circuit_breaker.memory_backend": {
+      "error": "expected string or bytes-like object, got 'Module'",
+      "path": "backend/src/providers/circuit_breaker/memory_backend.py"
+    },
+    "src.providers.circuit_breaker.redis_backend": {
+      "error": "expected string or bytes-like object, got 'Module'",
+      "path": "backend/src/providers/circuit_breaker/redis_backend.py"
+    },
+    "src.providers.digitalocean.__init__": {
+      "path": "backend/src/providers/digitalocean/__init__.py",
+      "line_count": 10,
+      "imports": [
+        "digitalocean_agent_client",
+        "digitalocean_agent_router",
+        "digitalocean_agent_types"
+      ],
+      "internal_imports": [],
+      "external_imports": [
+        "digitalocean_agent_client",
+        "digitalocean_agent_router",
+        "digitalocean_agent_types"
+      ],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.providers.digitalocean.circuit_breaker": {
+      "error": "expected string or bytes-like object, got 'Module'",
+      "path": "backend/src/providers/digitalocean/circuit_breaker.py"
+    },
+    "src.providers.digitalocean.digitalocean_agent_client": {
+      "path": "backend/src/providers/digitalocean/digitalocean_agent_client.py",
+      "line_count": 183,
+      "imports": [
+        "src.config.config",
+        "src.providers.digitalocean.circuit_breaker",
+        "src.providers.digitalocean.digitalocean_agent_types",
+        "src.utils.logger",
+        "httpx",
+        "tenacity",
+        "time",
+        "typing"
+      ],
+      "internal_imports": [
+        "src.config.config",
+        "src.providers.digitalocean.circuit_breaker",
+        "src.providers.digitalocean.digitalocean_agent_types",
+        "src.utils.logger"
+      ],
+      "external_imports": [
+        "httpx",
+        "tenacity",
+        "time",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "DigitalOceanAgentClient",
+          "lineno": 15,
+          "bases": [],
+          "methods": 2
+        }
+      ],
+      "functions": [],
+      "total_classes": 1,
+      "total_functions": 2
+    },
+    "src.providers.digitalocean.digitalocean_agent_router": {
+      "path": "backend/src/providers/digitalocean/digitalocean_agent_router.py",
+      "line_count": 78,
+      "imports": [
+        "src.config.config",
+        "src.providers.digitalocean.digitalocean_agent_client",
+        "src.providers.digitalocean.digitalocean_agent_types",
+        "src.utils.logger",
+        "typing"
+      ],
+      "internal_imports": [
+        "src.config.config",
+        "src.providers.digitalocean.digitalocean_agent_client",
+        "src.providers.digitalocean.digitalocean_agent_types",
+        "src.utils.logger"
+      ],
+      "external_imports": [
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "DigitalOceanAgentRouter",
+          "lineno": 11,
+          "bases": [],
+          "methods": 1
+        }
+      ],
+      "functions": [],
+      "total_classes": 1,
+      "total_functions": 1
+    },
+    "src.providers.digitalocean.digitalocean_agent_types": {
+      "error": "expected string or bytes-like object, got 'Module'",
+      "path": "backend/src/providers/digitalocean/digitalocean_agent_types.py"
+    },
+    "src.schemas.__init__": {
+      "path": "backend/src/schemas/__init__.py",
+      "line_count": 19,
+      "imports": [
+        "src.schemas.chat",
+        "src.schemas.evolution",
+        "src.schemas.skill",
+        "src.schemas.system",
+        "src.schemas.task"
+      ],
+      "internal_imports": [
+        "src.schemas.chat",
+        "src.schemas.evolution",
+        "src.schemas.skill",
+        "src.schemas.system",
+        "src.schemas.task"
+      ],
+      "external_imports": [],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.schemas.auth": {
+      "error": "expected string or bytes-like object, got 'Module'",
+      "path": "backend/src/schemas/auth.py"
+    },
+    "src.schemas.chat": {
+      "error": "expected string or bytes-like object, got 'Module'",
+      "path": "backend/src/schemas/chat.py"
+    },
+    "src.schemas.evolution": {
+      "error": "expected string or bytes-like object, got 'Module'",
+      "path": "backend/src/schemas/evolution.py"
+    },
+    "src.schemas.skill": {
+      "error": "expected string or bytes-like object, got 'Module'",
+      "path": "backend/src/schemas/skill.py"
+    },
+    "src.schemas.system": {
+      "error": "expected string or bytes-like object, got 'Module'",
+      "path": "backend/src/schemas/system.py"
+    },
+    "src.schemas.task": {
+      "error": "expected string or bytes-like object, got 'Module'",
+      "path": "backend/src/schemas/task.py"
+    },
+    "src.services.__init__": {
+      "path": "backend/src/services/__init__.py",
+      "line_count": 5,
+      "imports": [
+        "src.services.evolution_service",
+        "src.services.skill_service",
+        "src.services.task_service"
+      ],
+      "internal_imports": [
+        "src.services.evolution_service",
+        "src.services.skill_service",
+        "src.services.task_service"
+      ],
+      "external_imports": [],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.services.auth_service": {
+      "path": "backend/src/services/auth_service.py",
+      "line_count": 117,
+      "imports": [
+        "src.config.config",
+        "base64",
+        "datetime",
+        "hashlib",
+        "hmac",
+        "json",
+        "sqlalchemy",
+        "typing"
+      ],
+      "internal_imports": [
+        "src.config.config"
+      ],
+      "external_imports": [
+        "base64",
+        "datetime",
+        "hashlib",
+        "hmac",
+        "json",
+        "sqlalchemy",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "AuthService",
+          "lineno": 17,
+          "bases": [],
+          "methods": 7
+        }
+      ],
+      "functions": [],
+      "total_classes": 1,
+      "total_functions": 7
+    },
+    "src.services.chat_service": {
+      "path": "backend/src/services/chat_service.py",
+      "line_count": 46,
+      "imports": [
+        "src.db.models",
+        "src.schemas.chat",
+        "sqlalchemy"
+      ],
+      "internal_imports": [
+        "src.db.models",
+        "src.schemas.chat"
+      ],
+      "external_imports": [
+        "sqlalchemy"
+      ],
+      "classes": [
+        {
+          "name": "ChatService",
+          "lineno": 8,
+          "bases": [],
+          "methods": 1
+        }
+      ],
+      "functions": [],
+      "total_classes": 1,
+      "total_functions": 1
+    },
+    "src.services.evolution_service": {
+      "path": "backend/src/services/evolution_service.py",
+      "line_count": 15,
+      "imports": [
+        "src.core.evolution_engine",
+        "sqlalchemy"
+      ],
+      "internal_imports": [
+        "src.core.evolution_engine"
+      ],
+      "external_imports": [
+        "sqlalchemy"
+      ],
+      "classes": [
+        {
+          "name": "EvolutionService",
+          "lineno": 6,
+          "bases": [],
+          "methods": 1
+        }
+      ],
+      "functions": [],
+      "total_classes": 1,
+      "total_functions": 1
+    },
+    "src.services.skill_service": {
+      "path": "backend/src/services/skill_service.py",
+      "line_count": 32,
+      "imports": [
+        "src.db.models",
+        "src.skills.registry",
+        "sqlalchemy"
+      ],
+      "internal_imports": [
+        "src.db.models",
+        "src.skills.registry"
+      ],
+      "external_imports": [
+        "sqlalchemy"
+      ],
+      "classes": [
+        {
+          "name": "SkillService",
+          "lineno": 8,
+          "bases": [],
+          "methods": 1
+        }
+      ],
+      "functions": [],
+      "total_classes": 1,
+      "total_functions": 1
+    },
+    "src.services.task_service": {
+      "path": "backend/src/services/task_service.py",
+      "line_count": 24,
+      "imports": [
+        "src.core.task_manager",
+        "src.schemas.task",
+        "sqlalchemy"
+      ],
+      "internal_imports": [
+        "src.core.task_manager",
+        "src.schemas.task"
+      ],
+      "external_imports": [
+        "sqlalchemy"
+      ],
+      "classes": [
+        {
+          "name": "TaskService",
+          "lineno": 7,
+          "bases": [],
+          "methods": 1
+        }
+      ],
+      "functions": [],
+      "total_classes": 1,
+      "total_functions": 1
+    },
+    "src.skills.__init__": {
+      "path": "backend/src/skills/__init__.py",
+      "line_count": 4,
+      "imports": [
+        "src.skills.executor",
+        "src.skills.registry"
+      ],
+      "internal_imports": [
+        "src.skills.executor",
+        "src.skills.registry"
+      ],
+      "external_imports": [],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.skills.core_skills.__init__": {
+      "path": "backend/src/skills/core_skills/__init__.py",
+      "line_count": 1,
+      "imports": [],
+      "internal_imports": [],
+      "external_imports": [],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.skills.core_skills.coding": {
+      "path": "backend/src/skills/core_skills/coding.py",
+      "line_count": 20,
+      "imports": [],
+      "internal_imports": [],
+      "external_imports": [],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.skills.core_skills.planning": {
+      "path": "backend/src/skills/core_skills/planning.py",
+      "line_count": 26,
+      "imports": [],
+      "internal_imports": [],
+      "external_imports": [],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.skills.core_skills.reasoning": {
+      "path": "backend/src/skills/core_skills/reasoning.py",
+      "line_count": 23,
+      "imports": [],
+      "internal_imports": [],
+      "external_imports": [],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.skills.executor": {
+      "error": "expected string or bytes-like object, got 'Module'",
+      "path": "backend/src/skills/executor.py"
+    },
+    "src.skills.generated_skills.__init__": {
+      "path": "backend/src/skills/generated_skills/__init__.py",
+      "line_count": 1,
+      "imports": [],
+      "internal_imports": [],
+      "external_imports": [],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.skills.generated_skills.web_search": {
+      "path": "backend/src/skills/generated_skills/web_search.py",
+      "line_count": 19,
+      "imports": [],
+      "internal_imports": [],
+      "external_imports": [],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.skills.registry": {
+      "path": "backend/src/skills/registry.py",
+      "line_count": 87,
+      "imports": [
+        "__future__",
+        "dataclasses",
+        "importlib",
+        "inspect",
+        "pathlib",
+        "pkgutil",
+        "types",
+        "typing"
+      ],
+      "internal_imports": [],
+      "external_imports": [
+        "__future__",
+        "dataclasses",
+        "importlib",
+        "inspect",
+        "pathlib",
+        "pkgutil",
+        "types",
+        "typing"
+      ],
+      "classes": [
+        {
+          "name": "SkillDefinition",
+          "lineno": 13,
+          "bases": [],
+          "methods": 0
+        },
+        {
+          "name": "SkillRegistry",
+          "lineno": 22,
+          "bases": [],
+          "methods": 9
+        }
+      ],
+      "functions": [],
+      "total_classes": 2,
+      "total_functions": 9
+    },
+    "src.skills.templates.__init__": {
+      "path": "backend/src/skills/templates/__init__.py",
+      "line_count": 1,
+      "imports": [],
+      "internal_imports": [],
+      "external_imports": [],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.skills.templates.skill_template": {
+      "path": "backend/src/skills/templates/skill_template.py",
+      "line_count": 5,
+      "imports": [],
+      "internal_imports": [],
+      "external_imports": [],
+      "classes": [
+        {
+          "name": "SkillTemplate",
+          "lineno": 1,
+          "bases": [],
+          "methods": 0
+        }
+      ],
+      "functions": [],
+      "total_classes": 1,
+      "total_functions": 0
+    },
+    "src.storage.__init__": {
+      "path": "backend/src/storage/__init__.py",
+      "line_count": 1,
+      "imports": [],
+      "internal_imports": [],
+      "external_imports": [],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.storage.artifact_store": {
+      "path": "backend/src/storage/artifact_store.py",
+      "line_count": 37,
+      "imports": [
+        "src.db.models",
+        "__future__",
+        "pathlib",
+        "sqlalchemy"
+      ],
+      "internal_imports": [
+        "src.db.models"
+      ],
+      "external_imports": [
+        "__future__",
+        "pathlib",
+        "sqlalchemy"
+      ],
+      "classes": [
+        {
+          "name": "ArtifactStore",
+          "lineno": 10,
+          "bases": [],
+          "methods": 1
+        }
+      ],
+      "functions": [],
+      "total_classes": 1,
+      "total_functions": 1
+    },
+    "src.utils.__init__": {
+      "path": "backend/src/utils/__init__.py",
+      "line_count": 1,
+      "imports": [],
+      "internal_imports": [],
+      "external_imports": [],
+      "classes": [],
+      "functions": [],
+      "total_classes": 0,
+      "total_functions": 0
+    },
+    "src.utils.audit_logger": {
+      "path": "backend/src/utils/audit_logger.py",
+      "line_count": 94,
+      "imports": [
+        "src.config.dependencies",
+        "src.db.models",
+        "__future__",
+        "fastapi",
+        "pathlib",
+        "typing"
+      ],
+      "internal_imports": [
+        "src.config.dependencies",
+        "src.db.models"
+      ],
+      "external_imports": [
+        "__future__",
+        "fastapi",
+        "pathlib",
+        "typing"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "name": "_route_paths",
+          "lineno": 20,
+          "args": 1
+        },
+        {
+          "name": "generate_audit_log",
+          "lineno": 29,
+          "args": 2
+        }
+      ],
+      "total_classes": 0,
+      "total_functions": 2
+    },
+    "src.utils.code_parser": {
+      "path": "backend/src/utils/code_parser.py",
+      "line_count": 2,
+      "imports": [],
+      "internal_imports": [],
+      "external_imports": [],
+      "classes": [],
+      "functions": [
+        {
+          "name": "parse_code",
+          "lineno": 1,
+          "args": 1
+        }
+      ],
+      "total_classes": 0,
+      "total_functions": 1
+    },
+    "src.utils.logger": {
+      "path": "backend/src/utils/logger.py",
+      "line_count": 31,
+      "imports": [
+        "loguru",
+        "os",
+        "sys"
+      ],
+      "internal_imports": [],
+      "external_imports": [
+        "loguru",
+        "os",
+        "sys"
+      ],
+      "classes": [],
+      "functions": [
+        {
+          "name": "configure_logging",
+          "lineno": 9,
+          "args": 0
+        },
+        {
+          "name": "get_logger",
+          "lineno": 29,
+          "args": 1
+        }
+      ],
+      "total_classes": 0,
+      "total_functions": 2
+    },
+    "src.utils.validators": {
+      "path": "backend/src/utils/validators.py",
+      "line_count": 9,
+      "imports": [
+        "src.schemas.task"
+      ],
+      "internal_imports": [
+        "src.schemas.task"
+      ],
+      "external_imports": [],
+      "classes": [],
+      "functions": [
+        {
+          "name": "validate_task_payload",
+          "lineno": 4,
+          "args": 1
+        }
+      ],
+      "total_classes": 0,
+      "total_functions": 1
+    }
+  },
+  "stats": {
+    "total_modules": 72,
+    "total_lines": 3825,
+    "total_classes": 26,
+    "total_functions": 78
+  },
+  "cycles": []
+}

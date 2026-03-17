@@ -1,4 +1,4 @@
-const DEBUG = true;
+const DEBUG = false;  // Real API calls enabled
 
 const COLORS = {
     bg: getComputedStyle(document.documentElement).getPropertyValue('--color-bg'),
@@ -76,11 +76,87 @@ async function apiPost(path, payload, fallbackValue) {
 }
 
 async function fetchChatMessages() {
-    return await apiGet('/api/chat/messages', syntheticChatMessages);
+    if (DEBUG) {
+        return syntheticChatMessages;
+    }
+
+    try {
+        if (!currentChatId) {
+            return [];
+        }
+
+        const response = await getTasks(currentChatId);
+        const items = Array.isArray(response && response.items) ? response.items : [];
+        const messages = [];
+
+        items.forEach(function(task) {
+            const title = task && task.title ? String(task.title) : 'Untitled task';
+            const status = task && task.status ? String(task.status) : 'queued';
+            messages.push({ sender: 'user', text: title });
+
+            if (status === 'completed') {
+                const responseText = extractTaskResponseText(task);
+                if (responseText) {
+                    messages.push({ sender: 'llm', text: responseText });
+                }
+            } else if (status === 'failed') {
+                messages.push({ sender: 'llm', text: 'Task failed. Please retry.' });
+            }
+        });
+
+        return messages;
+    } catch (_) {
+        return syntheticChatMessages;
+    }
+}
+
+function extractTaskResponseText(task) {
+    const raw = String(task && task.result ? task.result : '').trim();
+    if (!raw) return '';
+
+    const finalDoubleQuoted = raw.match(/"final"\s*:\s*"([\s\S]*?)"/);
+    if (finalDoubleQuoted && finalDoubleQuoted[1]) {
+        return finalDoubleQuoted[1].replace(/\\n/g, '\n').trim();
+    }
+
+    const finalSingleQuoted = raw.match(/'final'\s*:\s*'([\s\S]*?)'/);
+    if (finalSingleQuoted && finalSingleQuoted[1]) {
+        return finalSingleQuoted[1].replace(/\\n/g, '\n').trim();
+    }
+
+    return raw.length > 800 ? `${raw.slice(0, 800)}...` : raw;
+}
+
+function delay(ms) {
+    return new Promise(function(resolve) {
+        setTimeout(resolve, ms);
+    });
+}
+
+async function waitForTaskCompletion(taskId) {
+    const maxAttempts = 40;
+    const intervalMs = 1500;
+
+    for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+        try {
+            const task = await getTask(taskId);
+            const status = task && task.status ? String(task.status) : '';
+            if (status === 'completed' || status === 'failed') {
+                return task;
+            }
+        } catch (_) {
+            // Keep polling on transient errors.
+        }
+
+        await delay(intervalMs);
+    }
+
+    return null;
 }
 
 async function renderChatPanel() {
     const messages = await fetchChatMessages();
+    console.log('Rendering chat panel with messages:', messages);
     const container = document.getElementById('chat-messages');
     container.innerHTML = '';
     messages.forEach(msg => {
@@ -105,13 +181,34 @@ async function handleSend() {
         return;
     }
 
-    const result = await apiPost('/api/chat/send', { text }, null);
-    if (result && Array.isArray(result.messages)) {
+    try {
+        if (!currentChatId) {
+            const chat = await createChat('New Chat');
+            currentChatId = chat && chat.id ? String(chat.id) : null;
+            await renderChatHistory();
+        }
+
+        const createdTask = await createTask(text, 'Created from chat input', currentChatId);
+        await renderChatHistory();
         await renderChatPanel();
+
+        const taskId = createdTask && createdTask.id ? String(createdTask.id) : '';
+        if (taskId) {
+            void (async function() {
+                await waitForTaskCompletion(taskId);
+                await renderChatHistory();
+                await renderChatPanel();
+                await renderThoughtProcess();
+                await renderModelStats();
+            })();
+        }
+
         return;
+    } catch (_) {
+        // Fall through to synthetic fallback behavior.
     }
 
-    // Fallback behavior if backend schema differs or request fails.
+    // Fallback behavior if request fails.
     syntheticChatMessages.push({ sender: 'user', text });
     syntheticChatMessages.push({ sender: 'llm', text: 'Unable to reach backend. Please retry.' });
     await renderChatPanel();
@@ -127,6 +224,59 @@ const syntheticStats = 'Model: GPT-4.1 | Tokens: 1024 | Latency: 120ms';
 let hasShownDashboardGreeting = false;
 let currentAccountName = 'there';
 let currentAccountEmail = '';
+let currentChatId = null;
+
+function getChatIdFromUrl() {
+    try {
+        const params = new URLSearchParams(window.location.search);
+        const value = params.get('chat');
+        return value ? String(value) : null;
+    } catch (_) {
+        return null;
+    }
+}
+
+function syncChatUrl(chatId, replace) {
+    if (!window.history || !window.history.pushState || !window.history.replaceState) {
+        return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    if (chatId) {
+        params.set('chat', String(chatId));
+    } else {
+        params.delete('chat');
+    }
+
+    const query = params.toString();
+    const nextUrl = query ? `${window.location.pathname}?${query}${window.location.hash || ''}` : `${window.location.pathname}${window.location.hash || ''}`;
+    const state = { chatId: chatId ? String(chatId) : null };
+
+    if (replace) {
+        window.history.replaceState(state, '', nextUrl);
+        return;
+    }
+
+    window.history.pushState(state, '', nextUrl);
+}
+
+async function applyChatSelection(chatId, options) {
+    const opts = options || {};
+    currentChatId = chatId ? String(chatId) : null;
+    setActiveChat(currentChatId);
+
+    if (opts.replaceUrl) {
+        syncChatUrl(currentChatId, true);
+    } else if (opts.pushUrl) {
+        syncChatUrl(currentChatId, false);
+    }
+
+    if (!opts.skipPanelRender) {
+        showMiddlePanelSection('history');
+        await renderChatPanel();
+    }
+}
+
 const THEME_SETTINGS_KEY = 'axon.themeSettings';
 const THEME_TINT_MIN = 5;
 const THEME_TINT_MAX = 25;
@@ -140,6 +290,14 @@ function setText(id, value) {
     const el = byId(id);
     if (!el) return;
     el.textContent = value;
+}
+
+function setActiveChat(chatId) {
+    const items = Array.from(document.querySelectorAll('.chat-history-item[data-chat-id]'));
+    items.forEach(function(item) {
+        const isActive = String(item.dataset.chatId || '') === String(chatId || '');
+        item.classList.toggle('is-active', isActive);
+    });
 }
 
 function clampNumber(value, min, max) {
@@ -520,9 +678,12 @@ function setupProfileModal() {
         // TODO: Replace with real API call.
         // Example: await apiPost('/api/account/profile', { name, email }, null);
 
-        if (DEBUG) {
-            syntheticAccount.name = name;
-            syntheticAccount.email = email;
+        syntheticAccount.name = name;
+        syntheticAccount.email = email;
+        try {
+            localStorage.setItem('axon.account', JSON.stringify({ name, email }));
+        } catch (_) {
+            // Ignore storage failures.
         }
 
         currentAccountName = name;
@@ -566,19 +727,105 @@ function setupProfileModal() {
 
 // Helper Functions (to be implemented)
 async function fetchChatHistory() {
-    return await apiGet('/api/chat/history', syntheticChatHistory);
+    if (DEBUG) {
+        return syntheticChatHistory;
+    }
+
+    try {
+        const response = await getChats();
+        const items = Array.isArray(response && response.items) ? response.items : [];
+        if (items.length > 0) {
+            const hasCurrent = currentChatId
+                ? items.some(function(chat) { return String(chat && chat.id ? chat.id : '') === String(currentChatId); })
+                : false;
+
+            if (!hasCurrent) {
+                currentChatId = String(items[0].id);
+            }
+        }
+        return items.map(function(chat) {
+            const chatId = String(chat && chat.id ? chat.id : '');
+            const shortId = chatId.slice(0, 8);
+            return {
+                id: chatId || shortId,
+                title: chat && chat.title ? chat.title : `Chat ${shortId || ''}`.trim()
+            };
+        });
+    } catch (_) {
+        return syntheticChatHistory;
+    }
 }
 
 async function fetchThoughtProcess() {
-    return await apiGet('/api/chat/thought-process', syntheticThoughtProcess);
+    if (DEBUG) {
+        return syntheticThoughtProcess;
+    }
+
+    try {
+        const system = await getSystemStatus();
+        return [
+            ['status', `System: ${system && system.status ? system.status : 'unknown'}`],
+            ['database', `Database: ${system && system.database ? system.database : 'unknown'}`],
+            ['vector', `Vector store: ${system && system.vector_store ? system.vector_store : 'unknown'}`],
+            ['agents', `Agents ready: ${system && typeof system.agents_ready !== 'undefined' ? String(system.agents_ready) : 'unknown'}`]
+        ];
+    } catch (_) {
+        return syntheticThoughtProcess;
+    }
 }
 
 async function fetchAccountInfo() {
-    return await apiGet('/api/account', syntheticAccount);
+    try {
+        // Try to get authenticated user info from auth module
+        if (typeof getAuthUser === 'function') {
+            const authUser = getAuthUser();
+            if (authUser && authUser.name) {
+                return {
+                    name: authUser.name,
+                    email: authUser.email || ''
+                };
+            }
+        }
+        
+        // Fallback to localStorage
+        const raw = localStorage.getItem('axon.account');
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            return {
+                name: parsed && parsed.name ? parsed.name : syntheticAccount.name,
+                email: parsed && parsed.email ? parsed.email : syntheticAccount.email
+            };
+        }
+    } catch (_) {
+        // Ignore storage failures.
+    }
+    return syntheticAccount;
 }
 
 async function fetchModelStats() {
-    return await apiGet('/api/model/stats', syntheticStats);
+    if (DEBUG) {
+        return syntheticStats;
+    }
+
+    try {
+        const metrics = await getSystemMetrics();
+        if (metrics && typeof metrics === 'object') {
+            const parts = [];
+            if (typeof metrics.version !== 'undefined') {
+                parts.push(`Version: ${metrics.version}`);
+            }
+            if (typeof metrics.timestamp !== 'undefined') {
+                parts.push(`Timestamp: ${metrics.timestamp}`);
+            }
+            if (typeof metrics.error !== 'undefined') {
+                parts.push('Status: degraded');
+            }
+            return parts.length ? parts.join(' | ') : JSON.stringify(metrics);
+        }
+    } catch (_) {
+        // fall through
+    }
+    return syntheticStats;
 }
 
 // UI Fillers
@@ -586,50 +833,192 @@ async function renderChatHistory() {
     const history = await fetchChatHistory();
     const container = document.getElementById('chat-history');
     container.innerHTML = '';
+
+    async function handleRenameChat(chatId, currentTitle) {
+        const nextTitle = window.prompt('Rename chat', String(currentTitle || '').trim());
+        const normalized = String(nextTitle || '').trim();
+        if (!normalized || normalized === String(currentTitle || '').trim()) {
+            return;
+        }
+
+        try {
+            await updateChat(String(chatId), normalized);
+            await renderChatHistory();
+        } catch (_) {
+            // Ignore failures and keep UI state.
+        }
+    }
+
+    async function handleDeleteChat(chatId) {
+        const ok = window.confirm('Delete this chat?');
+        if (!ok) {
+            return;
+        }
+
+        try {
+            await deleteChat(String(chatId));
+
+            if (String(currentChatId || '') === String(chatId || '')) {
+                currentChatId = null;
+                await renderChatHistory();
+
+                if (!currentChatId && !DEBUG) {
+                    const created = await createChat('New Chat');
+                    currentChatId = created && created.id ? String(created.id) : null;
+                    await renderChatHistory();
+                }
+
+                syncChatUrl(currentChatId, true);
+                await renderChatPanel();
+                return;
+            }
+
+            await renderChatHistory();
+        } catch (_) {
+            // Ignore failures and keep UI state.
+        }
+    }
+
     history.forEach(chat => {
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'chat-history-item';
-        if (chat.icon) {
-            button.innerHTML = `<span class="icon">${chat.icon}</span>${chat.title}`;
-        } else {
-            button.textContent = chat.title;
-        }
+        const title = document.createElement('span');
+        title.className = 'chat-history-title';
+        title.textContent = chat.title;
+
+        const actions = document.createElement('span');
+        actions.className = 'chat-history-actions';
+
+        const renameBtn = document.createElement('button');
+        renameBtn.type = 'button';
+        renameBtn.className = 'chat-history-action-btn';
+        renameBtn.textContent = '✎';
+        renameBtn.title = 'Rename chat';
+        renameBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            void handleRenameChat(chat.id, chat.title);
+        };
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.type = 'button';
+        deleteBtn.className = 'chat-history-action-btn';
+        deleteBtn.textContent = '✕';
+        deleteBtn.title = 'Delete chat';
+        deleteBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            void handleDeleteChat(chat.id);
+        };
+
+        actions.appendChild(renameBtn);
+        actions.appendChild(deleteBtn);
+        button.appendChild(title);
+        button.appendChild(actions);
+        button.dataset.chatId = chat.id;
         button.onclick = function() {
-            showMiddlePanelSection('history');
+            void applyChatSelection(chat.id, { pushUrl: true });
         };
         container.appendChild(button);
     });
+
+    setActiveChat(currentChatId);
 }
 
 async function renderThoughtProcess() {
     const thoughts = await fetchThoughtProcess();
     const container = document.getElementById('thought-process');
-    container.innerHTML = '';
-    const list = document.createElement('div');
-    list.className = 'thought-list';
+    const isFirstThoughtRender = container.dataset.thoughtsRendered !== 'true';
+    let list = container.querySelector('.thought-list');
+    if (!list) {
+        list = document.createElement('div');
+        list.className = 'thought-list';
+        container.innerHTML = '';
+        container.appendChild(list);
+    }
 
-    thoughts.forEach(tuple => {
+    const occurrenceByBaseKey = Object.create(null);
+    const nextEntries = thoughts.map(function(tuple) {
         const type = Array.isArray(tuple) ? String(tuple[0] || 'step') : 'step';
         const text = Array.isArray(tuple) ? String(tuple[1] || '') : String(tuple || '');
+        const baseKey = `${type}::${text}`;
+        const occurrence = (occurrenceByBaseKey[baseKey] || 0) + 1;
+        occurrenceByBaseKey[baseKey] = occurrence;
+        return {
+            type,
+            text,
+            key: `${baseKey}::${occurrence}`
+        };
+    });
 
+    const existingItems = Array.from(list.querySelectorAll('.thought-item'));
+    const existingKeys = existingItems.map(function(item) {
+        return String(item.dataset.key || '');
+    });
+
+    const shouldReset =
+        existingKeys.length > nextEntries.length ||
+        existingKeys.some(function(key, index) {
+            return key !== nextEntries[index].key;
+        });
+
+    function createThoughtItem(entry, withEnterAnimation) {
         const item = document.createElement('div');
-        item.className = 'thought-item thought-' + type.toLowerCase().replace(/[^a-z0-9_-]/g, '');
+        item.className = 'thought-item ' + (withEnterAnimation ? 'thought-item-enter ' : '') + 'thought-' + entry.type.toLowerCase().replace(/[^a-z0-9_-]/g, '');
+        item.dataset.key = entry.key;
 
         const typeEl = document.createElement('div');
         typeEl.className = 'thought-type';
-        typeEl.textContent = type;
+        typeEl.textContent = entry.type;
 
         const textEl = document.createElement('div');
         textEl.className = 'thought-text';
-        textEl.textContent = text;
+        textEl.textContent = entry.text;
 
         item.appendChild(typeEl);
         item.appendChild(textEl);
-        list.appendChild(item);
-    });
+        return item;
+    }
 
-    container.appendChild(list);
+    if (shouldReset) {
+        list.innerHTML = '';
+        if (isFirstThoughtRender) {
+            for (let index = 0; index < nextEntries.length; index += 1) {
+                const entry = nextEntries[index];
+                const item = createThoughtItem(entry, true);
+                list.appendChild(item);
+
+                requestAnimationFrame(function() {
+                    item.classList.add('thought-item-enter-active');
+                });
+
+                if (index < nextEntries.length - 1) {
+                    await delay(260);
+                }
+            }
+        } else {
+            nextEntries.forEach(function(entry) {
+                const item = createThoughtItem(entry, false);
+                list.appendChild(item);
+            });
+        }
+        container.dataset.thoughtsRendered = 'true';
+        return;
+    }
+
+    const startIndex = existingItems.length;
+    for (let index = startIndex; index < nextEntries.length; index += 1) {
+        const entry = nextEntries[index];
+        const item = createThoughtItem(entry, true);
+        list.appendChild(item);
+
+        requestAnimationFrame(function() {
+            item.classList.add('thought-item-enter-active');
+        });
+    }
+
+    container.dataset.thoughtsRendered = 'true';
 }
 
 async function renderAccountInfo() {
@@ -724,7 +1113,25 @@ function releaseThemePreloadLock() {
 }
 
 async function renderInitialUI() {
+    const chatIdFromUrl = getChatIdFromUrl();
+    if (chatIdFromUrl) {
+        currentChatId = chatIdFromUrl;
+    }
+
     await renderChatHistory();
+
+    if (!DEBUG && !currentChatId) {
+        try {
+            const created = await createChat('New Chat');
+            currentChatId = created && created.id ? String(created.id) : null;
+            await renderChatHistory();
+        } catch (_) {
+            // Keep UI usable with synthetic fallbacks.
+        }
+    }
+
+    syncChatUrl(currentChatId, true);
+
     await renderChatPanel();
     await renderThoughtProcess();
     await renderAccountInfo();
@@ -748,7 +1155,21 @@ function bindNavigationActions() {
     }
 
     if (newChatBtn) {
-        newChatBtn.onclick = function() {
+        newChatBtn.onclick = async function() {
+            if (DEBUG) {
+                showMiddlePanelSection('history');
+                return;
+            }
+
+            try {
+                const created = await createChat('New Chat');
+                currentChatId = created && created.id ? String(created.id) : null;
+                await renderChatHistory();
+                await applyChatSelection(currentChatId, { pushUrl: true });
+            } catch (_) {
+                // Ignore and keep current view.
+            }
+
             showMiddlePanelSection('history');
         };
     }
@@ -775,15 +1196,67 @@ function bindChatActions() {
     }
 }
 
+function bindBrowserNavigation() {
+    window.addEventListener('popstate', function() {
+        const chatId = getChatIdFromUrl();
+        void applyChatSelection(chatId, { replaceUrl: true });
+    });
+}
+
+/**
+ * Handle authentication state changes
+ */
+function setupAuthListener() {
+    window.addEventListener('authChanged', async function(event) {
+        // Update account info when user logs in/out
+        await renderAccountInfo();
+        
+        // Update dashboard greeting if visible
+        if (isVisible(byId('dashboard-main'))) {
+            renderDashboardGreeting();
+        }
+    });
+}
+
 // Initial Render
 window.onload = async function() {
     applyThemeAtBoot();
     releaseThemePreloadLock();
+    bindBrowserNavigation();
+
+    // Set up auth listener first
+    setupAuthListener();
+
+    // Wait a bit for auth to initialize (auth.js runs before this)
+    // Then proceed with UI rendering
+    if (!isAuthenticated()) {
+        // User is not authenticated, login modal will be shown by auth.js
+        // Don't render main UI until they log in
+        return;
+    }
 
     await renderInitialUI();
     setupUIControllers();
-    showMiddlePanelSection('dashboard');
+    
+    // Show chat panel if chat ID in URL, otherwise show dashboard
+    const chatIdFromUrl = getChatIdFromUrl();
+    showMiddlePanelSection(chatIdFromUrl ? 'history' : 'dashboard');
 
     bindNavigationActions();
     bindChatActions();
+
+    // Listen for successful login to initialize UI
+    window.addEventListener('authChanged', async function initUiAfterLogin(event) {
+        if (event.detail) {
+            // User just logged in
+            await renderInitialUI();
+            setupUIControllers();
+            const chatIdFromUrl = getChatIdFromUrl();
+            showMiddlePanelSection(chatIdFromUrl ? 'history' : 'dashboard');
+            bindNavigationActions();
+            bindChatActions();
+            // Remove this listener after first login
+            window.removeEventListener('authChanged', initUiAfterLogin);
+        }
+    });
 };

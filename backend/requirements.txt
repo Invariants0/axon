@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+sqlalchemy>=2
+asyncpg
+alembic
+python-dotenv
+pydantic-settings
+pydantic[email]
+httpx
+tenacity
+orjson
+loguru
+chromadb
+sentence-transformers

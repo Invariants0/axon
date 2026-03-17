@@ -44,14 +44,32 @@ class TaskManager:
         self._stopping = True
         await self._pool.stop()
 
-    async def create_task(self, session: AsyncSession, title: str, description: str) -> Task:
+    async def create_task(
+        self,
+        session: AsyncSession,
+        title: str,
+        description: str,
+        chat_id: str | None = None,
+    ) -> Task:
         started_at = perf_counter()
-        task = Task(title=title, description=description, status="queued", result="")
+        task = Task(
+            chat_id=chat_id,
+            title=title,
+            description=description,
+            status="queued",
+            result="",
+        )
         session.add(task)
         await session.flush()
         await self._queue.put(task.id)
         await self.event_bus.publish(
-            {"event": "task.created", "task_id": task.id, "title": task.title, "status": task.status}
+            {
+                "event": "task.created",
+                "task_id": task.id,
+                "chat_id": task.chat_id,
+                "title": task.title,
+                "status": task.status,
+            }
         )
         logger.info(
             "task.created",
@@ -62,8 +80,11 @@ class TaskManager:
         )
         return task
 
-    async def list_tasks(self, session: AsyncSession) -> list[Task]:
-        result = await session.execute(select(Task).order_by(Task.created_at.desc()))
+    async def list_tasks(self, session: AsyncSession, chat_id: str | None = None) -> list[Task]:
+        stmt = select(Task)
+        if chat_id:
+            stmt = stmt.where(Task.chat_id == chat_id)
+        result = await session.execute(stmt.order_by(Task.created_at.desc()))
         return list(result.scalars().all())
 
     async def get_task(self, session: AsyncSession, task_id: str) -> Task | None:

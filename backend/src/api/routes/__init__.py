@@ -1,3 +1,3 @@
-from src.api.routes import evolution, skills, system, tasks
+from src.api.routes import chats, evolution, skills, system, tasks
 
-__all__ = ["tasks", "skills", "evolution", "system"]
+__all__ = ["tasks", "skills", "evolution", "system", "chats"]

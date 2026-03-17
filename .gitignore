@@ -5,18 +5,47 @@ Thumbs.db
 # Logs
 *.log
 
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.orig
+*.swp
+*.swo
+*~
+.cache/
+tmp/
+temp/
+
 # Node / Next / Bun (no longer used; kept for historical reference)
 
-# Python / UV
+# Python
 backend/.venv/
 **/__pycache__/
 *.pyc
+*.pyo
+*.pyd
+.pytest_cache/
 backend/.pytest_cache/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+*.py,cover
+*.egg-info/
 backend/*.egg-info/
 backend/.mypy_cache/
 backend/.ruff_cache/
+.mypy_cache/
+.ruff_cache/
+.nox/
+.tox/
+.ipynb_checkpoints/
 .chroma/
 backend/.chroma/
+dist/
+build/
 
 # Env
 .env
@@ -26,13 +55,3 @@ backend/.chroma/
 .vscode/
 .idea/
 
-# Terraform
-**/.terraform/
-*.tfstate
-*.tfstate.*
-crash.log
-override.tf
-override.tf.json
-*_override.tf
-*_override.tf.json
-.terraform.lock.hcl

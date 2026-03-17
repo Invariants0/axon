@@ -13,6 +13,7 @@ from src.core.task_manager import TaskManager
 from src.db.session import get_db_session
 from src.memory.vector_store import VectorStore
 from src.services.evolution_service import EvolutionService
+from src.services.chat_service import ChatService
 from src.services.skill_service import SkillService
 from src.services.task_service import TaskService
 from src.skills.executor import SkillExecutor
@@ -94,6 +95,12 @@ async def get_evolution_service(
     session: AsyncSession = Depends(get_db_session),
 ) -> AsyncGenerator[EvolutionService, None]:
     yield EvolutionService(evolution_engine=_evolution_engine, session=session)
+
+
+async def get_chat_service(
+    session: AsyncSession = Depends(get_db_session),
+) -> AsyncGenerator[ChatService, None]:
+    yield ChatService(session=session)
 
 
 async def require_api_key(

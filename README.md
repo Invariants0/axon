@@ -20,8 +20,10 @@ AXON is a self-evolving AI agent platform scaffolded as a monorepo with a vanill
 ## Project Structure
 
 - `frontend/`: Vanilla HTML, CSS, and JavaScript static files
-- `backend/`: FastAPI (Python 3.11+, UV, async-first skeleton)
-- `infra/`: Docker and Terraform configuration
+- `backend/`: FastAPI (Python 3.11+, async-first skeleton)
+- `utils/`: Operational scripts, test helpers, and architecture analysis tools
+- `docker/`: Docker build configuration
+- `nginx/`: Nginx runtime configuration
 - `docs/`: Project documentation
   - [`docs/api/`](docs/api/README.md): REST and WebSocket API reference
 
@@ -40,8 +42,8 @@ The app is served by nginx on http://localhost:80.
 
 ```bash
 cd backend
-uv sync
-uv run start.py
+python -m pip install -r requirements.txt
+python start.py
 ```
 
 Backend runs on http://127.0.0.1:8000.
@@ -71,5 +73,6 @@ When the backend is running, the interactive OpenAPI docs are available at http:
 
 ## Further Reading
 
+- [Documentation Hub](docs/README.md)
 - [Product Requirements Document](docs/AXON-(PRD).md)
 - [Backend API architecture](backend/src/api/README.md)

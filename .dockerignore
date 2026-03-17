@@ -1,0 +1,44 @@
+.git
+.gitignore
+.vscode
+.devcontainer
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.sqlite
+*.db
+*.swp
+*.swo
+*.tmp
+
+# Python virtual environments
+.venv
+venv
+**/.venv
+**/venv
+
+# Node and frontend build artifacts
+node_modules
+frontend/node_modules
+frontend/dist
+frontend/build
+
+# Test/cache artifacts
+.pytest_cache
+.mypy_cache
+.ruff_cache
+coverage
+htmlcov
+
+# Large or generated docs/artifacts
+analysis
+*.ipynb
+
+# Runtime data
+backend/.chroma
+backend/logs
+
+# OS files
+.DS_Store
