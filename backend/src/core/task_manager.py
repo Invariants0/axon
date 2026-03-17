@@ -11,6 +11,7 @@ from sqlalchemy.exc import IntegrityError
 
 from src.core.agent_orchestrator import AgentOrchestrator
 from src.core.event_bus import EventBus
+from src.core.trace_context import TraceContext
 from src.core.worker_pool import WorkerPool
 from src.db.models import Task
 from src.db.session import SessionLocal
@@ -53,12 +54,18 @@ class TaskManager:
         chat_id: str | None = None,
     ) -> Task:
         started_at = perf_counter()
+
+        # Generate trace_id for this task
+        trace_id = TraceContext.generate_trace_id()
+        TraceContext.set_trace_id(trace_id)
+
         task = Task(
             chat_id=chat_id,
             title=title,
             description=description,
             status="queued",
             result="",
+            trace_id=trace_id,
         )
         session.add(task)
         try:
@@ -73,21 +80,27 @@ class TaskManager:
             # Let the caller translate this into an appropriate HTTP error (e.g., 400/404)
             raise ValueError(f"Invalid chat_id: {chat_id}") from exc
         await self._queue.put(task.id)
-        await self.event_bus.publish(
-            {
-                "event": "task.created",
+
+        # Emit event using new event structure
+        event = TraceContext.create_event(
+            "task.created",
+            data={
                 "task_id": task.id,
                 "chat_id": task.chat_id,
                 "title": task.title,
                 "status": task.status,
-            }
+            },
+            trace_id=trace_id,
+            task_id=task.id,
         )
+        await self.event_bus.publish(event)
         logger.info(
             "task.created",
             task_id=task.id,
             agent_name="task_manager",
             execution_time=round(perf_counter() - started_at, 6),
             title=title,
+            trace_id=trace_id,
         )
         return task
 

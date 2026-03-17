@@ -8,16 +8,22 @@ from src.api.routes import auth, chats, evolution, skills, system, tasks
 from src.api.websocket.event_stream import router as ws_router
 from src.config.config import get_settings
 from src.config.dependencies import get_task_manager
+from src.config.validator import ConfigValidator
 from src.db.session import close_db, init_db
 from src.utils.audit_logger import generate_audit_log
-from src.utils.logger import configure_logging
+from src.utils.logger import configure_logging, get_logger
 
 settings = get_settings()
+logger = get_logger(__name__)
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     configure_logging()
+    logger.info("Starting configuration validation")
+    if not ConfigValidator.validate():
+        logger.error("Configuration validation failed - startup aborted")
+        raise RuntimeError("Configuration validation failed")
     await init_db()
     task_manager = get_task_manager()
     await task_manager.start()

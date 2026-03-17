@@ -2,6 +2,10 @@ import json
 
 from src.agents.base_agent import BaseAgent
 from src.config.config import get_settings
+from src.core.trace_context import TraceContext
+from src.utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class ResearchAgent(BaseAgent):

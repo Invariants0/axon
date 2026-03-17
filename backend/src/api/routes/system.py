@@ -1,10 +1,13 @@
-import asyncio
-
-from fastapi import APIRouter, Depends
-from sqlalchemy import text
+from fastapi import APIRouter, Depends, Path
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.config.config import Settings
+from src.api.controllers.system_controller import (
+    get_event_stats as get_event_stats_controller,
+    get_pipeline_graph as get_pipeline_controller,
+    get_system_metrics as get_metrics_controller,
+    get_system_status as get_status_controller,
+    get_task_timeline as get_timeline_controller,
+)
 from src.config.dependencies import (
     get_app_settings,
     get_db_session,
@@ -16,129 +19,122 @@ from src.config.dependencies import (
     rate_limit_hook,
     require_api_key,
 )
-from src.core.agent_orchestrator import AgentOrchestrator
-from src.core.event_bus import EventBus
-from src.core.metrics import MetricsCollector
-from src.core.task_manager import TaskManager
-from src.memory.vector_store import VectorStore
 from src.schemas.system import SystemStatusResponse
-from src.skills.registry import SkillRegistry
+from src.services.system_service import SystemService
 
 router = APIRouter(dependencies=[Depends(require_api_key), Depends(rate_limit_hook)])
 
-# Phase-3: Metrics collector instance
-_metrics_collector = MetricsCollector()
+
+async def get_system_service(
+    settings=Depends(get_app_settings),
+    session: AsyncSession = Depends(get_db_session),
+    task_manager=Depends(get_task_manager),
+    vector_store=Depends(get_vector_store),
+    skill_registry=Depends(get_skill_registry),
+    orchestrator=Depends(get_orchestrator),
+    event_bus=Depends(get_event_bus),
+) -> SystemService:
+    """Dependency injection for SystemService"""
+    return SystemService(
+        settings=settings,
+        session=session,
+        task_manager=task_manager,
+        vector_store=vector_store,
+        skill_registry=skill_registry,
+        orchestrator=orchestrator,
+        event_bus=event_bus,
+    )
 
 
 @router.get("/", response_model=SystemStatusResponse)
 async def get_system_status(
-    settings: Settings = Depends(get_app_settings),
-    session: AsyncSession = Depends(get_db_session),
-    vector_store: VectorStore = Depends(get_vector_store),
-    skill_registry: SkillRegistry = Depends(get_skill_registry),
-    orchestrator: AgentOrchestrator = Depends(get_orchestrator),
-    task_manager: TaskManager = Depends(get_task_manager),
-    event_bus: EventBus = Depends(get_event_bus),
+    system_service: SystemService = Depends(get_system_service),
 ) -> SystemStatusResponse:
-    database_state = "ok"
-    try:
-        await session.execute(text("SELECT 1"))
-    except Exception:
-        database_state = "error"
-
-    vector_store_state = "ok"
-    try:
-        await asyncio.to_thread(vector_store.collection.count)
-    except Exception:
-        vector_store_state = "error"
-
-    skills_loaded = len(skill_registry.all())
-    agents_ready = bool(getattr(orchestrator, "agents", {}))
-    event_bus_state = "running" if event_bus.is_running else "stopped"
-    task_queue = "running" if task_manager.status() == "running" else "stopped"
-    return SystemStatusResponse(
-        status="ready",
-        app=settings.app_name,
-        environment=settings.env,
-        database=database_state,
-        vector_store=vector_store_state,
-        skills_loaded=skills_loaded,
-        agents_ready=agents_ready,
-        event_bus=event_bus_state,
-        task_queue=task_queue,
-    )
+    """Get overall system status and health checks"""
+    status = await get_status_controller(system_service)
+    return SystemStatusResponse(**status)
 
 
-# Phase-3: Pipeline Graph Endpoint
 @router.get("/pipeline")
 async def get_pipeline_graph(
-    orchestrator: AgentOrchestrator = Depends(get_orchestrator),
+    system_service: SystemService = Depends(get_system_service),
 ):
     """
     Get pipeline execution graph structure.
-    
+
     Returns the DAG (directed acyclic graph) of the 4-stage agent pipeline.
     """
-    try:
-        # Try to get pipeline graph from orchestrator if available
-        pipeline_graph = getattr(orchestrator, "pipeline_graph", None)
-        if pipeline_graph:
-            return {
-                "nodes": ["planning", "research", "reasoning", "builder"],
-                "edges": [
-                    ["planning", "research"],
-                    ["research", "reasoning"],
-                    ["reasoning", "builder"],
-                ],
-                "description": "Sequential 4-stage agent pipeline",
-            }
-        return {
-            "nodes": ["planning", "research", "reasoning", "builder"],
-            "edges": [
-                ["planning", "research"],
-                ["research", "reasoning"],
-                ["reasoning", "builder"],
-            ],
-            "description": "Sequential 4-stage agent pipeline",
-        }
-    except Exception as e:
-        return {
-            "error": str(e),
-            "nodes": ["planning", "research", "reasoning", "builder"],
-            "edges": [
-                ["planning", "research"],
-                ["research", "reasoning"],
-                ["reasoning", "builder"],
-            ],
-        }
+    return await get_pipeline_controller(system_service)
 
 
-# Phase-3: System Metrics Endpoint
 @router.get("/metrics")
 async def get_system_metrics(
-    task_manager: TaskManager = Depends(get_task_manager),
+    system_service: SystemService = Depends(get_system_service),
 ):
     """
-    Get system-wide metrics.
-    
+    Get system-wide metrics (Phase-4 enhanced).
+
     Returns current metrics including:
-    - Worker count and utilization
-    - Queue size and throughput
+    - Tasks processed and failed
+    - Active task count
+    - Queue size
+    - Worker count
+    - LLM call count
+    - Evolution trigger count
     - Circuit breaker state
-    - Memory and vector store statistics
     - System uptime
+    - Event bus statistics
     """
-    try:
-        metrics = await _metrics_collector.collect(
-            worker_pool=getattr(task_manager, "_pool", None),
-            task_queue=getattr(task_manager, "_queue", None),
-        )
-        return metrics.to_dict()
-    except Exception as e:
-        # Fallback metrics if collection fails
-        return {
-            "error": str(e),
-            "timestamp": asyncio.get_event_loop().time(),
-            "version": "Phase-3",
-        }
+    return await get_metrics_controller(system_service)
+
+
+@router.get("/tasks/{task_id}/timeline")
+async def get_task_timeline(
+    task_id: str = Path(..., description="Task ID"),
+    system_service: SystemService = Depends(get_system_service),
+):
+    """
+    Get complete execution timeline for a task (Phase-4).
+
+    Returns:
+    - Task metadata
+    - All agent executions with timing (start, end, duration)
+    - Execution order and dependencies
+    - Total pipeline duration
+    """
+    return await get_timeline_controller(system_service, task_id)
+
+
+@router.get("/events/stats")
+async def get_event_stats(
+    system_service: SystemService = Depends(get_system_service),
+):
+    """
+    Get event bus statistics (Phase-4).
+
+    Returns:
+    - Total events published
+    - Event distribution by type
+    - Subscriber count
+    - Event bus status
+    """
+    return await get_event_stats_controller(system_service)
+
+
+@router.get("/config")
+async def get_config(
+    system_service: SystemService = Depends(get_system_service),
+):
+    """
+    Get active system configuration (Phase-4).
+
+    Returns:
+    - AXON_MODE (mock/gemini/gradient/real)
+    - LLM provider info
+    - Vector store type
+    - Evolution status
+    - Feature flags
+    """
+    return await system_service.get_active_config()
+
 
