@@ -7,6 +7,7 @@ from time import perf_counter
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import IntegrityError
 
 from src.core.agent_orchestrator import AgentOrchestrator
 from src.core.event_bus import EventBus
@@ -67,11 +68,17 @@ class TaskManager:
             trace_id=trace_id,
         )
         session.add(task)
-        await session.flush()
-
-        # Set task context for all downstream operations
-        TraceContext.set_task_id(task.id)
-
+        try:
+            await session.flush()
+        except IntegrityError as exc:
+            # Likely caused by an invalid foreign key value (e.g., unknown chat_id)
+            logger.warning(
+                "task.create_failed_invalid_chat",
+                chat_id=chat_id,
+                error=str(exc),
+            )
+            # Let the caller translate this into an appropriate HTTP error (e.g., 400/404)
+            raise ValueError(f"Invalid chat_id: {chat_id}") from exc
         await self._queue.put(task.id)
 
         # Emit event using new event structure
