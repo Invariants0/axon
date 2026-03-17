@@ -101,7 +101,6 @@ class TaskManager:
             agent_name="task_manager",
             execution_time=round(perf_counter() - started_at, 6),
             title=title,
-            trace_id=trace_id,
         )
         return task
 
