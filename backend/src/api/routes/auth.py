@@ -117,9 +117,7 @@ async def login(
 
 
 @router.post("/logout")
-async def logout(
-    auth_service: AuthService = Depends(lambda: None),
-) -> dict[str, str]:
+async def logout() -> dict[str, str]:
     """
     Logout user (invalidate token on client side).
     """
