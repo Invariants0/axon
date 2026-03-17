@@ -40,7 +40,7 @@
             root.style.setProperty('--theme-tint', tint + '%');
         })();
     </script>
-    <link rel="stylesheet" href="/style/axon.css">
+    <link rel="stylesheet" href="axon.css">
 </head>
 <body>
     <div id="main-container">
@@ -172,9 +172,6 @@
         </div>
     </div>
 
-    <script src="/js/api.js"></script>
-    <script src="/js/websocket.js"></script>
-    <script src="/js/app.js"></script>
-    <script src="/js/axon.js"></script>
+    <script src="axon.js"></script>
 </body>
 </html>
