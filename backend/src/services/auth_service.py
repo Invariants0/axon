@@ -112,6 +112,6 @@ class AuthService:
     def _base64url_decode(data: str) -> str:
         """Decode base64url to string"""
         import base64
-        padding = 4 - len(data) % 4
+        padding = (-len(data)) % 4
         data_padded = data + ("=" * padding)
         return base64.urlsafe_b64decode(data_padded).decode("utf-8")
