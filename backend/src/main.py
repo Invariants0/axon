@@ -13,12 +13,19 @@ from src.db.session import close_db, init_db
 from src.utils.audit_logger import generate_audit_log
 from src.utils.logger import configure_logging, get_logger
 
+logger = get_logger(__name__)
 settings = get_settings()
 logger = get_logger(__name__)
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    # Validate configuration at startup (Phase-4)
+    logger.info("Starting configuration validation")
+    if not ConfigValidator.validate():
+        logger.error("Configuration validation failed - startup aborted")
+        raise RuntimeError("Configuration validation failed")
+    
     configure_logging()
     logger.info("Starting configuration validation")
     if not ConfigValidator.validate():

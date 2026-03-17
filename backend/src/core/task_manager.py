@@ -97,6 +97,7 @@ class TaskManager:
         logger.info(
             "task.created",
             task_id=task.id,
+            trace_id=trace_id,
             agent_name="task_manager",
             execution_time=round(perf_counter() - started_at, 6),
             title=title,
@@ -123,14 +124,25 @@ class TaskManager:
                 task = await self.get_task(session, task_id)
                 if not task:
                     return
+                
+                # Set trace context from task
+                TraceContext.set_trace_id(task.trace_id)
+                TraceContext.set_task_id(task.id)
+                
                 task.status = "running"
                 await session.flush()
-                await self.event_bus.publish(
-                    {"event": "task.progress", "task_id": task.id, "status": task.status}
+                
+                # Emit task.started event
+                event = TraceContext.create_event(
+                    "task.started",
+                    data={"task_id": task.id, "status": task.status},
                 )
+                await self.event_bus.publish(event)
+                
                 logger.info(
                     "task.started",
                     task_id=task.id,
+                    trace_id=task.trace_id,
                     agent_name="task_manager",
                     execution_time=round(perf_counter() - task_started_at, 6),
                 )
@@ -139,16 +151,22 @@ class TaskManager:
                 task.status = "completed"
                 task.result = str(result)
                 await session.commit()
-                await self.event_bus.publish(
-                    {
-                        "event": "task.progress",
+                
+                # Emit task.completed event
+                event = TraceContext.create_event(
+                    "task.completed",
+                    data={
                         "task_id": task.id,
                         "status": task.status,
-                    }
+                        "result_size": len(str(result)),
+                    },
                 )
+                await self.event_bus.publish(event)
+                
                 logger.info(
                     "task.completed",
                     task_id=task.id,
+                    trace_id=task.trace_id,
                     agent_name="task_manager",
                     execution_time=round(perf_counter() - task_started_at, 6),
                 )
@@ -159,14 +177,24 @@ class TaskManager:
                     failed.status = "failed"
                     failed.result = str(exc)
                     await session.commit()
-                await self.event_bus.publish(
-                    {
-                        "event": "task.error",
+                
+                # Emit task.failed event
+                event = TraceContext.create_event(
+                    "task.failed",
+                    data={
                         "task_id": task_id,
                         "error": str(exc),
-                    }
+                        "error_type": type(exc).__name__,
+                    },
+                    task_id=task_id,
                 )
-                logger.exception("task_failed", task_id=task_id, error=str(exc))
+                await self.event_bus.publish(event)
+                
+                logger.exception(
+                    "task.failed",
+                    task_id=task_id,
+                    error=str(exc),
+                )
 
     # Legacy run() method kept for backward compatibility with tests
     async def run(self) -> None:

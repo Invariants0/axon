@@ -85,6 +85,14 @@ class AgentExecution(Base, TimestampMixin):
     status: Mapped[str] = mapped_column(String(50), default="started", nullable=False)
     input_payload: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
     output_payload: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    
+    # Timeline tracking (Phase-4)
+    start_time: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    end_time: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    duration_ms: Mapped[int | None] = mapped_column(nullable=True)
+    
+    # Error tracking
+    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     # Timeline tracking (Phase-4)
     start_time: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

@@ -12,8 +12,7 @@ from src.core.evolution_engine import EvolutionEngine
 from src.core.event_bus import EventBus
 from src.core.task_manager import TaskManager
 from src.db.session import get_db_session
-from src.providers.vector_store_provider import create_vector_store
-from src.services.chat_service import ChatService
+from src.memory.vector_store import VectorStore
 from src.services.evolution_service import EvolutionService
 from src.services.skill_service import SkillService
 from src.services.task_service import TaskService
@@ -23,7 +22,7 @@ from src.skills.registry import SkillRegistry
 _event_bus = EventBus()
 _skill_registry = SkillRegistry()
 _skill_executor = SkillExecutor(_skill_registry)
-_vector_store: Any | None = None  # Lazily initialized; see get_vector_store()
+_vector_store = VectorStore()
 _llm_service = LLMService()
 _orchestrator: AgentOrchestrator | None = None  # Lazily initialized; see get_orchestrator()
 _task_manager: TaskManager | None = None  # Lazily initialized; see get_task_manager()
@@ -55,21 +54,7 @@ def get_llm_service() -> LLMService:
     return _llm_service
 
 
-def get_vector_store() -> Any:
-    """
-    Lazily initialize and return the global vector store instance.
-
-    This avoids triggering configuration-dependent failures at import time.
-    """
-    global _vector_store
-    if _vector_store is None:
-        try:
-            _vector_store = create_vector_store()  # Uses factory to select Chroma or Qdrant
-        except Exception as exc:  # noqa: BLE001 - we want to surface any startup error clearly
-            raise RuntimeError(
-                "Failed to initialize vector store. "
-                "Please verify VECTOR_DB_PROVIDER and related configuration."
-            ) from exc
+def get_vector_store() -> VectorStore:
     return _vector_store
 
 
