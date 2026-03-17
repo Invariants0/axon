@@ -5,7 +5,10 @@ from dotenv import load_dotenv
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-load_dotenv()
+# Load .env from backend root directory
+backend_root = Path(__file__).resolve().parents[2]
+env_file = backend_root / ".env"
+load_dotenv(env_file)
 
 
 class Settings(BaseSettings):
@@ -54,6 +57,13 @@ class Settings(BaseSettings):
     axon_redis_url: str = Field(default="redis://localhost:6379", alias="AXON_REDIS_URL")
     axon_redis_queue_name: str = Field(default="axon:tasks", alias="AXON_REDIS_QUEUE_NAME")
     axon_breaker_backend: str = Field(default="memory", alias="AXON_BREAKER_BACKEND")
+    
+    # Vector Database Provider Selection
+    vector_db_provider: str = Field(default="chroma", alias="VECTOR_DB_PROVIDER")
+    qdrant_url: str = Field(default="", alias="QDRANT_URL")
+    qdrant_api_key: str = Field(default="", alias="QDRANT_API_KEY")
+    qdrant_collection: str = Field(default="axon_memory", alias="QDRANT_COLLECTION")
+    embedding_dimension: int = Field(default=384, alias="EMBEDDING_DIMENSION")
     
     # Hackathon Testing
     axon_api_key: str = Field(default="", alias="AXON_API_KEY")
