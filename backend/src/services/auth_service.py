@@ -86,7 +86,7 @@ class AuthService:
             ).digest()
             expected_signature_encoded = self._base64url_encode(expected_signature)
             
-            if signature_encoded != expected_signature_encoded:
+            if not hmac.compare_digest(signature_encoded, expected_signature_encoded):
                 return None
             
             # Decode payload
