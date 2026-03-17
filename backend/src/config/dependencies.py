@@ -16,6 +16,7 @@ from src.memory.vector_store import VectorStore
 from src.services.evolution_service import EvolutionService
 from src.services.skill_service import SkillService
 from src.services.task_service import TaskService
+from src.services.chat_service import ChatService
 from src.skills.executor import SkillExecutor
 from src.skills.registry import SkillRegistry
 
