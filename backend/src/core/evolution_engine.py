@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.ai.llm_service import LLMService
 from src.core.event_bus import EventBus
+from src.core.evolution_safety import EvolutionSafetyValidator, SkillVersioning
 from src.db.models import Skill, Task
 from src.skills.registry import SkillRegistry
 from src.utils.logger import get_logger
@@ -168,6 +169,26 @@ class EvolutionEngine:
             # Clean up any markdown artifacts
             generated_code = self._clean_generated_code(generated_code)
             
+            # ===== SAFETY VALIDATION (Phase-4) =====
+            logger.info("validating_generated_skill", skill_name=skill_name)
+            is_valid, errors = EvolutionSafetyValidator.validate_all(generated_code)
+            
+            if not is_valid:
+                error_msg = "; ".join(errors)
+                logger.error(
+                    "skill_validation_failed",
+                    skill_name=skill_name,
+                    errors=error_msg,
+                )
+                await self.event_bus.publish({
+                    "event": "evolution.validation_failed",
+                    "skill": skill_name,
+                    "errors": errors,
+                })
+                raise ValueError(f"Generated skill validation failed: {error_msg}")
+            
+            logger.info("skill_validation_passed", skill_name=skill_name)
+            
             # Save the generated skill
             output_path = self.skill_registry.generated_skills_path() / f"{module_name}.py"
             output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -209,14 +230,13 @@ class EvolutionEngine:
             self.generated_count += 1
             self.last_run = datetime.now(timezone.utc)
             
-            await self.event_bus.publish(
-                {
-                    "event": "evolution.skill_generated",
-                    "skill": definition.name,
-                    "description": definition.description,
-                    "auto_generated": True,
-                }
-            )
+            await self.event_bus.publish({
+                "event": "evolution.skill_generated",
+                "skill": definition.name,
+                "description": definition.description,
+                "auto_generated": True,
+                "validated": True,
+            })
             
             logger.info(
                 "skill_generation_complete",
@@ -230,6 +250,7 @@ class EvolutionEngine:
                 "description": definition.description,
                 "version": definition.version,
                 "code_length": len(generated_code),
+                "validated": True,
             }
             
         except Exception as exc:
