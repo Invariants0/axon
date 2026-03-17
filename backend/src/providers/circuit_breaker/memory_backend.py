@@ -57,6 +57,8 @@ class MemoryBreaker(BreakerBackend):
         old_state = self._breakers[name].state
         self._breakers[name].state = state
         self._breakers[name].last_state_change = datetime.utcnow()
+        if state == BreakerState.OPEN:
+            self._breakers[name].last_failure_time = datetime.utcnow()
         if old_state != state:
             logger.debug(f"Breaker state changed: {name} {old_state.value} → {state.value}")
 

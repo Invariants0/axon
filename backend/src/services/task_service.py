@@ -10,15 +10,29 @@ class TaskService:
         self.session = session
 
     async def create_task(self, payload: TaskCreate):
-        return await self.task_manager.create_task(
-            self.session,
-            title=payload.title,
-            description=payload.description,
-            chat_id=payload.chat_id,
-        )
+        try:
+            return await self.task_manager.create_task(
+                self.session,
+                title=payload.title,
+                description=payload.description,
+                chat_id=payload.chat_id,
+            )
+        except TypeError as exc:
+            if payload.chat_id is not None or "chat_id" not in str(exc):
+                raise
+            return await self.task_manager.create_task(
+                self.session,
+                title=payload.title,
+                description=payload.description,
+            )
 
     async def list_tasks(self, chat_id: str | None = None):
-        return await self.task_manager.list_tasks(self.session, chat_id=chat_id)
+        try:
+            return await self.task_manager.list_tasks(self.session, chat_id=chat_id)
+        except TypeError as exc:
+            if chat_id is not None or "chat_id" not in str(exc):
+                raise
+            return await self.task_manager.list_tasks(self.session)
 
     async def get_task(self, task_id: str):
         return await self.task_manager.get_task(self.session, task_id)

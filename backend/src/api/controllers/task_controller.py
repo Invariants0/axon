@@ -10,6 +10,8 @@ async def create_task(payload: TaskCreate, task_service: TaskService):
 
 
 async def list_tasks(task_service: TaskService, chat_id: str | None = None):
+    if chat_id is None:
+        return await task_service.list_tasks()
     return await task_service.list_tasks(chat_id=chat_id)
 
 

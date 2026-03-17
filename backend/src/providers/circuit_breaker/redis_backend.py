@@ -70,6 +70,11 @@ class RedisBreaker(BreakerBackend):
                 f"{self.prefix}:{name}:state_change",
                 datetime.utcnow().isoformat(),
             )
+            if state == BreakerState.OPEN:
+                await client.set(
+                    f"{self.prefix}:{name}:last_failure",
+                    datetime.utcnow().isoformat(),
+                )
             logger.debug(f"Breaker state set in Redis: {name} = {state.value}")
         except Exception as e:
             logger.error(f"Failed to set breaker state: {e}")
