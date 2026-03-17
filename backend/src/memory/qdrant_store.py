@@ -188,7 +188,8 @@ class QdrantStore:
         for scored_point in search_result.points:
             output.append(
                 {
-                    "id": str(scored_point.id),
+                    # Return the logical memory identifier when available to match VectorStore interface
+                    "id": str(scored_point.payload.get("memory_id", scored_point.id)),
                     "content": scored_point.payload.get("content", ""),
                     "metadata": {
                         k: v
