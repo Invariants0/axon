@@ -82,9 +82,11 @@ class QdrantStore:
                 field_name="task_id",
                 field_schema=KeywordIndexParams(type=KeywordIndexType.KEYWORD),
             )
-        except Exception:
-            # Index might already exist, that's ok
-            pass
+        except Exception as exc:
+            # Index might already exist; ignore that case but surface other errors
+            if "already exists" in str(exc).lower():
+                return
+            raise
 
     async def add_embedding(
         self,
