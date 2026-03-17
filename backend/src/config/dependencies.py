@@ -23,15 +23,10 @@ from src.skills.registry import SkillRegistry
 _event_bus = EventBus()
 _skill_registry = SkillRegistry()
 _skill_executor = SkillExecutor(_skill_registry)
-_vector_store = create_vector_store()  # Uses factory to select Chroma or Qdrant
+_vector_store: Any | None = None  # Lazily initialized; see get_vector_store()
 _llm_service = LLMService()
-_orchestrator = AgentOrchestrator(
-    llm_service=_llm_service,
-    skill_executor=_skill_executor,
-    vector_store=_vector_store,
-    event_bus=_event_bus,
-)
-_task_manager = TaskManager(event_bus=_event_bus, orchestrator=_orchestrator)
+_orchestrator: AgentOrchestrator | None = None  # Lazily initialized; see get_orchestrator()
+_task_manager: TaskManager | None = None  # Lazily initialized; see get_task_manager()
 _evolution_engine = EvolutionEngine(
     llm_service=_llm_service,
     skill_registry=_skill_registry,
@@ -61,14 +56,45 @@ def get_llm_service() -> LLMService:
 
 
 def get_vector_store() -> Any:
+    """
+    Lazily initialize and return the global vector store instance.
+
+    This avoids triggering configuration-dependent failures at import time.
+    """
+    global _vector_store
+    if _vector_store is None:
+        try:
+            _vector_store = create_vector_store()  # Uses factory to select Chroma or Qdrant
+        except Exception as exc:  # noqa: BLE001 - we want to surface any startup error clearly
+            raise RuntimeError(
+                "Failed to initialize vector store. "
+                "Please verify VECTOR_DB_PROVIDER and related configuration."
+            ) from exc
     return _vector_store
 
 
 def get_task_manager() -> TaskManager:
+    """
+    Lazily initialize and return the global TaskManager instance.
+    """
+    global _task_manager
+    if _task_manager is None:
+        _task_manager = TaskManager(event_bus=_event_bus, orchestrator=get_orchestrator())
     return _task_manager
 
 
 def get_orchestrator() -> AgentOrchestrator:
+    """
+    Lazily initialize and return the global AgentOrchestrator instance.
+    """
+    global _orchestrator
+    if _orchestrator is None:
+        _orchestrator = AgentOrchestrator(
+            llm_service=_llm_service,
+            skill_executor=_skill_executor,
+            vector_store=get_vector_store(),
+            event_bus=_event_bus,
+        )
     return _orchestrator
 
 
