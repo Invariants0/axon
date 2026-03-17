@@ -24,6 +24,9 @@ from qdrant_client.http.models import (
     VectorParams,
     KeywordIndexParams,
     KeywordIndexType,
+    Filter,
+    FieldCondition,
+    MatchValue,
 )
 from src.config.config import get_settings
 from src.memory.embeddings import embed
@@ -234,11 +237,17 @@ class QdrantStore:
         Args:
             memory_id: Memory ID to delete
         """
-        point_id = hash(memory_id) & 0x7FFFFFFF
         await asyncio.to_thread(
             self.client.delete,
             collection_name=self.collection_name,
-            points_selector=point_id,
+            points_selector=Filter(
+                must=[
+                    FieldCondition(
+                        key="memory_id",
+                        match=MatchValue(value=memory_id),
+                    )
+                ]
+            ),
         )
 
     async def get_collection_stats(self) -> dict:
