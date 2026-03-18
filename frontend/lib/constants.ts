@@ -5,11 +5,11 @@
 
 /** Base REST API URL */
 export const API_BASE_URL =
-  (process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000").replace(/\/$/, "");
+  (process.env.NEXT_PUBLIC_API_URL ?? "http://axon.luxionlabs.com/api").replace(/\/$/, "");
 
 /** WebSocket event stream URL */
 export const WS_URL =
-  process.env.NEXT_PUBLIC_WS_URL ?? "ws://127.0.0.1:8000/ws/events";
+  process.env.NEXT_PUBLIC_WS_URL ?? "ws://axon.luxionlabs.com/ws/events";
 
 /** Zustand localStorage persistence key */
 export const STORE_PERSIST_KEY = "axon-store";

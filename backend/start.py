@@ -95,7 +95,7 @@ def ensure_database_ready() -> None:
     if not parsed.scheme.startswith("postgresql"):
         return
 
-    host = parsed.hostname or "127.0.0.1"
+    host = parsed.hostname or "postgres"
     port = int(parsed.port or 5432)
     ensure_local_postgres_with_docker(host, port, database_url)
 
@@ -117,7 +117,7 @@ async def init_database() -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Start AXON backend")
-    parser.add_argument("--host", default="127.0.0.1", help="Host to bind")
+    parser.add_argument("--host", default="0.0.0.0", help="Host to bind")
     parser.add_argument("--port", type=int, default=8000, help="Port to bind")
     parser.add_argument("--reload", action="store_true", help="Enable auto-reload")
     parser.add_argument("--skip-db-init", action="store_true", help="Skip database initialization")
