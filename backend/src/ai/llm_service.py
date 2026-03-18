@@ -9,6 +9,7 @@ from tenacity import AsyncRetrying, retry_if_exception_type, stop_after_attempt,
 from src.ai.gemini_client import GeminiClient
 from src.ai.gradient_client import GradientClient
 from src.ai.huggingface_client import HuggingFaceClient
+from src.ai.do_inference_client import DOInferenceClient
 from src.config.config import get_settings
 from src.utils.logger import get_logger
 
@@ -21,6 +22,7 @@ class LLMService:
         self.gradient = GradientClient()
         self.huggingface = HuggingFaceClient()
         self.gemini = GeminiClient()
+        self.do_inference = DOInferenceClient()
         self._local_pipeline = None
 
     def _test_mode_response(self, messages: list[dict[str, str]]) -> str:
@@ -58,7 +60,9 @@ class LLMService:
         if choices:
             message = choices[0].get("message") or {}
             if isinstance(message, dict):
-                return str(message.get("content", ""))
+                # Handle glm-5 reasoning model - check both content and reasoning_content
+                content = message.get("content") or message.get("reasoning_content", "")
+                return str(content)
         if isinstance(response, list) and response and isinstance(response[0], dict):
             return str(response[0].get("generated_text", ""))
         return str(response)
@@ -104,9 +108,10 @@ class LLMService:
             logger.error("gemini_mode_no_key", message="AXON_MODE=gemini but GEMINI_API_KEY not set")
             raise ValueError("GEMINI_API_KEY required when AXON_MODE=gemini")
 
-        # PRODUCTION: Route to DigitalOcean Gradient when AXON_MODE=gradient
+        # PRODUCTION: Route to DigitalOcean Gradient/Inference when AXON_MODE=gradient
         if self.settings.axon_mode == "gradient":
-            if self.settings.gradient_api_key:
+            api_key = self.settings.gradient_model_access_key or self.settings.gradient_api_key
+            if api_key:
                 try:
                     response = await self._retry_call(self.gradient.chat, messages, False)
                     self._log_usage(response, "gradient")
@@ -115,8 +120,22 @@ class LLMService:
                     logger.error("gradient_call_failed", error=str(exc))
                     raise
 
-            logger.error("gradient_mode_no_key", message="AXON_MODE=gradient but GRADIENT_API_KEY not set")
-            raise ValueError("GRADIENT_API_KEY required when AXON_MODE=gradient")
+            logger.error("gradient_mode_no_key", message="AXON_MODE=gradient but GRADIENT_MODEL_ACCESS_KEY/GRADIENT_API_KEY not set")
+            raise ValueError("GRADIENT_MODEL_ACCESS_KEY or GRADIENT_API_KEY required when AXON_MODE=gradient")
+
+        # PRODUCTION: Route to DigitalOcean Inference when AXON_MODE=do_inference
+        if self.settings.axon_mode == "do_inference":
+            if self.settings.gradient_model_access_key:
+                try:
+                    response = await self._retry_call(self.do_inference.chat, messages, False)
+                    self._log_usage(response, "do_inference")
+                    return self._extract_text(response)
+                except Exception as exc:  # noqa: BLE001
+                    logger.error("do_inference_call_failed", error=str(exc))
+                    raise
+
+            logger.error("do_inference_mode_no_key", message="AXON_MODE=do_inference but GRADIENT_MODEL_ACCESS_KEY not set")
+            raise ValueError("GRADIENT_MODEL_ACCESS_KEY required when AXON_MODE=do_inference")
 
         # FALLBACK: Legacy behavior for mock mode
         if self.settings.gradient_api_key:

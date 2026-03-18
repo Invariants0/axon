@@ -1,11 +1,14 @@
 """
-DigitalOcean Gradient/Inference client for production AI access.
+DigitalOcean AI Inference client for production testing.
 
 This client provides async access to DigitalOcean's AI inference endpoint
-for production-grade model access with automatic retry and error handling.
+at https://inference.do-ai.run/v1/ for production-grade model access.
 """
 
-from typing import Any
+from __future__ import annotations
+
+import asyncio
+from typing import Any, AsyncIterator
 
 import httpx
 from tenacity import (
@@ -21,17 +24,20 @@ from src.utils.logger import get_logger
 logger = get_logger(__name__)
 
 
-class GradientClient:
+class DOInferenceClient:
     """
-    DigitalOcean Gradient/Inference client.
+    DigitalOcean AI Inference client for production testing.
     
-    Supports both legacy Gradient API and new DO Inference endpoint.
-    Uses GRADIENT_MODEL_ACCESS_KEY for authentication.
+    Supports:
+    - Async chat completions
+    - Model listing
+    - Automatic retry with exponential backoff
+    - Timeout handling
+    - Token usage logging
     """
 
     def __init__(self) -> None:
         self.settings = get_settings()
-        # Use DO Inference endpoint by default
         self.base_url = "https://inference.do-ai.run/v1"
         self.model = "glm-5"  # Fixed model for production
         self.timeout = 60.0
@@ -65,10 +71,9 @@ class GradientClient:
         if stream:
             payload["stream"] = True
 
-        # Use GRADIENT_MODEL_ACCESS_KEY for DO Inference
-        api_key = self.settings.gradient_model_access_key or self.settings.gradient_api_key
+        api_key = self.settings.gradient_model_access_key
         if not api_key:
-            raise ValueError("GRADIENT_MODEL_ACCESS_KEY or GRADIENT_API_KEY not configured")
+            raise ValueError("GRADIENT_MODEL_ACCESS_KEY not configured for DO Inference")
 
         url = f"{self.base_url}/chat/completions"
         headers = {
@@ -90,7 +95,7 @@ class GradientClient:
         usage = response.get("usage", {})
         logger.info(
             "llm_call",
-            provider="gradient",
+            provider="do_inference",
             model=self.model,
             prompt_tokens=usage.get("prompt_tokens", 0),
             completion_tokens=usage.get("completion_tokens", 0),
@@ -122,9 +127,9 @@ class GradientClient:
         Returns:
             Response dict with available models
         """
-        api_key = self.settings.gradient_model_access_key or self.settings.gradient_api_key
+        api_key = self.settings.gradient_model_access_key
         if not api_key:
-            raise ValueError("GRADIENT_MODEL_ACCESS_KEY or GRADIENT_API_KEY not configured")
+            raise ValueError("GRADIENT_MODEL_ACCESS_KEY not configured for DO Inference")
 
         url = f"{self.base_url}/models"
         headers = {
@@ -138,25 +143,25 @@ class GradientClient:
             return response.json()
 
     async def health(self) -> dict[str, str]:
-        """Check Gradient client health status."""
-        api_key = self.settings.gradient_model_access_key or self.settings.gradient_api_key
-        configured = bool(api_key)
+        """Check DO Inference client health status."""
+        configured = bool(self.settings.gradient_model_access_key)
         
+        # Try to list models if configured
         if configured:
             try:
                 models = await self.list_models()
                 model_count = len(models.get("data", []))
                 return {
-                    "provider": "gradient",
+                    "provider": "do_inference",
                     "configured": "yes",
                     "model": self.model,
                     "available_models": str(model_count),
                     "status": "healthy",
                 }
             except Exception as e:
-                logger.error("gradient_health_check_failed", error=str(e))
+                logger.error("do_inference_health_check_failed", error=str(e))
                 return {
-                    "provider": "gradient",
+                    "provider": "do_inference",
                     "configured": "yes",
                     "model": self.model,
                     "status": "unhealthy",
@@ -164,7 +169,7 @@ class GradientClient:
                 }
         
         return {
-            "provider": "gradient",
+            "provider": "do_inference",
             "configured": "no",
             "model": self.model,
             "status": "not_configured",
