@@ -15,7 +15,7 @@ export const WS_URL =
 export const STORE_PERSIST_KEY = "axon-store";
 
 /** API Key header name expected by the FastAPI backend */
-export const API_KEY_HEADER = "X-API-Key";
+export const API_KEY_HEADER = "X-AXON-KEY";
 
 // ─── Route segments ────────────────────────────────────────────
 export const API_ROUTES = {
