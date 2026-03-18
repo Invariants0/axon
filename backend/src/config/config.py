@@ -16,7 +16,6 @@ class Settings(BaseSettings):
     app_name: str = "AXON"
     env: str = "development"
     test_mode: bool = Field(default=True, alias="TEST_MODE")
-    api_key: str = Field(default="", alias="API_KEY")
     secret_key: str = Field(default="change-me-in-production", alias="SECRET_KEY")
     GRADIENT_MODEL_ACCESS_KEY: str = Field(default="", alias="GRADIENT_MODEL_ACCESS_KEY")
     gradient_model: str = Field(default="gpt-4.1-mini", alias="GRADIENT_MODEL")
@@ -44,7 +43,6 @@ class Settings(BaseSettings):
     request_rate_limit_per_minute: int = Field(default=120, alias="RATE_LIMIT_PER_MIN")
     axon_mode: str = Field(default="mock", alias="AXON_MODE")
     digitalocean_api_token: str = Field(default="", alias="DIGITALOCEAN_API_TOKEN")
-    gradient_model_access_key: str = Field(default="", alias="GRADIENT_MODEL_ACCESS_KEY")
     digitalocean_kb_uuid: str = Field(default="", alias="DIGITALOCEAN_KB_UUID")
     axon_agent_timeout: int = Field(default=120, alias="AXON_AGENT_TIMEOUT")
     axon_planner_agent_url: str = Field(default="", alias="AXON_PLANNER_AGENT_URL")

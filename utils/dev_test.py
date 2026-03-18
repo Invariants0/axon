@@ -8,15 +8,15 @@ import time
 import httpx
 
 BASE_URL = os.getenv("AXON_BASE_URL", "http://127.0.0.1:8000")
-API_KEY = os.getenv("API_KEY", "")
+AXON_API_KEY = os.getenv("AXON_API_KEY", "")
 POLL_TIMEOUT_SECONDS = int(os.getenv("AXON_TEST_TIMEOUT", "60"))
 POLL_INTERVAL_SECONDS = float(os.getenv("AXON_TEST_POLL_INTERVAL", "1.0"))
 
 
 def _headers() -> dict[str, str]:
     headers = {}
-    if API_KEY:
-        headers["x-api-key"] = API_KEY
+    if AXON_API_KEY:
+        headers["X-AXON-KEY"] = AXON_API_KEY
     return headers
 
 
