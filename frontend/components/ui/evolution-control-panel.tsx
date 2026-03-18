@@ -31,14 +31,8 @@ const STATUS_CONFIG = {
     dot: "bg-yellow-400 animate-pulse",
     glow: "shadow-[0_0_8px_rgba(234,179,8,0.4)]",
   },
-  completed: {
-    label: "Completed",
-    color: "text-emerald-400",
-    dot: "bg-emerald-400",
-    glow: "shadow-[0_0_8px_rgba(16,185,129,0.4)]",
-  },
-  failed: {
-    label: "Failed",
+  error: {
+    label: "Error",
     color: "text-red-400",
     dot: "bg-red-400",
     glow: "",
@@ -76,6 +70,7 @@ export function EvolutionControlPanel() {
       status: "running",
       generated_skills: 0,
       failed_tasks: 0,
+      last_run: null,
     });
     addLog("[EVOLUTION] ⚡ Manual evolution cycle triggered via dashboard...");
 
@@ -86,7 +81,7 @@ export function EvolutionControlPanel() {
       const msg = err instanceof Error ? err.message : "Unknown error";
       addLog(`[EVOLUTION] ✗ Failed to trigger: ${msg}`);
       addNotification(`Failed to trigger evolution: ${msg}`, "error");
-      setEvolutionState({ status: "failed", generated_skills: 0, failed_tasks: 1 });
+      setEvolutionState({ status: "error", generated_skills: 0, failed_tasks: 1, last_run: null });
     } finally {
       setIsTriggering(false);
     }
@@ -96,6 +91,7 @@ export function EvolutionControlPanel() {
     status: "idle",
     generated_skills: 0,
     failed_tasks: 0,
+    last_run: null,
   };
 
   const cfg = STATUS_CONFIG[state.status] ?? STATUS_CONFIG.idle;
@@ -171,15 +167,6 @@ export function EvolutionControlPanel() {
           </div>
         </div>
 
-        {/* Current Version */}
-        {state.current_version && (
-          <div className="flex items-center justify-between p-2 rounded-lg bg-primary/10 border border-primary/20">
-            <span className="text-xs text-primary/70">Current Version</span>
-            <span className="text-xs font-mono font-bold text-primary">
-              AXON {state.current_version}
-            </span>
-          </div>
-        )}
 
         {/* Trigger Button or Confirm Dialog */}
         <AnimatePresence mode="wait">
@@ -239,12 +226,6 @@ export function EvolutionControlPanel() {
           )}
         </AnimatePresence>
 
-        {/* Current state message */}
-        {state.message && (
-          <p className="text-xs text-white/40 italic border-t border-white/5 pt-3">
-            {state.message}
-          </p>
-        )}
       </CardContent>
     </Card>
   );

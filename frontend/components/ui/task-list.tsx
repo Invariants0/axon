@@ -71,7 +71,7 @@ function TaskDetailModal({
   }, [task.id]);
 
   const maxDuration = timeline
-    ? Math.max(...timeline.executions.map((e) => e.duration_ms ?? 0), 1)
+    ? Math.max(...timeline.timeline.map((e) => e.duration_ms ?? 0), 1)
     : 1;
 
   return (
@@ -96,7 +96,7 @@ function TaskDetailModal({
               <span className="text-[10px] font-mono text-white/30">{task.id.slice(0, 12)}…</span>
             </div>
             <h2 className="text-white font-semibold text-lg leading-tight truncate">
-              {task.title ?? task.name ?? "Untitled Task"}
+              {task.title ?? "Untitled Task"}
             </h2>
             {task.description && (
               <p className="text-sm text-white/50 mt-1">{task.description}</p>
@@ -112,16 +112,16 @@ function TaskDetailModal({
 
         <ScrollArea className="flex-1 p-6 space-y-6">
           {/* Result / Error */}
-          {(task.result || task.error) && (
+          {task.result && (
             <div className={`p-4 rounded-xl text-sm font-mono border ${
-              task.error
+              task.status === "failed"
                 ? "bg-red-950/30 border-red-500/20 text-red-300"
                 : "bg-emerald-950/20 border-emerald-500/20 text-emerald-300"
             }`}>
               <div className="text-[10px] uppercase tracking-wider mb-2 opacity-60">
-                {task.error ? "Error" : "Result"}
+                {task.status === "failed" ? "Error" : "Result"}
               </div>
-              <pre className="whitespace-pre-wrap break-words">{task.error ?? task.result}</pre>
+              <pre className="whitespace-pre-wrap break-words">{task.result}</pre>
             </div>
           )}
 
@@ -135,12 +135,12 @@ function TaskDetailModal({
                 <Loader2 className="w-4 h-4 animate-spin" />
                 Loading timeline...
               </div>
-            ) : timeline?.executions.length ? (
+            ) : timeline?.timeline.length ? (
               <div className="space-y-3">
-                {timeline.executions.map((exec, i) => {
+                {timeline.timeline.map((exec, i) => {
                   const pct = Math.round(((exec.duration_ms ?? 0) / maxDuration) * 100);
                   return (
-                    <div key={exec.id ?? i} className="space-y-1">
+                    <div key={exec.agent_name ?? i} className="space-y-1">
                       <div className="flex items-center justify-between text-xs">
                         <span className="font-medium capitalize text-white/80">
                           {exec.agent_name}
@@ -157,8 +157,8 @@ function TaskDetailModal({
                           className="h-full bg-primary rounded-full"
                         />
                       </div>
-                      {exec.error_message && (
-                        <p className="text-[10px] text-red-400">{exec.error_message}</p>
+                      {exec.error && (
+                        <p className="text-[10px] text-red-400">{exec.error}</p>
                       )}
                     </div>
                   );
@@ -225,12 +225,7 @@ export function TaskList() {
         const existingIds = new Set(tasks.map((t) => t.id));
         data.forEach((t) => {
           if (!existingIds.has(t.id)) {
-            addTask({
-              ...t,
-              name: t.title,
-              version: "v0",
-              time: t.created_at ? new Date(t.created_at).toLocaleTimeString() : "",
-            });
+            addTask(t);
           }
         });
       }
@@ -249,13 +244,11 @@ export function TaskList() {
   const filtered = tasks.filter((t) => {
     const matchesQuery =
       !query ||
-      (t.title ?? t.name ?? "").toLowerCase().includes(query.toLowerCase()) ||
+      t.title.toLowerCase().includes(query.toLowerCase()) ||
       t.id.toLowerCase().includes(query.toLowerCase());
     const matchesStatus =
       statusFilter === "all" ||
-      t.status === statusFilter ||
-      (statusFilter === "completed" && t.status === "success") ||
-      (statusFilter === "failed" && t.status === "fail");
+      t.status === statusFilter;
     return matchesQuery && matchesStatus;
   });
 
@@ -360,7 +353,7 @@ export function TaskList() {
                           </td>
                           <td className="px-4 py-3">
                             <span className="text-sm font-medium text-white/85 group-hover:text-white transition-colors">
-                              {task.title ?? task.name ?? "Untitled"}
+                              {task.title ?? "Untitled"}
                             </span>
                           </td>
                           <td className="px-4 py-3">
@@ -368,7 +361,7 @@ export function TaskList() {
                           </td>
                           <td className="px-4 py-3 hidden md:table-cell">
                             <span className="text-[11px] font-mono text-white/30">
-                              {task.created_at ? new Date(task.created_at).toLocaleTimeString() : task.time ?? "—"}
+                              {task.created_at ? new Date(task.created_at).toLocaleTimeString() : "—"}
                             </span>
                           </td>
                           <td className="px-4 py-3 text-right">

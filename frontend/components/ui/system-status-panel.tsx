@@ -1,19 +1,14 @@
 "use client";
 
+// ============================================================
+// components/ui/system-status-panel.tsx
+// Uses exact contract §2.1 fields from SystemHealth:
+//   backend, agents, skills_loaded, vector_store, llm_provider,
+//   axon_mode, debug_pipeline
+// ============================================================
+
 import { useEffect, useState, useCallback } from "react";
-import { motion } from "framer-motion";
-import {
-  Server,
-  Database,
-  BrainCircuit,
-  Activity,
-  Cpu,
-  Clock,
-  RefreshCw,
-  CheckCircle2,
-  XCircle,
-  AlertCircle,
-} from "lucide-react";
+import { Activity, RefreshCw } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { systemService } from "@/lib/services/system.service";
 import { useAppStore } from "@/store/app-store";
@@ -27,15 +22,14 @@ interface MetricRowProps {
 
 function MetricRow({ label, value, status = "neutral" }: MetricRowProps) {
   const statusColors = {
-    ok: "text-emerald-400",
-    error: "text-red-400",
+    ok:      "text-emerald-400",
+    error:   "text-red-400",
     warning: "text-yellow-400",
     neutral: "text-white/60",
   };
-
   const dotColors = {
-    ok: "bg-emerald-400 shadow-[0_0_5px_rgba(16,185,129,0.5)]",
-    error: "bg-red-400",
+    ok:      "bg-emerald-400 shadow-[0_0_5px_rgba(16,185,129,0.5)]",
+    error:   "bg-red-400",
     warning: "bg-yellow-400",
     neutral: "bg-white/20",
   };
@@ -51,10 +45,20 @@ function MetricRow({ label, value, status = "neutral" }: MetricRowProps) {
   );
 }
 
+const DEFAULT_HEALTH: SystemHealth = {
+  backend:        "connecting",
+  agents:         "unknown",
+  skills_loaded:  0,
+  vector_store:   "unknown",
+  llm_provider:   "unknown",
+  axon_mode:      "mock",
+  debug_pipeline: false,
+};
+
 export function SystemStatusPanel() {
   const { systemHealth, setSystemHealth } = useAppStore();
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
+  const [lastRefresh, setLastRefresh]   = useState<Date | null>(null);
 
   const fetchStatus = useCallback(async () => {
     setIsRefreshing(true);
@@ -62,35 +66,33 @@ export function SystemStatusPanel() {
       const health = await systemService.health();
       setSystemHealth(health);
       setLastRefresh(new Date());
-    } catch (err) {
-      setSystemHealth({ status: "offline" });
+    } catch {
+      setSystemHealth({ ...DEFAULT_HEALTH, backend: "error", agents: "error" });
     } finally {
       setIsRefreshing(false);
     }
   }, [setSystemHealth]);
 
-  // Initial fetch + auto-refresh every 15s
   useEffect(() => {
     fetchStatus();
-    const interval = setInterval(fetchStatus, 15000);
+    const interval = setInterval(fetchStatus, 15_000);
     return () => clearInterval(interval);
   }, [fetchStatus]);
 
-  const h: SystemHealth = systemHealth ?? { status: "connecting" };
+  const h: SystemHealth = systemHealth ?? DEFAULT_HEALTH;
 
-  const overallStatus = h.status ?? "connecting";
-  const statusConfig = {
-    healthy: { label: "Online", color: "text-emerald-400", bgDot: "bg-emerald-400 animate-pulse shadow-[0_0_6px_rgba(16,185,129,0.6)]" },
-    degraded: { label: "Degraded", color: "text-yellow-400", bgDot: "bg-yellow-400" },
-    offline: { label: "Offline", color: "text-red-400", bgDot: "bg-red-400" },
-    connecting: { label: "Connecting…", color: "text-white/40", bgDot: "bg-white/20 animate-pulse" },
-  };
+  const backendOk   = h.backend === "ok";
+  const agentsOk    = h.agents === "reachable";
+  const dbOk        = h.vector_store === "connected";
+  const llmLabel    = h.llm_provider ?? "unknown";
 
-  const cfg = statusConfig[overallStatus] ?? statusConfig.connecting;
-  const dbStatus = h.db_status ?? h.dbStatus ?? "connecting";
-  const workersActive = h.workers_active ?? h.workersActive ?? 0;
-  const llm = h.llm_provider ?? (h.llmProviders?.[0]) ?? "unknown";
-  const skillsCount = h.skills_count ?? 0;
+  const overallLabel = backendOk ? "Online" : h.backend === "error" ? "Offline" : "Connecting…";
+  const overallColor = backendOk ? "text-emerald-400" : h.backend === "error" ? "text-red-400" : "text-white/40";
+  const overallDot   = backendOk
+    ? "bg-emerald-400 animate-pulse shadow-[0_0_6px_rgba(16,185,129,0.6)]"
+    : h.backend === "error"
+    ? "bg-red-400"
+    : "bg-white/20 animate-pulse";
 
   return (
     <Card className="border-white/5 bg-[#0a0a0a]/80 backdrop-blur-xl overflow-hidden relative">
@@ -115,97 +117,54 @@ export function SystemStatusPanel() {
       <CardContent className="p-5 space-y-4">
         {/* Overall Status */}
         <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5">
-          <div className={`w-2.5 h-2.5 rounded-full ${cfg.bgDot}`} />
+          <div className={`w-2.5 h-2.5 rounded-full ${overallDot}`} />
           <div>
-            <div className={`font-medium text-sm ${cfg.color}`}>{cfg.label}</div>
+            <div className={`font-medium text-sm ${overallColor}`}>{overallLabel}</div>
             {lastRefresh && (
               <div className="text-[10px] text-white/30">
                 Updated {lastRefresh.toLocaleTimeString()}
               </div>
             )}
           </div>
-          {h.version && (
-            <div className="ml-auto text-[10px] font-mono text-white/40 bg-white/5 px-2 py-1 rounded border border-white/5">
-              {h.version}
-            </div>
-          )}
+          <div className="ml-auto text-[10px] font-mono text-white/40 bg-white/5 px-2 py-1 rounded border border-white/5">
+            {h.axon_mode}
+          </div>
         </div>
 
-        {/* Metrics */}
+        {/* Metrics — all from contract */}
         <div className="space-y-0">
           <MetricRow
-            label="Database"
-            value={dbStatus === "connected" ? "Connected" : dbStatus}
-            status={dbStatus === "connected" ? "ok" : "error"}
-          />
-          {h.vector_store && (
-            <MetricRow
-              label="Vector Store"
-              value={h.vector_store}
-              status="ok"
-            />
-          )}
-          <MetricRow
-            label="Inference Engine"
-            value={llm}
-            status={llm !== "unknown" ? "ok" : "warning"}
+            label="Backend"
+            value={h.backend}
+            status={backendOk ? "ok" : "error"}
           />
           <MetricRow
-            label="Active Workers"
-            value={workersActive > 0 ? `${workersActive} running` : "0"}
-            status={workersActive > 0 ? "ok" : "neutral"}
+            label="Agents"
+            value={h.agents}
+            status={agentsOk ? "ok" : "warning"}
           />
-          {skillsCount > 0 && (
-            <MetricRow label="Skills Loaded" value={String(skillsCount)} status="ok" />
-          )}
-          {h.queue_size !== undefined && (
-            <MetricRow
-              label="Task Queue"
-              value={h.queue_size === 0 ? "Empty" : `${h.queue_size} pending`}
-              status={h.queue_size === 0 ? "ok" : "warning"}
-            />
-          )}
-          {h.circuit_breaker && (
-            <MetricRow
-              label="Circuit Breaker"
-              value={h.circuit_breaker}
-              status={h.circuit_breaker === "closed" ? "ok" : "warning"}
-            />
-          )}
-          {h.uptime_seconds !== undefined && (
-            <MetricRow
-              label="Uptime"
-              value={formatUptime(h.uptime_seconds)}
-              status="neutral"
-            />
-          )}
+          <MetricRow
+            label="Vector Store"
+            value={h.vector_store}
+            status={dbOk ? "ok" : h.vector_store === "disconnected" ? "error" : "warning"}
+          />
+          <MetricRow
+            label="LLM Provider"
+            value={llmLabel}
+            status={llmLabel !== "unknown" ? "ok" : "warning"}
+          />
+          <MetricRow
+            label="Skills Loaded"
+            value={String(h.skills_loaded)}
+            status={h.skills_loaded > 0 ? "ok" : "warning"}
+          />
+          <MetricRow
+            label="Debug Pipeline"
+            value={h.debug_pipeline ? "enabled" : "disabled"}
+            status={h.debug_pipeline ? "warning" : "ok"}
+          />
         </div>
-
-        {/* LLM Providers */}
-        {h.llmProviders && h.llmProviders.length > 1 && (
-          <div className="pt-2 border-t border-white/5">
-            <div className="text-[10px] uppercase tracking-wider text-white/30 mb-2">
-              Available Providers
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              {h.llmProviders.map((p) => (
-                <span
-                  key={p}
-                  className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 border border-white/10 text-white/60"
-                >
-                  {p}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
       </CardContent>
     </Card>
   );
-}
-
-function formatUptime(seconds: number): string {
-  if (seconds < 60) return `${Math.round(seconds)}s`;
-  if (seconds < 3600) return `${Math.round(seconds / 60)}m`;
-  return `${Math.round(seconds / 3600)}h ${Math.round((seconds % 3600) / 60)}m`;
 }
