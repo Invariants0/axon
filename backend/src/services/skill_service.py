@@ -30,3 +30,21 @@ class SkillService:
                 }
             )
         return output
+
+    async def get_skill_code(self, name: str) -> dict:
+        """Return source code for a skill by name."""
+        try:
+            skill = self.registry.get(name)
+            return {
+                "name": skill.name,
+                "source_code": skill.source,
+                "version": skill.version,
+                "description": skill.description,
+            }
+        except KeyError:
+            return {
+                "name": name,
+                "source_code": f"# Skill '{name}' not found in registry",
+                "version": "unknown",
+                "description": "",
+            }
