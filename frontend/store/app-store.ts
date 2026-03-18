@@ -84,7 +84,7 @@ export const useAppStore = create<AppState>()(
         setSystemHealth: (systemHealth) => set({ systemHealth }),
 
         // ── Persona ─────────────────────────────────────────────
-        persona: "Engineer",
+        persona: "operator",
         setPersona: (persona) => set({ persona }),
 
         // ── Tasks ───────────────────────────────────────────────
@@ -141,7 +141,7 @@ export const useAppStore = create<AppState>()(
             systemStatus:
               evolutionState.status === "running"
                 ? "Evolving"
-                : evolutionState.status === "completed"
+                : evolutionState.status === "idle"
                 ? "Live"
                 : "Idle",
           }),
