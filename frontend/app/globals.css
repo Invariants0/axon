@@ -93,3 +93,16 @@
     @apply font-sans;
   }
 }
+
+@keyframes blob {
+  0%, 100% { transform: translateY(10px); }
+  50% { transform: translate(-10px); }
+}
+
+.animate-blob {
+  animation: blob 4s ease-in-out infinite;
+}
+
+.animation-delay-1000 {
+  animation-delay: -2s;
+}

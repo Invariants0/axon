@@ -47,20 +47,11 @@ export const SkewCard = ({
       </span>
 
       {/* Content */}
-      <div className="relative z-20 h-full flex flex-col justify-center p-10 bg-black/40 backdrop-blur-xl border border-white/10 rounded-3xl text-white transition-all duration-500 group-hover:left-[-15px] group-hover:bg-black/20">
+      <div className="relative z-20 h-full flex flex-col justify-center p-10 bg-black/40 backdrop-blur-xl border border-white/10 rounded-3xl text-white transition-all duration-500 left-0 group-hover:left-[-15px] group-hover:bg-black/20">
         <Icon className="w-12 h-12 text-white mb-6 transition-transform duration-500 group-hover:scale-110" />
         <h3 className="text-2xl font-bold mb-4">{title}</h3>
         <p className="text-muted-foreground leading-relaxed text-lg">{description}</p>
       </div>
-
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes blob {
-          0%, 100% { transform: translateY(10px); }
-          50% { transform: translate(-10px); }
-        }
-        .animate-blob { animation: blob 4s ease-in-out infinite; }
-        .animation-delay-1000 { animation-delay: -2s; }
-      `}} />
     </div>
   );
 };
