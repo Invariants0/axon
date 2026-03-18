@@ -46,7 +46,6 @@ services:
   backend:
     build:
       context: .
-      context: .
       dockerfile: docker/backend.Dockerfile
     container_name: axon-backend
     env_file:
