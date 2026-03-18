@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { BrainCircuit, Activity, Code2, Network } from "lucide-react";
 import Link from "next/link";
 import { GlowyWavesHero } from "@/components/ui/glowy-waves-hero-shadcnui";
+import { SkewCard } from "@/components/ui/gradient-card-showcase";
 
 export default function LandingPage() {
   return (
@@ -70,45 +71,34 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="rounded-3xl border border-white/10 bg-[#0a0a0a]/50 backdrop-blur-md p-10 relative overflow-hidden group">
-                <Network className="w-10 h-10 text-white mb-6" />
-                <h3 className="text-2xl font-bold mb-4 text-white">
-                  Self-Evolving Architecture
-                </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  Convert your projects into self-evolving systems. Constantly
-                  review, overlook, and upgrade the entire codebase
-                  autonomously.
-                </p>
-              </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+              <SkewCard
+                title="Self-Evolving Architecture"
+                description="Convert your projects into self-evolving systems. Constantly review, overlook, and upgrade the entire codebase autonomously."
+                icon={Network}
+                gradientFrom="#ffffff"
+                gradientTo="#d1dceb"
+              />
 
-              <div className="rounded-3xl border border-white/10 bg-[#0a0a0a]/50 backdrop-blur-md p-10 relative overflow-hidden group">
-                <Activity className="w-10 h-10 text-white mb-6" />
-                <h3 className="text-2xl font-bold mb-4 text-white">
-                  Real-Time Reasoning
-                </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  Watch the system&apos;s thought process unfold live.
-                  Transparent logs reveal exactly how decisions are made,
-                  hypotheses are formed, and failures are analyzed.
-                </p>
-              </div>
+              <SkewCard
+                title="Real-Time Reasoning"
+                description="Watch the system's thought process unfold live. Transparent logs reveal exactly how decisions are made, hypotheses are formed, and failures are analyzed."
+                icon={Activity}
+                gradientFrom="#d1dceb"
+                gradientTo="#94a3b8"
+              />
 
-              <div className="rounded-3xl border border-white/10 bg-[#0a0a0a]/50 backdrop-blur-md p-10 relative overflow-hidden group">
-                <Code2 className="w-10 h-10 text-white mb-6" />
-                <h3 className="text-2xl font-bold mb-4 text-white">
-                  Autonomous Skill Creation
-                </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  When faced with a novel problem, AXON writes, tests, and
-                  integrates new code modules dynamically. It expands its own
-                  capability graph without human intervention.
-                </p>
-              </div>
+              <SkewCard
+                title="Autonomous Skill Creation"
+                description="When faced with a novel problem, AXON writes, tests, and integrates new code modules dynamically. It expands its own capability graph without human intervention."
+                icon={Code2}
+                gradientFrom="#94a3b8"
+                gradientTo="#475569"
+              />
             </div>
           </div>
         </section>
+
 
         {/* Footer CTA */}
         <section className="py-32 px-6 border-t border-white/5 relative overflow-hidden">
