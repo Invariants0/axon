@@ -21,24 +21,17 @@ async def conduct_research(state: ResearchState) -> ResearchState:
     
     prompt = state.get("prompt", "")
     context = state.get("context", {})
-    
-    kb_uuid = os.environ.get("DIGITALOCEAN_KB_UUID")
-    kb_context = ""
-    
-    if kb_uuid:
-        try:
-            kb_results = await client.retrieve.documents(
-                knowledge_base_id=kb_uuid,
-                query=prompt,
-                limit=5,
-            )
-            kb_docs = [doc.content for doc in kb_results.documents]
-            kb_context = f"\n\nKnowledge Base Context:\n{chr(10).join(kb_docs)}"
-        except Exception:
-            pass
+    memory_context = context.get("memory_context", "")
+    formatted_memory_context = (
+        f"\n\nQdrant Memory Context:\n{memory_context}" if memory_context else ""
+    )
     
     system_prompt = "You are a research agent. Gather and synthesize information relevant to the task."
-    user_prompt = f"Research: {prompt}\n\nContext: {json.dumps(context)}{kb_context}\n\nProvide comprehensive research notes."
+    user_prompt = (
+        f"Research: {prompt}\n\n"
+        f"Context: {json.dumps(context)}{formatted_memory_context}\n\n"
+        "Provide comprehensive research notes."
+    )
     
     response = await client.chat.completions.create(
         model=os.environ.get("GRADIENT_MODEL", "openai-gpt-oss-120b"),

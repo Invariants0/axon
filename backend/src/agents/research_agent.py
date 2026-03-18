@@ -32,7 +32,11 @@ class ResearchAgent(BaseAgent):
                 response = await self.digitalocean_router.route_to_agent(
                     "research",
                     prompt,
-                    {"task_id": task_id, "plan": task.get("plan", {})},
+                    {
+                        "task_id": task_id,
+                        "plan": task.get("plan", {}),
+                        "memory_context": context,
+                    },
                     trace_id=task_id,
                 )
                 try:

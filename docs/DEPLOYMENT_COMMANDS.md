@@ -49,7 +49,6 @@ Required in each `.env`:
 GRADIENT_MODEL_ACCESS_KEY=your_gradient_key_here
 GRADIENT_MODEL=openai-gpt-oss-120b
 DIGITALOCEAN_API_TOKEN=your_do_token_here
-DIGITALOCEAN_KB_UUID=your_kb_uuid_here  # Optional
 ```
 
 ## 3. Deploy Agents to DigitalOcean
@@ -88,7 +87,10 @@ Edit `backend/.env`:
 AXON_MODE=real
 DIGITALOCEAN_API_TOKEN=your_do_token
 GRADIENT_MODEL_ACCESS_KEY=your_gradient_key
-DIGITALOCEAN_KB_UUID=your_kb_uuid
+VECTOR_DB_PROVIDER=qdrant
+QDRANT_URL=https://your-cluster.cloud.qdrant.io:6333
+QDRANT_API_KEY=your_qdrant_api_key
+QDRANT_COLLECTION=axon_memory
 AXON_AGENT_TIMEOUT=120
 
 # Paste agent URLs from deployment
@@ -199,7 +201,6 @@ gradient-adk delete <agent-id>
 GRADIENT_MODEL_ACCESS_KEY=     # Required
 GRADIENT_MODEL=                # Default: openai-gpt-oss-120b
 DIGITALOCEAN_API_TOKEN=        # Required
-DIGITALOCEAN_KB_UUID=          # Optional
 ```
 
 ### Backend .env
@@ -207,7 +208,10 @@ DIGITALOCEAN_KB_UUID=          # Optional
 AXON_MODE=                     # mock or real
 DIGITALOCEAN_API_TOKEN=        # Required for real mode
 GRADIENT_MODEL_ACCESS_KEY=     # Required for real mode
-DIGITALOCEAN_KB_UUID=          # Optional
+VECTOR_DB_PROVIDER=            # Set to qdrant for production vector memory
+QDRANT_URL=                    # Required when VECTOR_DB_PROVIDER=qdrant
+QDRANT_API_KEY=                # Required when VECTOR_DB_PROVIDER=qdrant
+QDRANT_COLLECTION=             # Optional (default: axon_memory)
 AXON_AGENT_TIMEOUT=            # Default: 120
 AXON_PLANNER_AGENT_URL=        # Required for real mode
 AXON_RESEARCH_AGENT_URL=       # Required for real mode
@@ -244,11 +248,12 @@ grep AXON_MODE backend/.env
 # Should be: AXON_MODE=real
 ```
 
-### Knowledge base not working
+### Qdrant context not working
 ```bash
-# Verify KB UUID
-grep DIGITALOCEAN_KB_UUID agents/research_agent/.env
+# Verify vector provider
+grep VECTOR_DB_PROVIDER backend/.env
 
-# Check KB exists
-# (Use DigitalOcean console)
+# Verify Qdrant config
+grep QDRANT_URL backend/.env
+grep QDRANT_API_KEY backend/.env
 ```

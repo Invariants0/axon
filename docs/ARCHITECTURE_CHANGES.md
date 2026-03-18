@@ -200,9 +200,9 @@ async def chat(self, messages):
 - No knowledge base integration
 
 **After:**
-- Research agent retrieves from Gradient KB
-- Augments prompts with retrieved documents
-- Configurable via DIGITALOCEAN_KB_UUID
+- Research stage uses vector memory context retrieval
+- Prompts are augmented with retrieved Qdrant context
+- Configurable via VECTOR_DB_PROVIDER and QDRANT_* settings
 
 ### 7. Evaluation Pipeline
 **Before:**
@@ -235,7 +235,7 @@ async def chat(self, messages):
    ├─ ADK Agent receives request
    │  ├─ LangGraph workflow executes
    │  ├─ Gradient SDK calls inference endpoint
-   │  ├─ (Research: KB retrieval)
+   │  ├─ (Research: Qdrant memory context)
    │  └─ Returns JSON response
    ├─ Parse response
    ├─ Store in VectorStore
@@ -279,7 +279,6 @@ OPENAI_API_KEY=sk-...
 ```bash
 GRADIENT_MODEL_ACCESS_KEY=gm-...
 GRADIENT_MODEL=openai-gpt-oss-120b
-DIGITALOCEAN_KB_UUID=kb-...
 ```
 
 ### Backend Configuration
@@ -295,7 +294,10 @@ AXON_PLANNER_AGENT_URL=...
 AXON_MODE=real
 DIGITALOCEAN_API_TOKEN=...
 GRADIENT_MODEL_ACCESS_KEY=...
-DIGITALOCEAN_KB_UUID=...
+VECTOR_DB_PROVIDER=qdrant
+QDRANT_URL=...
+QDRANT_API_KEY=...
+QDRANT_COLLECTION=axon_memory
 AXON_AGENT_TIMEOUT=120
 AXON_PLANNER_AGENT_URL=...
 AXON_RESEARCH_AGENT_URL=...
