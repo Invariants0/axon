@@ -34,9 +34,11 @@ docker compose up --build
 ```
 
 The app is served by nginx on http://localhost:80.
-- Static frontend files are served directly by nginx.
+- Frontend runs in Next.js development mode with live rebuilds.
 - Requests to `/api/*` are proxied to the backend (port 8000).
 - WebSocket connections to `/ws/*` are proxied to the backend.
+
+When iterating on the UI, regular `docker compose up` is enough. Changes in `frontend/` are mounted into the frontend container and trigger automatic rebuild/reload.
 
 ## Run Backend (standalone)
 

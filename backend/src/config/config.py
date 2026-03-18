@@ -49,6 +49,9 @@ class Settings(BaseSettings):
     axon_research_agent_url: str = Field(default="", alias="AXON_RESEARCH_AGENT_URL")
     axon_reasoning_agent_url: str = Field(default="", alias="AXON_REASONING_AGENT_URL")
     axon_builder_agent_url: str = Field(default="", alias="AXON_BUILDER_AGENT_URL")
+    # Object storage (DO Spaces / S3)
+    do_spaces_url: str = Field(default="", alias="DO_SPACES_URL")
+    do_spaces_key: str = Field(default="", alias="DO_SPACES_KEY")
     
     # Phase-3: Distributed Infrastructure
     axon_queue_backend: str = Field(default="inmemory", alias="AXON_QUEUE_BACKEND")
@@ -88,6 +91,13 @@ class Settings(BaseSettings):
                 raise RuntimeError(
                     "DATABASE_URL must be set in non-development environments."
                 )
+
+        # If DO Spaces is configured and user didn't override storage provider,
+        # prefer S3-style provider.
+        if self.storage_provider in (None, "", "local") and (
+            self.do_spaces_url or self.do_spaces_key or self.do_spaces_bucket
+        ):
+            object.__setattr__(self, "storage_provider", "s3")
 
 
 @lru_cache(maxsize=1)
