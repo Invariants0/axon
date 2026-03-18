@@ -12,8 +12,7 @@ import {
   BarChart2,
   History,
   Settings,
-  Moon,
-  Sun,
+  PackageOpen,
   ChevronDown,
 } from "lucide-react";
 import Link from "next/link";
@@ -26,10 +25,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { EtheralShadow } from "@/components/ui/etheral-shadow";
+import { NotificationBar } from "@/components/ui/notifications";
+import type { PersonaMode } from "@/types";
 
 const navItems = [
   { name: "Control Room", href: "/dashboard", icon: LayoutDashboard },
   { name: "Task Execution", href: "/dashboard/execution", icon: Activity },
+  { name: "Skills Registry", href: "/dashboard/skills", icon: PackageOpen },
   { name: "Code Evolution", href: "/dashboard/code", icon: Code2 },
   { name: "Evolution Versions", href: "/dashboard/evolution", icon: GitMerge },
   { name: "System Metrics", href: "/dashboard/metrics", icon: BarChart2 },
@@ -164,15 +166,15 @@ export default function DashboardLayout({
                 align="end"
                 className="bg-[#0a0a0a] border-white/10"
               >
-                {[
+                {([
                   "Engineer",
                   "Research Scientist",
                   "Startup Hacker",
                   "Minimal Agent",
-                ].map((p) => (
+                ] as PersonaMode[]).map((p) => (
                   <DropdownMenuItem
                     key={p}
-                    onClick={() => setPersona(p as any)}
+                    onClick={() => setPersona(p)}
                     className="hover:bg-white/5 focus:bg-white/5 cursor-pointer"
                   >
                     {p}
@@ -181,13 +183,7 @@ export default function DashboardLayout({
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <Moon className="w-5 h-5" />
-            </Button>
+
           </div>
         </header>
 
@@ -234,6 +230,9 @@ export default function DashboardLayout({
           </main>
         </div>
       </div>
+
+      {/* Global Notification Toast Bar */}
+      <NotificationBar />
     </EtheralShadow>
   );
 }
