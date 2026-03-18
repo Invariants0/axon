@@ -49,13 +49,13 @@ export function deriveStagesFromExecutions(
 
     let status: StageStatus = "waiting";
     if (exec) {
-      if (exec.error_message) status = "error";
-      else if (exec.end_time)  status = "done";
-      else                     status = "running";
+      if (exec.error)   status = "error";
+      else if (exec.end_time) status = "done";
+      else              status = "running";
     } else if (taskStatus === "running") {
       // If task is running but no execution record yet, mark first undone as running
       const doneBefore = executions.filter((e) =>
-        !e.error_message && e.end_time
+        !e.error && e.end_time
       );
       const stageIdx = STAGE_CONFIG.findIndex((s) => s.key === cfg.key);
       if (doneBefore.length === stageIdx) status = "running";
@@ -65,8 +65,8 @@ export function deriveStagesFromExecutions(
       key: cfg.key,
       label: cfg.label,
       status,
-      durationMs: exec?.duration_ms,
-      errorMessage: exec?.error_message,
+      durationMs: exec?.duration_ms ?? undefined,
+      errorMessage: exec?.error ?? undefined,
     };
   });
 }

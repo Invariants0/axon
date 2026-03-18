@@ -19,10 +19,9 @@ import { useAppStore } from "@/store/app-store";
 import type { PersonaMode } from "@/types";
 
 const PERSONAS: PersonaMode[] = [
-  "Engineer",
-  "Research Scientist",
-  "Startup Hacker",
-  "Minimal Agent",
+  "operator",
+  "developer",
+  "researcher",
 ];
 
 const AGENTS = [
