@@ -52,6 +52,9 @@ class Settings(BaseSettings):
     # Object storage (DO Spaces / S3)
     do_spaces_url: str = Field(default="", alias="DO_SPACES_URL")
     do_spaces_key: str = Field(default="", alias="DO_SPACES_KEY")
+    do_spaces_secret: str = Field(default="", alias="DO_SPACES_SECRET")
+    do_spaces_bucket: str = Field(default="", alias="DO_SPACES_BUCKET")
+    storage_provider: str = Field(default="local", alias="STORAGE_PROVIDER")
     
     # Phase-3: Distributed Infrastructure
     axon_queue_backend: str = Field(default="inmemory", alias="AXON_QUEUE_BACKEND")
