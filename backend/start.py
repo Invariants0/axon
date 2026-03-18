@@ -1,4 +1,5 @@
 import argparse
+import asyncio
 import os
 import socket
 import subprocess
@@ -8,7 +9,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 
-DEFAULT_DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost:5432/axon"
+DEFAULT_DATABASE_URL = "postgresql+asyncpg://postgres:postgres@postgres:5432/axon"
 DEFAULT_DOCKER_CONTAINER = "axon-postgres"
 
 
@@ -98,15 +99,15 @@ def ensure_database_ready() -> None:
     ensure_local_postgres_with_docker(host, port, database_url)
 
 
-def run_migrations(project_dir: Path) -> None:
-    """Apply database migrations before starting the API."""
-    cmd = [sys.executable, "-m", "alembic", "upgrade", "head"]
+async def init_database() -> None:
+    """Initialize database tables using SQLAlchemy."""
+    from src.db.session import init_db
     try:
-        subprocess.run(cmd, cwd=project_dir, check=True)
-    except subprocess.CalledProcessError as exc:
-        raise RuntimeError(
-            "Migration failed. Verify DATABASE_URL points to a reachable PostgreSQL instance."
-        ) from exc
+        await init_db()
+        print("Database tables initialized successfully")
+    except Exception as e:
+        print(f"Error initializing database: {e}")
+        raise
 
 
 def main() -> None:
@@ -114,7 +115,7 @@ def main() -> None:
     parser.add_argument("--host", default="127.0.0.1", help="Host to bind")
     parser.add_argument("--port", type=int, default=8000, help="Port to bind")
     parser.add_argument("--reload", action="store_true", help="Enable auto-reload")
-    parser.add_argument("--no-migrate", action="store_true", help="Skip Alembic migration step")
+    parser.add_argument("--skip-db-init", action="store_true", help="Skip database initialization")
     parser.add_argument("--no-auto-db", action="store_true", help="Do not auto-start local Docker Postgres")
     args = parser.parse_args()
 
@@ -126,11 +127,11 @@ def main() -> None:
 
     settings = get_settings()
 
-    if not args.no_migrate:
+    if not args.skip_db_init:
         if not args.no_auto_db and settings.env.lower() == "development":
             ensure_database_ready()
-        print("Running migrations: alembic upgrade head")
-        run_migrations(project_dir)
+        print("Initializing database tables...")
+        asyncio.run(init_database())
 
     print(f"Starting API on http://{args.host}:{args.port}")
     import uvicorn

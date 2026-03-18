@@ -52,7 +52,7 @@ class Settings(BaseSettings):
     
     # Phase-3: Distributed Infrastructure
     axon_queue_backend: str = Field(default="inmemory", alias="AXON_QUEUE_BACKEND")
-    axon_redis_url: str = Field(default="redis://localhost:6379", alias="AXON_REDIS_URL")
+    axon_redis_url: str = Field(default="redis://redis:6379", alias="AXON_REDIS_URL")
     axon_redis_queue_name: str = Field(default="axon:tasks", alias="AXON_REDIS_QUEUE_NAME")
     axon_breaker_backend: str = Field(default="memory", alias="AXON_BREAKER_BACKEND")
     
@@ -82,7 +82,7 @@ class Settings(BaseSettings):
                 object.__setattr__(
                     self,
                     "database_url",
-                    "postgresql+asyncpg://postgres:postgres@localhost:5432/axon",
+                    "postgresql+asyncpg://postgres:postgres@postgres:5432/axon",
                 )
             else:
                 raise RuntimeError(
