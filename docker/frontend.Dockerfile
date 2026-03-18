@@ -1,29 +1,29 @@
-FROM node:20-alpine as builder
+FROM oven/bun:1-alpine as builder
 
 WORKDIR /app
 
 # Copy package files
-COPY frontend/package.json frontend/package-lock.json ./
+COPY frontend/package.json frontend/bun.lock ./
 
 # Install dependencies
-RUN npm ci
+RUN bun install --frozen-lockfile
 
 # Copy source code
 COPY frontend/ ./
 
 # Build the Next.js application
-RUN npm run build
+RUN bun run build
 
 # Production stage
-FROM node:20-alpine
+FROM oven/bun:1-alpine
 
 WORKDIR /app
 
 # Copy package files
-COPY frontend/package.json frontend/package-lock.json ./
+COPY frontend/package.json frontend/bun.lock ./
 
 # Install only production dependencies
-RUN npm ci --only=production
+RUN bun install --frozen-lockfile --production
 
 # Copy built application from builder
 COPY --from=builder /app/.next ./.next
@@ -32,4 +32,4 @@ COPY --from=builder /app/public ./public
 ENV NODE_ENV=production
 EXPOSE 3000
 
-CMD ["npm", "start"]
+CMD ["bun", "start"]
