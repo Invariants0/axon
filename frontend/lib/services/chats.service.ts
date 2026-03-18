@@ -21,7 +21,7 @@ function normalizeChat(raw: Record<string, unknown>): Chat {
     id:         String(raw.id ?? ""),
     title:      String(raw.title ?? "Untitled Chat"),
     created_at: String(raw.created_at ?? new Date().toISOString()),
-    updated_at: raw.updated_at ? String(raw.updated_at) : undefined,
+    updated_at: String(raw.updated_at ?? raw.created_at ?? new Date().toISOString()),
   };
 }
 
