@@ -75,8 +75,8 @@ class SystemService:
         if self.settings.axon_mode != "gradient":
             return {"status": "not_configured", "mode": self.settings.axon_mode}
         
-        if not self.settings.gradient_api_key:
-            return {"status": "misconfigured", "error": "GRADIENT_API_KEY not set"}
+        if not self.settings.GRADIENT_MODEL_ACCESS_KEY:
+            return {"status": "misconfigured", "error": "GRADIENT_MODEL_ACCESS_KEY not set"}
         
         try:
             if self.llm_service:

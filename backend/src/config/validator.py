@@ -45,9 +45,9 @@ class ConfigValidator:
                 )
         
         if settings.axon_mode == "gradient":
-            if not settings.gradient_api_key:
+            if not settings.GRADIENT_MODEL_ACCESS_KEY:
                 issues.append(
-                    "AXON_MODE=gradient requires GRADIENT_API_KEY to be set"
+                    "AXON_MODE=gradient requires GRADIENT_MODEL_ACCESS_KEY to be set"
                 )
             if not settings.gradient_model:
                 issues.append(

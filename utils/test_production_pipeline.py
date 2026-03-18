@@ -332,7 +332,7 @@ async def main():
         print("\n🎉 SUCCESS! The production pipeline works perfectly with Gemini!")
         print("\nTo switch to DigitalOcean Gradient for production:")
         print("  1. Set AXON_MODE=gradient")
-        print("  2. Set GRADIENT_API_KEY=your_key")
+        print("  2. Set GRADIENT_MODEL_ACCESS_KEY=your_key")
         print("  3. Restart the backend")
         print("\nNo code changes needed - just environment variables!")
         return 0

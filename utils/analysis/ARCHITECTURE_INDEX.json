@@ -374,7 +374,7 @@
         {
           "layer": 3,
           "provider": "Gradient API",
-          "condition": "settings.gradient_api_key set",
+          "condition": "settings.GRADIENT_MODEL_ACCESS_KEY set",
           "retry": "3 attempts, 1-8s exponential backoff"
         },
         {
@@ -625,8 +625,8 @@
         "note": "Resolved relative to backend root"
       },
       {
-        "name": "GRADIENT_API_KEY",
-        "env_var": "GRADIENT_API_KEY"
+        "name": "GRADIENT_MODEL_ACCESS_KEY",
+        "env_var": "GRADIENT_MODEL_ACCESS_KEY"
       },
       {
         "name": "HUGGINGFACE_API_KEY",

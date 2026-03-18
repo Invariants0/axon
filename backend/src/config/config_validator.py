@@ -153,8 +153,8 @@ class ConfigValidator:
                 )
 
         # Optional provider keys
-        if not self.settings.gradient_api_key:
-            self.warnings.append("GRADIENT_API_KEY not set; Gradient provider unavailable")
+        if not self.settings.GRADIENT_MODEL_ACCESS_KEY:
+            self.warnings.append("GRADIENT_MODEL_ACCESS_KEY not set; Gradient provider unavailable")
 
         if not self.settings.huggingface_api_key:
             self.warnings.append(

@@ -183,7 +183,7 @@ export AXON_DEBUG_PIPELINE=true
 ```bash
 # Update .env
 AXON_MODE=gradient
-GRADIENT_API_KEY=your_gradient_key
+GRADIENT_MODEL_ACCESS_KEY=your_gradient_key
 
 # Restart backend
 # No code changes needed

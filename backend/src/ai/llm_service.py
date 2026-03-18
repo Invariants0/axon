@@ -138,7 +138,8 @@ class LLMService:
             raise ValueError("GRADIENT_MODEL_ACCESS_KEY required when AXON_MODE=do_inference")
 
         # FALLBACK: Legacy behavior for mock mode
-        if self.settings.gradient_api_key:
+        api_key = self.settings.gradient_model_access_key or self.settings.gradient_api_key
+        if api_key:
             try:
                 response = await self._retry_call(self.gradient.chat, messages, False)
                 self._log_usage(response, "gradient")
