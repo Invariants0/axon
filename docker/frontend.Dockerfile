@@ -11,6 +11,9 @@ RUN bun install --frozen-lockfile
 # Copy source code
 COPY frontend/ ./
 
+# Ensure public directory exists (some apps may not have it)
+RUN mkdir -p public
+
 # Build the Next.js application
 RUN bun run build
 
