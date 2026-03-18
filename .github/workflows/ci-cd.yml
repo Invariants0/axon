@@ -69,7 +69,9 @@ jobs:
           python utils/analysis/analyze_dependencies.py
 
       - name: Validate Docker Compose config
-        run: docker compose config
+        run: |
+          touch .env
+          docker compose config
 
   deploy:
     name: Deploy to Server

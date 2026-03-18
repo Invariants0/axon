@@ -31,26 +31,8 @@ services:
       context: .
       dockerfile: docker/backend.Dockerfile
     container_name: axon-backend
-    environment:
-      ENV: ${ENV:-development}
-      TEST_MODE: ${TEST_MODE:-true}
-      AXON_MODE: ${AXON_MODE:-mock}
-      AXON_API_KEY: ${AXON_API_KEY:-}
-      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://postgres:postgres@postgres:5432/axon}
-      AXON_QUEUE_BACKEND: ${AXON_QUEUE_BACKEND:-redis}
-      AXON_REDIS_URL: ${AXON_REDIS_URL:-redis://redis:6379}
-      AXON_REDIS_QUEUE_NAME: ${AXON_REDIS_QUEUE_NAME:-axon:tasks}
-      AXON_BREAKER_BACKEND: ${AXON_BREAKER_BACKEND:-redis}
-      CORS_ORIGINS: ${CORS_ORIGINS:-["http://localhost","http://localhost:80"]}
-      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
-      GRADIENT_API_KEY: ${GRADIENT_API_KEY:-}
-      DIGITALOCEAN_API_TOKEN: ${DIGITALOCEAN_API_TOKEN:-}
-      GRADIENT_MODEL_ACCESS_KEY: ${GRADIENT_MODEL_ACCESS_KEY:-}
-      DIGITALOCEAN_KB_UUID: ${DIGITALOCEAN_KB_UUID:-}
-      AXON_PLANNER_AGENT_URL: ${AXON_PLANNER_AGENT_URL:-}
-      AXON_RESEARCH_AGENT_URL: ${AXON_RESEARCH_AGENT_URL:-}
-      AXON_REASONING_AGENT_URL: ${AXON_REASONING_AGENT_URL:-}
-      AXON_BUILDER_AGENT_URL: ${AXON_BUILDER_AGENT_URL:-}
+    env_file:
+      - .env
     depends_on:
       postgres:
         condition: service_healthy
