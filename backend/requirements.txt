@@ -8,6 +8,7 @@ loguru
 passlib[bcrypt]
 pydantic[email]
 pydantic-settings
+psycopg2-binary
 python-dotenv
 qdrant-client>=1.7.0
 sentence-transformers
