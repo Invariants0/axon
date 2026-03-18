@@ -12,7 +12,7 @@ DIGITALOCEAN_API_TOKEN=dop_v1_xxxx...
 AXON_MODE=gradient  # or: mock, gemini, real
 
 # ===== REQUIRED IF USING GRADIENT MODE =====
-GRADIENT_API_KEY=dop_v1_xxxx...  # Usually same as DIGITALOCEAN_API_TOKEN
+GRADIENT_MODEL_ACCESS_KEY=dop_v1_xxxx...  # Usually same as DIGITALOCEAN_API_TOKEN
 GRADIENT_MODEL=gpt-4.1-mini
 GRADIENT_BASE_URL=https://api.digitalocean.com/v2/ai
 
@@ -87,7 +87,7 @@ AXON_MODE=gradient
 DIGITALOCEAN_API_TOKEN=paste_your_token_here
 
 # From Step 3: Gradient
-GRADIENT_API_KEY=paste_your_token_here_again
+GRADIENT_MODEL_ACCESS_KEY=paste_your_token_here_again
 GRADIENT_MODEL=gpt-4.1-mini
 GRADIENT_BASE_URL=https://api.digitalocean.com/v2/ai
 
@@ -161,7 +161,7 @@ AXON_MODE=gradient
 
 DIGITALOCEAN_API_TOKEN=dop_v1_abc123xyz789...
 
-GRADIENT_API_KEY=dop_v1_abc123xyz789...
+GRADIENT_MODEL_ACCESS_KEY=dop_v1_abc123xyz789...
 GRADIENT_MODEL=gpt-4.1-mini
 GRADIENT_BASE_URL=https://api.digitalocean.com/v2/ai
 
@@ -188,7 +188,7 @@ AXON_AGENT_TIMEOUT=120
 ## Did You Know?
 
 - **API Token is your password:** Treat it like a credit card number - don't share!
-- **GRADIENT_API_KEY is the same token:** Use DIGITALOCEAN_API_TOKEN for Gradient
+- **GRADIENT_MODEL_ACCESS_KEY is the same token:** Use DIGITALOCEAN_API_TOKEN for Gradient
 - **Agent URLs are public:** You can test them manually with `curl`
 - **Free tier available:** Check if you qualify for DigitalOcean free credits
 - **24/7 Support:** DigitalOcean has live chat support in dashboard

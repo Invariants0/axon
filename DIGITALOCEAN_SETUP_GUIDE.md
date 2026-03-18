@@ -172,13 +172,13 @@ API Key:      Use your DIGITALOCEAN_API_TOKEN (from Step: Generate API Token)
 ```bash
 # backend/.env
 AXON_MODE=gradient  # Use Gradient as LLM provider
-GRADIENT_API_KEY=dop_v1_xxxx...  # Same as DIGITALOCEAN_API_TOKEN
+GRADIENT_MODEL_ACCESS_KEY=dop_v1_xxxx...  # Same as DIGITALOCEAN_API_TOKEN
 GRADIENT_MODEL=gpt-4.1-mini
 GRADIENT_BASE_URL=https://api.digitalocean.com/v2/ai
 ```
 
 ✅ **You now have:**
-- `GRADIENT_API_KEY` (same as DIGITALOCEAN_API_TOKEN)
+- `GRADIENT_MODEL_ACCESS_KEY` (same as DIGITALOCEAN_API_TOKEN)
 - `GRADIENT_MODEL`
 - `GRADIENT_BASE_URL`
 
@@ -416,7 +416,7 @@ doctl apps get <app-id>
 | Variable | Value | How to Get | Status |
 |----------|-------|-----------|--------|
 | `DIGITALOCEAN_API_TOKEN` | `dop_v1_xxxx...` | [Generate API Token](#generate-api-token) | ✅ |
-| `GRADIENT_API_KEY` | `dop_v1_xxxx...` | Same as above | ✅ |
+| `GRADIENT_MODEL_ACCESS_KEY` | `dop_v1_xxxx...` | Same as above | ✅ |
 | `GRADIENT_MODEL` | `gpt-4.1-mini` | Shown in Gradient dashboard | ✅ |
 | `GRADIENT_BASE_URL` | `https://api.digitalocean.com/v2/ai` | Fixed value | ✅ |
 | `AXON_PLANNER_AGENT_URL` | `https://axon-planner.ondigitalocean.app` | [Deploy ADK Agents](#deploy-adk-agents) | ⏳ |
@@ -436,7 +436,7 @@ DIGITALOCEAN_API_TOKEN=dop_v1_xxxx...
 
 # ===== Gradient LLM Configuration =====
 AXON_MODE=gradient
-GRADIENT_API_KEY=dop_v1_xxxx...
+GRADIENT_MODEL_ACCESS_KEY=dop_v1_xxxx...
 GRADIENT_MODEL=gpt-4.1-mini
 GRADIENT_BASE_URL=https://api.digitalocean.com/v2/ai
 
@@ -472,7 +472,7 @@ Replace placeholders with your actual values:
 
 ```bash
 DIGITALOCEAN_API_TOKEN=dop_v1_1a2b3c4d5e...  # Your actual token
-GRADIENT_API_KEY=dop_v1_1a2b3c4d5e...        # Same as above
+GRADIENT_MODEL_ACCESS_KEY=dop_v1_1a2b3c4d5e...        # Same as above
 AXON_PLANNER_AGENT_URL=https://axon-planner-xxxx.ondigitalocean.app  # Your URL
 ```
 
@@ -523,7 +523,7 @@ curl -X GET "https://api.digitalocean.com/v2/account" \
 ### Step 2: Test Gradient Endpoint
 
 ```bash
-# Test GRADIENT_API_KEY
+# Test GRADIENT_MODEL_ACCESS_KEY
 curl -X POST "https://api.digitalocean.com/v2/ai/chat/completions" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer dop_v1_xxxx..." \

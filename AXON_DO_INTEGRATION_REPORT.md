@@ -75,7 +75,7 @@ Gradient is DigitalOcean's managed LLM service providing OpenAI-compatible API e
 
 ```yaml
 AXON_MODE: gradient
-GRADIENT_API_KEY: sk-do-...  # DigitalOcean API token
+GRADIENT_MODEL_ACCESS_KEY: sk-do-...  # DigitalOcean API token
 GRADIENT_MODEL: gpt-4.1-mini  # Model identifier
 GRADIENT_BASE_URL: https://api.digitalocean.com/v2/ai  # API endpoint
 ```
@@ -90,7 +90,7 @@ LLMService.chat(messages)
 Check AXON_MODE
   ↓
 if "gradient":
-  - Validate GRADIENT_API_KEY exists
+  - Validate GRADIENT_MODEL_ACCESS_KEY exists
   - Create GradientClient
   - Build OpenAI-compatible payload
     {
@@ -99,7 +99,7 @@ if "gradient":
       "stream": false
     }
   - POST to: https://api.digitalocean.com/v2/ai/chat/completions
-  - Headers: Authorization: Bearer GRADIENT_API_KEY
+  - Headers: Authorization: Bearer GRADIENT_MODEL_ACCESS_KEY
   - Timeout: 60s (configurable)
   - Retry: 3 attempts with exponential backoff
   ↓
@@ -125,12 +125,12 @@ Agent executes with Gradient-generated text
   - Error handling with fallback
 
 - **src/config/config.py**
-  - GRADIENT_API_KEY configuration
+  - GRADIENT_MODEL_ACCESS_KEY configuration
   - GRADIENT_MODEL selection
   - GRADIENT_BASE_URL endpoint
 
 - **src/config/validator.py**
-  - Validates GRADIENT_API_KEY presence when AXON_MODE=gradient
+  - Validates GRADIENT_MODEL_ACCESS_KEY presence when AXON_MODE=gradient
   - Validates GRADIENT_MODEL and GRADIENT_BASE_URL
   - Enforces mode-specific requirements
 
@@ -147,7 +147,7 @@ Agent executes with Gradient-generated text
 ```bash
 # Set environment
 export AXON_MODE=gradient
-export GRADIENT_API_KEY=sk-do-xxxx
+export GRADIENT_MODEL_ACCESS_KEY=sk-do-xxxx
 export GRADIENT_MODEL=gpt-4.1-mini
 export GRADIENT_BASE_URL=https://api.digitalocean.com/v2/ai
 
@@ -312,8 +312,8 @@ python scripts/test_real_mode_agents.py
 
 **Gradient:**
 ```
-Header: Authorization: Bearer GRADIENT_API_KEY
-Source: Environment variable GRADIENT_API_KEY
+Header: Authorization: Bearer GRADIENT_MODEL_ACCESS_KEY
+Source: Environment variable GRADIENT_MODEL_ACCESS_KEY
 Scope: Call Gradient LLM endpoints
 ```
 
@@ -428,7 +428,7 @@ ConfigValidator.validate()
 ├─ If AXON_MODE == "gemini"
 │  └─ Require GEMINI_API_KEY
 ├─ If AXON_MODE == "gradient"
-│  ├─ Require GRADIENT_API_KEY
+│  ├─ Require GRADIENT_MODEL_ACCESS_KEY
 │  ├─ Require GRADIENT_MODEL
 │  └─ Require GRADIENT_BASE_URL
 ├─ If AXON_MODE == "real"
@@ -450,7 +450,7 @@ APP_NAME=AXON
 ENV=production
 
 # Gradient (if AXON_MODE=gradient)
-GRADIENT_API_KEY=sk-do-xxxx
+GRADIENT_MODEL_ACCESS_KEY=sk-do-xxxx
 GRADIENT_MODEL=gpt-4.1-mini
 GRADIENT_BASE_URL=https://api.digitalocean.com/v2/ai
 
@@ -661,7 +661,7 @@ AXON_MODE=gradient  # or "real" for ADK agents
 ENVIRONMENT=production
 
 # Gradient Configuration
-GRADIENT_API_KEY=sk-do-xxxx
+GRADIENT_MODEL_ACCESS_KEY=sk-do-xxxx
 GRADIENT_MODEL=gpt-4.1-mini
 GRADIENT_BASE_URL=https://api.digitalocean.com/v2/ai
 

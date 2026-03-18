@@ -202,7 +202,7 @@ SKILL_EXECUTION_TIMEOUT=20
 AXON_MODE=gradient
 
 # DigitalOcean Gradient credentials (unchanged)
-GRADIENT_API_KEY=your_gradient_key
+GRADIENT_MODEL_ACCESS_KEY=your_gradient_key
 GRADIENT_MODEL=gpt-4.1-mini
 GRADIENT_BASE_URL=https://api.digitalocean.com/v2/ai
 ```
@@ -242,7 +242,7 @@ GRADIENT_BASE_URL=https://api.digitalocean.com/v2/ai
 1. **Update environment**:
    ```bash
    export AXON_MODE=gradient
-   export GRADIENT_API_KEY=your_gradient_key
+   export GRADIENT_MODEL_ACCESS_KEY=your_gradient_key
    export AXON_DEBUG_PIPELINE=false
    ```
 

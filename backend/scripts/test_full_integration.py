@@ -236,7 +236,7 @@ async def main():
     if settings.axon_mode == "gemini" and settings.gemini_api_key:
         modes_to_test.append("gemini")
     
-    if settings.axon_mode == "gradient" and settings.gradient_api_key:
+    if settings.axon_mode == "gradient" and settings.GRADIENT_MODEL_ACCESS_KEY:
         modes_to_test.append("gradient")
     
     if settings.axon_mode == "real" and settings.digitalocean_api_token:

@@ -222,7 +222,7 @@ python scripts/test_pipeline.py
 ### Production with Gradient
 ```bash
 export AXON_MODE=gradient
-export GRADIENT_API_KEY=your_key
+export GRADIENT_MODEL_ACCESS_KEY=your_key
 python -m uvicorn src.main:app
 ```
 

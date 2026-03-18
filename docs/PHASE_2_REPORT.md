@@ -401,7 +401,7 @@ validator.summary() → {
     'agents_configured': 4,
     'vector_store_path': '/path/to/.chroma',
     'errors': [],
-    'warnings': ['GRADIENT_API_KEY not set'],
+    'warnings': ['GRADIENT_MODEL_ACCESS_KEY not set'],
     'is_valid': True,
 }
 ```

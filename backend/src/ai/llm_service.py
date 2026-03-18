@@ -106,7 +106,7 @@ class LLMService:
 
         # PRODUCTION: Route to DigitalOcean Gradient when AXON_MODE=gradient
         if self.settings.axon_mode == "gradient":
-            if self.settings.gradient_api_key:
+            if self.settings.GRADIENT_MODEL_ACCESS_KEY:
                 try:
                     response = await self._retry_call(self.gradient.chat, messages, False)
                     self._log_usage(response, "gradient")
@@ -115,11 +115,11 @@ class LLMService:
                     logger.error("gradient_call_failed", error=str(exc))
                     raise
 
-            logger.error("gradient_mode_no_key", message="AXON_MODE=gradient but GRADIENT_API_KEY not set")
-            raise ValueError("GRADIENT_API_KEY required when AXON_MODE=gradient")
+            logger.error("gradient_mode_no_key", message="AXON_MODE=gradient but GRADIENT_MODEL_ACCESS_KEY not set")
+            raise ValueError("GRADIENT_MODEL_ACCESS_KEY required when AXON_MODE=gradient")
 
         # FALLBACK: Legacy behavior for mock mode
-        if self.settings.gradient_api_key:
+        if self.settings.GRADIENT_MODEL_ACCESS_KEY:
             try:
                 response = await self._retry_call(self.gradient.chat, messages, False)
                 self._log_usage(response, "gradient")

@@ -288,7 +288,7 @@ export TEST_MODE=false
 ### Gradient Mode (Production)
 ```bash
 export AXON_MODE=gradient
-export GRADIENT_API_KEY=your_gradient_key
+export GRADIENT_MODEL_ACCESS_KEY=your_gradient_key
 export TEST_MODE=false
 ```
 

@@ -202,7 +202,7 @@ Created `src/config/validator.py` that validates at startup:
 **Validation Checks:**
 - AXON_MODE in {mock, gemini, gradient, real}
 - If AXON_MODE=gemini: GEMINI_API_KEY required
-- If AXON_MODE=gradient: GRADIENT_API_KEY required
+- If AXON_MODE=gradient: GRADIENT_MODEL_ACCESS_KEY required
 - If AXON_MODE=real: All 4 agent URLs required
 - DATABASE_URL configured
 - VECTOR_DB_PROVIDER in {chroma, qdrant}
@@ -504,7 +504,7 @@ System now validates configuration before starting. Ensure:
 export GEMINI_API_KEY=sk-...
 
 # Or for gradient mode
-export GRADIENT_API_KEY=...
+export GRADIENT_MODEL_ACCESS_KEY=...
 
 # Or agents for real mode
 export AXON_PLANNER_AGENT_URL=...

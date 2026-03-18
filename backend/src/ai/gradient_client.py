@@ -16,7 +16,7 @@ class GradientClient:
             "stream": stream,
         }
         headers = {
-            "Authorization": f"Bearer {self.settings.gradient_api_key}",
+            "Authorization": f"Bearer {self.settings.GRADIENT_MODEL_ACCESS_KEY}",
             "Content-Type": "application/json",
         }
         async with httpx.AsyncClient(timeout=60.0) as client:
@@ -31,5 +31,5 @@ class GradientClient:
     async def health(self) -> dict[str, str]:
         return {
             "provider": "gradient",
-            "configured": "yes" if bool(self.settings.gradient_api_key) else "no",
+            "configured": "yes" if bool(self.settings.GRADIENT_MODEL_ACCESS_KEY) else "no",
         }

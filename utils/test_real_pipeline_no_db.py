@@ -259,7 +259,7 @@ async def test_real_production_pipeline():
             
             print(f"\n💡 To switch to DigitalOcean Gradient for production:")
             print(f"  1. Set AXON_MODE=gradient")
-            print(f"  2. Set GRADIENT_API_KEY=your_key")
+            print(f"  2. Set GRADIENT_MODEL_ACCESS_KEY=your_key")
             print(f"  3. Restart backend")
             print(f"  No code changes needed!")
             

@@ -35,7 +35,7 @@ async def test_health():
             llm_provider = "gradient"
         elif settings.axon_mode == "real":
             llm_provider = "digitalocean-adk"
-        elif settings.gradient_api_key:
+        elif settings.GRADIENT_MODEL_ACCESS_KEY:
             llm_provider = "gradient"
         elif settings.huggingface_api_key:
             llm_provider = "huggingface"

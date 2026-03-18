@@ -32,7 +32,7 @@ async def test_gradient_config() -> bool:
     settings = get_settings()
     
     checks = {
-        "GRADIENT_API_KEY set": bool(settings.gradient_api_key),
+        "GRADIENT_MODEL_ACCESS_KEY set": bool(settings.GRADIENT_MODEL_ACCESS_KEY),
         "GRADIENT_MODEL set": bool(settings.gradient_model),
         "GRADIENT_BASE_URL set": bool(settings.gradient_base_url),
     }
@@ -54,8 +54,8 @@ async def test_gradient_client() -> bool:
     
     settings = get_settings()
     
-    if not settings.gradient_api_key:
-        print("✗ SKIP: GRADIENT_API_KEY not configured")
+    if not settings.GRADIENT_MODEL_ACCESS_KEY:
+        print("✗ SKIP: GRADIENT_MODEL_ACCESS_KEY not configured")
         return False
     
     try:
@@ -86,8 +86,8 @@ async def test_gradient_llm_service() -> bool:
         print(f"  Set AXON_MODE=gradient to test")
         return False
     
-    if not settings.gradient_api_key:
-        print("✗ SKIP: GRADIENT_API_KEY not configured")
+    if not settings.GRADIENT_MODEL_ACCESS_KEY:
+        print("✗ SKIP: GRADIENT_MODEL_ACCESS_KEY not configured")
         return False
     
     try:
@@ -128,7 +128,7 @@ async def test_gradient_chat_performance() -> bool:
     
     settings = get_settings()
     
-    if settings.axon_mode != "gradient" or not settings.gradient_api_key:
+    if settings.axon_mode != "gradient" or not settings.GRADIENT_MODEL_ACCESS_KEY:
         print("✗ SKIP: Gradient not configured")
         return False
     
@@ -173,11 +173,11 @@ async def test_gradient_error_handling() -> bool:
     print("=" * 50)
     
     import os
-    original_key = os.environ.get("GRADIENT_API_KEY")
+    original_key = os.environ.get("GRADIENT_MODEL_ACCESS_KEY")
     
     try:
         # Temporarily set invalid key
-        os.environ["GRADIENT_API_KEY"] = "invalid_test_key"
+        os.environ["GRADIENT_MODEL_ACCESS_KEY"] = "invalid_test_key"
         
         # Force reload settings
         from importlib import reload
@@ -197,9 +197,9 @@ async def test_gradient_error_handling() -> bool:
     finally:
         # Restore original key
         if original_key:
-            os.environ["GRADIENT_API_KEY"] = original_key
-        elif "GRADIENT_API_KEY" in os.environ:
-            del os.environ["GRADIENT_API_KEY"]
+            os.environ["GRADIENT_MODEL_ACCESS_KEY"] = original_key
+        elif "GRADIENT_MODEL_ACCESS_KEY" in os.environ:
+            del os.environ["GRADIENT_MODEL_ACCESS_KEY"]
         
         # Reload settings again
         from importlib import reload
