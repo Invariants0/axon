@@ -2,6 +2,7 @@ import asyncio
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.ai.llm_service import LLMService
 from src.config.config import Settings
 from src.core.agent_orchestrator import AgentOrchestrator
 from src.core.event_bus import EventBus
@@ -23,6 +24,7 @@ class SystemService:
         skill_registry: SkillRegistry,
         orchestrator: AgentOrchestrator,
         event_bus: EventBus,
+        llm_service: LLMService | None = None,
     ):
         self.settings = settings
         self.session = session
@@ -31,6 +33,7 @@ class SystemService:
         self.skill_registry = skill_registry
         self.orchestrator = orchestrator
         self.event_bus = event_bus
+        self.llm_service = llm_service
 
     async def check_database(self) -> str:
         """Check database connectivity"""
@@ -67,10 +70,64 @@ class SystemService:
         except Exception:
             return "error"
 
+    async def check_gradient_llm(self) -> dict:
+        """Check Gradient LLM health (Phase-5)"""
+        if self.settings.axon_mode != "gradient":
+            return {"status": "not_configured", "mode": self.settings.axon_mode}
+        
+        if not self.settings.gradient_api_key:
+            return {"status": "misconfigured", "error": "GRADIENT_API_KEY not set"}
+        
+        try:
+            if self.llm_service:
+                health = await self.llm_service.gradient.health()
+                return {
+                    "status": "ok" if health.get("configured") == "yes" else "error",
+                    "provider": "gradient",
+                    "model": self.settings.gradient_model,
+                    "endpoint": self.settings.gradient_base_url,
+                }
+            return {"status": "error", "error": "LLMService not available"}
+        except Exception as e:
+            return {
+                "status": "error",
+                "error": str(e)[:200],
+                "provider": "gradient",
+            }
+
+    async def check_adk_agents(self) -> dict:
+        """Check ADK agents reachability (Phase-5)"""
+        if self.settings.axon_mode != "real":
+            return {"status": "not_configured", "mode": self.settings.axon_mode}
+        
+        if not self.settings.digitalocean_api_token:
+            return {"status": "misconfigured", "error": "DIGITALOCEAN_API_TOKEN not set"}
+        
+        agents_status = {}
+        
+        if hasattr(self.orchestrator, "agents") and self.orchestrator.agents:
+            for agent_name, agent in self.orchestrator.agents.items():
+                if agent.digitalocean_router:
+                    try:
+                        health_results = await agent.digitalocean_router.health_check_all()
+                        agents_status[agent_name] = health_results.get(agent_name, {})
+                    except Exception as e:
+                        agents_status[agent_name] = {"status": "error", "error": str(e)[:100]}
+                else:
+                    agents_status[agent_name] = {"status": "not_configured"}
+        
+        return {
+            "status": "ok" if all(a.get("status") == "ok" for a in agents_status.values()) else "partial",
+            "agents": agents_status,
+            "digitalocean_api_token_configured": bool(self.settings.digitalocean_api_token),
+        }
+
     async def get_system_status(self) -> dict:
-        """Get overall system status with health checks"""
+        """Get overall system status with health checks (Phase-5 enhanced)"""
         db_state = await self.check_database()
         vs_state = await self.check_vector_store()
+        gradient_state = await self.check_gradient_llm()
+        adk_state = await self.check_adk_agents()
 
         skills_loaded = len(self.skill_registry.all())
         agents_ready = bool(getattr(self.orchestrator, "agents", {}))
@@ -81,12 +138,16 @@ class SystemService:
             "status": "ready",
             "app": self.settings.app_name,
             "environment": self.settings.env,
+            "axon_mode": self.settings.axon_mode,
             "database": db_state,
             "vector_store": vs_state,
             "skills_loaded": skills_loaded,
             "agents_ready": agents_ready,
             "event_bus": event_bus_state,
             "task_queue": task_queue_state,
+            "gradient_llm": gradient_state,
+            "adk_agents": adk_state,
+            "version": "Phase-5",
         }
 
     def get_pipeline_graph(self) -> dict:
