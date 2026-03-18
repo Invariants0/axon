@@ -90,6 +90,7 @@ def ensure_local_postgres_with_docker(host: str, port: int, database_url: str) -
 
 def ensure_database_ready() -> None:
     database_url = os.getenv("DATABASE_URL", DEFAULT_DATABASE_URL)
+    print(f"Ensuring database is ready at {database_url}...")
     parsed = urlparse(database_url)
     if not parsed.scheme.startswith("postgresql"):
         return
@@ -131,6 +132,7 @@ def main() -> None:
         if not args.no_auto_db and settings.env.lower() == "development":
             ensure_database_ready()
         print("Initializing database tables...")
+        print("Database URL:", settings.database_url)
         asyncio.run(init_database())
 
     print(f"Starting API on http://{args.host}:{args.port}")
