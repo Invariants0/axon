@@ -21,8 +21,13 @@ async def get_tasks(
     task_service: TaskService = Depends(get_task_service),
 ) -> TaskListResponse:
     tasks = await list_tasks(task_service, chat_id=chat_id)
-    # Sort newest-first and apply limit
-    sorted_tasks = sorted(tasks, key=lambda t: t.created_at, reverse=True)[:limit]
+    # Sort newest-first and apply limit. Support both ORM objects and dicts.
+    def _created_at_value(t):
+        if isinstance(t, dict):
+            return t.get("created_at") or t.get("createdAt") or 0
+        return getattr(t, "created_at", 0) or 0
+
+    sorted_tasks = sorted(tasks, key=_created_at_value, reverse=True)[:limit]
     return TaskListResponse(items=[TaskResponse.model_validate(task) for task in sorted_tasks])
 
 
