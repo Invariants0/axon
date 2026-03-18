@@ -5,16 +5,16 @@ import { BarChart2, Cpu, Database } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { SystemMetricsWidget } from '@/components/ui/system-metrics-widget';
 import { useEffect, useState } from 'react';
-import { systemApi } from '@/lib/api-client';
+import { systemService } from '@/lib/services/system.service';
 import type { SystemMetrics } from '@/types';
 
 export default function MetricsPage() {
   const [metrics, setMetrics] = useState<SystemMetrics | null>(null);
 
   useEffect(() => {
-    systemApi.metrics().then(setMetrics).catch(() => {});
+    systemService.metrics().then(setMetrics).catch(() => {});
     const interval = setInterval(() => {
-      systemApi.metrics().then(setMetrics).catch(() => {});
+      systemService.metrics().then(setMetrics).catch(() => {});
     }, 30000);
     return () => clearInterval(interval);
   }, []);
