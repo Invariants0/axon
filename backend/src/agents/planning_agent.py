@@ -12,7 +12,7 @@ class PlanningAgent(BaseAgent):
     agent_name = "planning"
 
     async def execute(self, task: dict) -> dict:
-        """Execute planning agent with error handling (Phase-4)."""
+        """Execute planning agent with error handling (Phase-4) and observability (Phase-5)."""
         task_id = task["id"]
         
         # Set trace context
@@ -25,6 +25,14 @@ class PlanningAgent(BaseAgent):
             context = await self._load_context(f"{title}\n{description}", task_id)
 
             if settings.axon_mode == "real" and self.digitalocean_router:
+                logger.info(
+                    "agent.execution",
+                    agent_name=self.agent_name,
+                    mode="real",
+                    provider="digitalocean_adk",
+                    task_id=task_id,
+                )
+                
                 prompt = (
                     f"Task: {title}\nDescription: {description}\nContext: {context}\n"
                     "Create a detailed plan with actionable steps."
@@ -35,6 +43,18 @@ class PlanningAgent(BaseAgent):
                     {"task_id": task_id},
                     trace_id=task_id,
                 )
+                
+                event = TraceContext.create_event(
+                    "agent.step",
+                    data={
+                        "agent_name": self.agent_name,
+                        "mode": "real",
+                        "provider": "digitalocean_adk",
+                        "task_id": task_id,
+                    },
+                )
+                await self.event_bus.publish(event)
+                
                 try:
                     plan_data = json.loads(response.response)
                 except json.JSONDecodeError:
@@ -46,6 +66,15 @@ class PlanningAgent(BaseAgent):
                     "llm_refinement": response.response,
                 }
             else:
+                mode = settings.axon_mode
+                logger.info(
+                    "agent.execution",
+                    agent_name=self.agent_name,
+                    mode=mode,
+                    provider="llm_service",
+                    task_id=task_id,
+                )
+                
                 skill_result = await self.skills.execute(
                     "planning",
                     {"task": f"{title}\n{description}", "max_steps": 5},
@@ -55,6 +84,18 @@ class PlanningAgent(BaseAgent):
                     f"Task: {title}\nDescription: {description}\nContext:{context}\n"
                     f"Draft: {skill_result['output']}"
                 )
+                
+                event = TraceContext.create_event(
+                    "agent.step",
+                    data={
+                        "agent_name": self.agent_name,
+                        "mode": mode,
+                        "provider": "llm_service",
+                        "task_id": task_id,
+                    },
+                )
+                await self.event_bus.publish(event)
+                
                 result = {
                     "agent": self.agent_name,
                     "plan": skill_result["output"],
