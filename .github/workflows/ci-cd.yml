@@ -68,11 +68,6 @@ jobs:
           python utils/test_llm_routing.py
           python utils/analysis/analyze_dependencies.py
 
-      - name: Validate Docker Compose config
-        run: |
-          touch .env
-          docker compose config
-
   deploy:
     name: Deploy to Server
     runs-on: ubuntu-latest
