@@ -36,7 +36,7 @@ function agentKey(name: string) {
   return AGENT_ORDER.find((k) => name.toLowerCase().includes(k)) ?? name;
 }
 
-function fmtDuration(ms?: number) {
+function fmtDuration(ms?: number | null) {
   if (!ms) return "—";
   if (ms < 1000) return `${ms}ms`;
   return `${(ms / 1000).toFixed(1)}s`;
@@ -95,7 +95,7 @@ function AgentStageRow({ exec, maxMs }: { exec: AgentExecution; maxMs: number })
           {fmtDuration(exec.duration_ms)}
         </span>
       </div>
-      {exec.error_message ? (
+      {exec.error ? (
         <AlertCircle className="w-3.5 h-3.5 text-red-400 shrink-0" />
       ) : exec.end_time ? (
         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
@@ -148,8 +148,8 @@ export default function TaskDetailPage() {
     }
   };
 
-  const executions = timeline?.executions ?? [];
-  const maxMs = Math.max(...executions.map((e) => e.duration_ms ?? 0), 1);
+  const executions = timeline?.timeline ?? [];
+  const maxMs = Math.max(...executions.map((e) => (e.duration_ms ?? 0)), 1);
   const totalMs = timeline?.total_duration_ms ?? executions.reduce((s, e) => s + (e.duration_ms ?? 0), 0);
 
   if (loading) {
@@ -255,7 +255,7 @@ export default function TaskDetailPage() {
             <div className="space-y-2">
               {executions.length > 0 ? (
                 executions.map((exec) => (
-                  <AgentStageRow key={exec.id} exec={exec} maxMs={maxMs} />
+                  <AgentStageRow key={exec.agent_name} exec={exec} maxMs={maxMs} />
                 ))
               ) : (
                 /* Skeleton placeholder stages when no timeline data */
@@ -280,34 +280,28 @@ export default function TaskDetailPage() {
         </div>
 
         {/* Result / Error */}
-        {(task.result || task.error) && (
-          <div className={`rounded-xl border p-5 space-y-3 ${
-            task.error
-              ? "border-red-500/20 bg-red-500/[0.04]"
-              : "border-emerald-500/20 bg-emerald-500/[0.04]"
-          }`}>
+        {task.result && (
+          <div className="rounded-xl border p-5 space-y-3 border-emerald-500/20 bg-emerald-500/[0.04]">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em]
                               text-white/40">
                 <Terminal className="w-3.5 h-3.5" />
-                {task.error ? "Error Output" : "Task Result"}
+                {task.status === "failed" ? "Error Output" : "Task Result"}
               </div>
-              {task.result && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={copyResult}
-                  className="text-white/30 hover:text-white/70 gap-1.5 text-xs h-7 px-2"
-                >
-                  <Copy className="w-3 h-3" />
-                  {copied ? "Copied!" : "Copy"}
-                </Button>
-              )}
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={copyResult}
+                className="text-white/30 hover:text-white/70 gap-1.5 text-xs h-7 px-2"
+              >
+                <Copy className="w-3 h-3" />
+                {copied ? "Copied!" : "Copy"}
+              </Button>
             </div>
             <pre className={`text-sm font-mono leading-relaxed whitespace-pre-wrap break-words ${
-              task.error ? "text-red-400/80" : "text-white/80"
+              task.status === "failed" ? "text-red-400/80" : "text-white/80"
             }`}>
-              {task.error ?? task.result}
+              {task.result}
             </pre>
           </div>
         )}
