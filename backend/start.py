@@ -120,8 +120,14 @@ def main() -> None:
 
     project_dir = Path(__file__).resolve().parent
 
+    # Only attempt to auto-start a local Postgres container when running in development.
+    # In production/cloud, the database should be provided via DATABASE_URL.
+    from src.config.config import get_settings
+
+    settings = get_settings()
+
     if not args.no_migrate:
-        if not args.no_auto_db:
+        if not args.no_auto_db and settings.env.lower() == "development":
             ensure_database_ready()
         print("Running migrations: alembic upgrade head")
         run_migrations(project_dir)

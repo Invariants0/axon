@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     gemini_api_key: str = Field(default="", alias="GEMINI_API_KEY")
     gemini_model: str = Field(default="gemini-2.5-flash", alias="GEMINI_MODEL")
     database_url: str = Field(
-        default="postgresql+asyncpg://postgres:postgres@localhost:5432/axon",
+        default="",
         alias="DATABASE_URL",
     )
     embedding_model: str = Field(
@@ -69,12 +69,25 @@ class Settings(BaseSettings):
     skill_execution_timeout: int = Field(default=20, alias="SKILL_EXECUTION_TIMEOUT")
 
     def model_post_init(self, __context) -> None:
-        """Resolve relative vector DB paths against backend root, not shell cwd."""
+        """Resolve relative vector DB paths and supply defaults in development."""
         vector_path = Path(self.vector_db_path).expanduser()
         if not vector_path.is_absolute():
             backend_root = Path(__file__).resolve().parents[2]
             vector_path = (backend_root / vector_path).resolve()
         object.__setattr__(self, "vector_db_path", str(vector_path))
+
+        # Only fall back to local Postgres for development.
+        if not self.database_url:
+            if self.env.lower() == "development":
+                object.__setattr__(
+                    self,
+                    "database_url",
+                    "postgresql+asyncpg://postgres:postgres@localhost:5432/axon",
+                )
+            else:
+                raise RuntimeError(
+                    "DATABASE_URL must be set in non-development environments."
+                )
 
 
 @lru_cache(maxsize=1)
