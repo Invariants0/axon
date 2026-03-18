@@ -35,7 +35,10 @@
 
 **New Environment Variables:**
 - `GRADIENT_MODEL_ACCESS_KEY`: Gradient inference API key
-- `DIGITALOCEAN_KB_UUID`: Knowledge base UUID (optional)
+- `VECTOR_DB_PROVIDER`: Vector backend (`qdrant` for production)
+- `QDRANT_URL`: Qdrant cluster URL (required when provider is qdrant)
+- `QDRANT_API_KEY`: Qdrant API key (required when provider is qdrant)
+- `QDRANT_COLLECTION`: Collection name for memory retrieval
 - `AXON_AGENT_TIMEOUT`: Agent timeout in seconds (default: 120)
 - `GRADIENT_MODEL`: Model name (default: openai-gpt-oss-120b)
 
@@ -56,14 +59,13 @@
 - Session ID propagation
 - Enhanced logging
 
-### 6. Knowledge Base Integration
+### 6. Knowledge Integration
 **Modified File:** `agents/research_agent/main.py`
 
 **Features:**
-- Optional Gradient Knowledge Base retrieval
-- Uses `client.retrieve.documents()`
-- Augments prompts with KB context
-- Configurable via `DIGITALOCEAN_KB_UUID`
+- Uses backend-provided memory context retrieved from vector store
+- Context is labeled as Qdrant memory context in research prompts
+- No DigitalOcean KB UUID dependency in agent runtime
 
 ### 7. Agent Evaluation Pipeline
 **New Files:**
@@ -104,7 +106,6 @@ Edit `.env`:
 GRADIENT_MODEL_ACCESS_KEY=your_gradient_key
 GRADIENT_MODEL=openai-gpt-oss-120b
 DIGITALOCEAN_API_TOKEN=your_do_token
-DIGITALOCEAN_KB_UUID=your_kb_uuid  # Optional
 ```
 
 ### 3. Deploy Agents
@@ -126,7 +127,10 @@ Edit `backend/.env`:
 AXON_MODE=real
 DIGITALOCEAN_API_TOKEN=your_do_token
 GRADIENT_MODEL_ACCESS_KEY=your_gradient_key
-DIGITALOCEAN_KB_UUID=your_kb_uuid
+VECTOR_DB_PROVIDER=qdrant
+QDRANT_URL=https://your-cluster.cloud.qdrant.io:6333
+QDRANT_API_KEY=your_qdrant_api_key
+QDRANT_COLLECTION=axon_memory
 AXON_AGENT_TIMEOUT=120
 AXON_PLANNER_AGENT_URL=https://agents.do-ai.run/<planner-id>
 AXON_RESEARCH_AGENT_URL=https://agents.do-ai.run/<research-id>
@@ -208,9 +212,9 @@ All agent calls include:
 
 Logged at each stage for observability.
 
-## Knowledge Base Usage
+## Knowledge Usage
 
-Research agent automatically retrieves context from Gradient Knowledge Base when `DIGITALOCEAN_KB_UUID` is configured.
+Research agent consumes memory context produced by backend vector retrieval (Qdrant when `VECTOR_DB_PROVIDER=qdrant`).
 
 ## Testing
 
