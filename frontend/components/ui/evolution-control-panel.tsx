@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { evolutionApi } from "@/lib/api-client";
+import { evolutionService } from "@/lib/services/evolution.service";
 import { useAppStore } from "@/store/app-store";
 import type { EvolutionState } from "@/types";
 
@@ -53,7 +53,7 @@ export function EvolutionControlPanel() {
 
   // Fetch initial evolution status
   useEffect(() => {
-    evolutionApi.status().then(setEvolutionState).catch(() => {});
+    evolutionService.getStatus().then(setEvolutionState).catch(() => {});
   }, [setEvolutionState]);
 
   // Simulate progress animation during evolution
@@ -80,7 +80,7 @@ export function EvolutionControlPanel() {
     addLog("[EVOLUTION] ⚡ Manual evolution cycle triggered via dashboard...");
 
     try {
-      await evolutionApi.trigger();
+      await evolutionService.trigger();
       addNotification("Evolution cycle triggered — monitoring event stream", "info");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Unknown error";

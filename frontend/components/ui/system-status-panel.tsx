@@ -15,7 +15,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { systemApi } from "@/lib/api-client";
+import { systemService } from "@/lib/services/system.service";
 import { useAppStore } from "@/store/app-store";
 import type { SystemHealth } from "@/types";
 
@@ -59,7 +59,7 @@ export function SystemStatusPanel() {
   const fetchStatus = useCallback(async () => {
     setIsRefreshing(true);
     try {
-      const health = await systemApi.health();
+      const health = await systemService.health();
       setSystemHealth(health);
       setLastRefresh(new Date());
     } catch (err) {

@@ -16,7 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { skillsApi } from "@/lib/api-client";
+import { skillsService } from "@/lib/services/skills.service";
 import { useAppStore } from "@/store/app-store";
 import type { Skill } from "@/types";
 
@@ -148,7 +148,7 @@ export function SkillsCatalog() {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await skillsApi.list();
+      const data = await skillsService.list();
       if (Array.isArray(data) && data.length > 0) {
         setSkillDetails(data);
       }

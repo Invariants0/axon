@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChatMessage } from "@/types";
-import { TaskService } from "@/services/task.service";
+import { tasksService } from "@/lib/services/tasks.service";
 import { useAppStore } from "@/store/app-store";
 
 export function AxonChat() {
@@ -64,7 +64,7 @@ export function AxonChat() {
 
     try {
       // 3. Trigger actual POST /tasks
-      await TaskService.createTask(userCmd, "Dispatched via Control Room Chat");
+      await tasksService.create({ title: userCmd, description: "Dispatched via Control Room Chat" });
 
       // Update streaming message state
       setMessages((prev) =>

@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { Server, Database, BrainCircuit, Activity, RefreshCw } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { systemApi } from "@/lib/api-client";
+import { systemService } from "@/lib/services/system.service";
 import { useAppStore } from "@/store/app-store";
 import type { SystemHealth } from "@/types";
 
@@ -13,7 +13,7 @@ export function SystemMetricsWidget() {
 
   const fetchHealth = useCallback(async () => {
     try {
-      const h = await systemApi.health();
+      const h = await systemService.health();
       setSystemHealth(h);
     } catch {
       setSystemHealth({ status: "offline" });

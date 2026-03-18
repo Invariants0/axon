@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   CheckCircle2,
@@ -18,7 +19,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
-import { tasksApi } from "@/lib/api-client";
+import { tasksService } from "@/lib/services/tasks.service";
 import { useAppStore } from "@/store/app-store";
 import type { Task, TaskStatus, TaskTimeline } from "@/types";
 
@@ -63,7 +64,7 @@ function TaskDetailModal({
   }, [onClose]);
 
   useEffect(() => {
-    tasksApi.timeline(task.id)
+    tasksService.timeline(task.id)
       .then(setTimeline)
       .catch(() => setTimeline(null))
       .finally(() => setLoading(false));
@@ -206,6 +207,7 @@ function TaskDetailModal({
 // ─── Task List Component ──────────────────────────────────────
 
 export function TaskList() {
+  const router = useRouter();
   const { tasks, addTask, setTasks } = useAppStore();
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | TaskStatus>("all");
@@ -217,7 +219,7 @@ export function TaskList() {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await tasksApi.list();
+      const data = await tasksService.list();
       if (Array.isArray(data)) {
         // Merge: add new ones, keep local real-time ones too
         const existingIds = new Set(tasks.map((t) => t.id));
@@ -351,7 +353,7 @@ export function TaskList() {
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           className="hover:bg-white/[0.02] transition-colors group cursor-pointer"
-                          onClick={() => setSelectedTask(task)}
+                          onClick={() => router.push(`/dashboard/task/${task.id}`)}
                         >
                           <td className="px-5 py-3">
                             <span className="font-mono text-[10px] text-white/30">{task.id.slice(0, 8)}&hellip;</span>
