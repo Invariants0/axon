@@ -14,3 +14,4 @@ sentence-transformers
 sqlalchemy>=2
 tenacity
 uvicorn
+boto3
