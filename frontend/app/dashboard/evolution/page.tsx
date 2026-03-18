@@ -38,10 +38,9 @@ const EVOLUTION_STAGES = [
 type StageId = (typeof EVOLUTION_STAGES)[number]["id"];
 
 function stageForStatus(status: EvolutionState["status"] | undefined): number {
-  if (!status || status === "idle")      return -1;
-  if (status === "running")              return 3; // mid-generation
-  if (status === "completed")            return EVOLUTION_STAGES.length - 1;
-  if (status === "failed")               return 4; // failed at validate
+  if (!status || status === "idle")    return -1;
+  if (status === "running")            return 3; // mid-generation
+  if (status === "error")              return 4; // failed at validate
   return -1;
 }
 
@@ -57,10 +56,9 @@ function EvolutionStageTracker({ evolutionState }: { evolutionState: EvolutionSt
           <span className="text-sm font-semibold text-white/90">Evolution Stage Tracker</span>
         </div>
         <span className={`text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${
-          evolutionState?.status === "running"   ? "text-primary    bg-primary/10    border-primary/20" :
-          evolutionState?.status === "completed" ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" :
-          evolutionState?.status === "failed"    ? "text-red-400    bg-red-500/10    border-red-500/20" :
-                                                    "text-white/30   bg-white/[0.03]  border-white/[0.06]"
+          evolutionState?.status === "running" ? "text-primary    bg-primary/10    border-primary/20" :
+          evolutionState?.status === "error"   ? "text-red-400    bg-red-500/10    border-red-500/20" :
+                                                  "text-white/30   bg-white/[0.03]  border-white/[0.06]"
         }`}>
           {evolutionState?.status ?? "Idle"}
         </span>
@@ -80,9 +78,9 @@ function EvolutionStageTracker({ evolutionState }: { evolutionState: EvolutionSt
 
         <div className="space-y-3 relative">
           {EVOLUTION_STAGES.map((stage, i) => {
-            const isDone    = i < currentIdx || (i === currentIdx && evolutionState?.status === "completed");
+            const isDone    = i < currentIdx;
             const isCurrent = i === currentIdx && evolutionState?.status === "running";
-            const isFailed  = i === currentIdx && evolutionState?.status === "failed";
+            const isFailed  = i === currentIdx && evolutionState?.status === "error";
 
             return (
               <motion.div

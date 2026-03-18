@@ -45,14 +45,14 @@ function stageStateForTask(task: Task | null, key: StageKey): StageState {
   if (!task) return "waiting";
   const status = task.status;
   const idx = STAGES.findIndex((s) => s.key === key);
-  if (status === "queued" || status === "pending") return "waiting";
+  if (status === "queued") return "waiting";
   if (status === "running") {
     if (idx === 0) return "done";
     if (idx === 1) return "running";
     return "waiting";
   }
-  if (status === "completed" || status === "success") return "done";
-  if (status === "failed" || status === "fail") {
+  if (status === "completed") return "done";
+  if (status === "failed") {
     return idx === 0 ? "done" : idx === 1 ? "error" : "waiting";
   }
   return "waiting";
