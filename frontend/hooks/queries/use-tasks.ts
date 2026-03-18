@@ -67,7 +67,7 @@ export function useCreateTask() {
 
     onSuccess: (task) => {
       // Sync into Zustand for WS-driven components
-      addTask({ ...task, name: task.title, version: "v0", time: "" });
+      addTask(task);
       addNotification(`Task created: "${task.title}"`, "success");
       // Invalidate list so the history page updates
       qc.invalidateQueries({ queryKey: QUERY_KEYS.tasks });
