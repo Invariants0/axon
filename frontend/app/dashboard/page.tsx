@@ -49,7 +49,7 @@ export default function DashboardPage() {
   // Hydrate on mount
   useEffect(() => {
     tasksService.list(20).then((data) => {
-      if (Array.isArray(data)) data.forEach((t) => addTask({ ...t, name: t.title, version: "v0", time: "" }));
+      if (Array.isArray(data)) data.forEach((t) => addTask(t));
     }).catch(() => {});
 
     skillsService.list().then((data) => {
@@ -62,7 +62,7 @@ export default function DashboardPage() {
 
   const recentTasks = tasks.slice(0, 5);
   const runningTasks = tasks.filter((t) => t.status === "running").length;
-  const completedTasks = tasks.filter((t) => t.status === "completed" || t.status === "success").length;
+  const completedTasks = tasks.filter((t) => t.status === "completed").length;
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
