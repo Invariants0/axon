@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Path
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.ai.llm_service import LLMService
 from src.api.controllers.system_controller import (
     get_event_stats as get_event_stats_controller,
     get_pipeline_graph as get_pipeline_controller,
@@ -12,6 +13,7 @@ from src.config.dependencies import (
     get_app_settings,
     get_db_session,
     get_event_bus,
+    get_llm_service,
     get_orchestrator,
     get_skill_registry,
     get_task_manager,
@@ -33,6 +35,7 @@ async def get_system_service(
     skill_registry=Depends(get_skill_registry),
     orchestrator=Depends(get_orchestrator),
     event_bus=Depends(get_event_bus),
+    llm_service: LLMService = Depends(get_llm_service),
 ) -> SystemService:
     """Dependency injection for SystemService"""
     return SystemService(
@@ -43,6 +46,7 @@ async def get_system_service(
         skill_registry=skill_registry,
         orchestrator=orchestrator,
         event_bus=event_bus,
+        llm_service=llm_service,
     )
 
 
