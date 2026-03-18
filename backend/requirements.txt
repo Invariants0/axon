@@ -1,5 +1,4 @@
 aioredis
-alembic
 asyncpg
 chromadb
 fastapi
