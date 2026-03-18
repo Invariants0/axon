@@ -71,13 +71,11 @@ export default function HistoryPage() {
   const filtered = useMemo(() => {
     return tasks.filter((t) => {
       const matchSearch =
-        (t.title ?? t.name ?? "").toLowerCase().includes(search.toLowerCase()) ||
+        t.title.toLowerCase().includes(search.toLowerCase()) ||
         t.id.toLowerCase().includes(search.toLowerCase());
       const matchStatus =
         statusFilter === "all" ||
-        t.status === statusFilter ||
-        (statusFilter === "completed" && t.status === "success") ||
-        (statusFilter === "failed"    && t.status === "fail");
+        t.status === statusFilter;
       return matchSearch && matchStatus;
     });
   }, [tasks, search, statusFilter]);
@@ -85,7 +83,7 @@ export default function HistoryPage() {
   const exportCSV = () => {
     const rows = [
       ["ID", "Title", "Status", "Created", "Updated"],
-      ...filtered.map((t) => [t.id, t.title ?? t.name ?? "", t.status, t.created_at, t.updated_at ?? ""]),
+      ...filtered.map((t) => [t.id, t.title, t.status, t.created_at, t.updated_at]),
     ];
     const csv = rows.map((r) => r.map((c) => `"${c}"`).join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
@@ -198,7 +196,7 @@ export default function HistoryPage() {
                         </td>
                         <td className="px-4 py-3.5">
                           <span className="text-sm font-medium text-white/80 group-hover:text-white transition-colors">
-                            {task.title ?? task.name ?? "Untitled"}
+                            {task.title ?? "Untitled"}
                           </span>
                         </td>
                         <td className="px-4 py-3.5">

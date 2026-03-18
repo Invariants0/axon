@@ -21,26 +21,28 @@ export default function MetricsPage() {
 
   const statCards = [
     {
-      title: 'Tasks Completed',
-      value: metrics?.tasks_completed != null ? String(metrics.tasks_completed) : '—',
-      icon: BarChart2,
+      title: 'Active Workers',
+      value: metrics?.workers != null ? String(metrics.workers) : '—',
+      icon: Cpu,
       color: 'text-emerald-500',
     },
     {
-      title: 'Tasks Failed',
-      value: metrics?.tasks_failed != null ? String(metrics.tasks_failed) : '—',
-      icon: Cpu,
-      color: 'text-red-400',
+      title: 'Queued Tasks',
+      value: metrics?.queued_tasks != null ? String(metrics.queued_tasks) : '—',
+      icon: BarChart2,
+      color: 'text-yellow-400',
     },
     {
-      title: 'Skills Generated',
-      value: metrics?.skills_generated != null ? String(metrics.skills_generated) : '—',
+      title: 'Version',
+      value: metrics?.version ?? '—',
       icon: Database,
       color: 'text-primary',
     },
     {
-      title: 'Evolutions Run',
-      value: metrics?.evolutions_run != null ? String(metrics.evolutions_run) : '—',
+      title: 'Last Updated',
+      value: metrics?.timestamp
+        ? new Date(metrics.timestamp * 1000).toLocaleTimeString()
+        : '—',
       icon: BarChart2,
       color: 'text-blue-400',
     },
