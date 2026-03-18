@@ -21,6 +21,24 @@ services:
     command: ["redis-server", "--save", "", "--appendonly", "no"]
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
+
+        frontend:
+          build:
+            context: .
+            dockerfile: docker/frontend.Dockerfile
+          container_name: axon-frontend
+          ports:
+            - "3000:3000"
+          environment:
+            NODE_ENV: production
+          healthcheck:
+            test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/"]
+            interval: 10s
+            timeout: 5s
+            retries: 12
+            start_period: 30s
+          restart: unless-stopped
+
       interval: 5s
       timeout: 5s
       retries: 12
