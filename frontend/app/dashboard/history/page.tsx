@@ -14,7 +14,7 @@ export default function HistoryPage() {
 
   const filteredTasks = useMemo(() => {
     return tasks.filter(task => {
-      const matchesSearch = task.name.toLowerCase().includes(search.toLowerCase()) || 
+      const matchesSearch = (task.title ?? task.name ?? '').toLowerCase().includes(search.toLowerCase()) || 
                            task.id.toLowerCase().includes(search.toLowerCase());
       const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
       return matchesSearch && matchesStatus;
@@ -73,7 +73,7 @@ export default function HistoryPage() {
               {filteredTasks.map((task) => (
                 <tr key={task.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                   <td className="px-6 py-4 font-mono text-[10px]">{task.id}</td>
-                  <td className="px-6 py-4 font-medium text-foreground">{task.name}</td>
+                  <td className="px-6 py-4 font-medium text-foreground">{task.title ?? task.name ?? "—"}</td>
                   <td className="px-6 py-4">
                     <span className={`px-2 py-1 rounded-full text-[10px] font-medium ${
                       task.status === 'success' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' :
