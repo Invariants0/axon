@@ -16,11 +16,11 @@ def _load_module():
 
 def test_headers_empty_when_api_key_not_set(monkeypatch):
     module = _load_module()
-    monkeypatch.setattr(module, "API_KEY", "")
+    monkeypatch.setattr(module, "AXON_API_KEY", "")
     assert module._headers() == {}
 
 
 def test_headers_include_api_key(monkeypatch):
     module = _load_module()
-    monkeypatch.setattr(module, "API_KEY", "secret")
-    assert module._headers() == {"x-api-key": "secret"}
+    monkeypatch.setattr(module, "AXON_API_KEY", "secret")
+    assert module._headers() == {"X-AXON-KEY": "secret"}

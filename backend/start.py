@@ -102,13 +102,17 @@ def ensure_database_ready() -> None:
 
 async def init_database() -> None:
     """Initialize database tables using SQLAlchemy."""
-    from src.db.session import init_db
+    from src.db.session import close_db, init_db
     try:
         await init_db()
         print("Database tables initialized successfully")
     except Exception as e:
         print(f"Error initializing database: {e}")
         raise
+    finally:
+        # Prevent asyncpg connections created by this event loop from being reused
+        # by Uvicorn's lifespan loop.
+        await close_db()
 
 
 def main() -> None:

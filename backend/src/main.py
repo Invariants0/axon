@@ -27,10 +27,6 @@ async def lifespan(_: FastAPI):
         raise RuntimeError("Configuration validation failed")
     
     configure_logging()
-    logger.info("Starting configuration validation")
-    if not ConfigValidator.validate():
-        logger.error("Configuration validation failed - startup aborted")
-        raise RuntimeError("Configuration validation failed")
     await init_db()
     task_manager = get_task_manager()
     await task_manager.start()
