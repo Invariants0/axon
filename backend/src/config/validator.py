@@ -49,8 +49,21 @@ class ConfigValidator:
                 issues.append(
                     "AXON_MODE=gradient requires GRADIENT_API_KEY to be set"
                 )
+            if not settings.gradient_model:
+                issues.append(
+                    "AXON_MODE=gradient requires GRADIENT_MODEL to be set"
+                )
+            if not settings.gradient_base_url:
+                issues.append(
+                    "AXON_MODE=gradient requires GRADIENT_BASE_URL to be set"
+                )
         
         if settings.axon_mode == "real":
+            if not settings.digitalocean_api_token:
+                issues.append(
+                    "AXON_MODE=real requires DIGITALOCEAN_API_TOKEN to be set"
+                )
+            
             required_urls = {
                 "AXON_PLANNER_AGENT_URL": settings.axon_planner_agent_url,
                 "AXON_RESEARCH_AGENT_URL": settings.axon_research_agent_url,
