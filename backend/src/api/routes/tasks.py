@@ -17,10 +17,13 @@ router = APIRouter(dependencies=[Depends(require_api_key), Depends(rate_limit_ho
 @router.get("/", response_model=TaskListResponse)
 async def get_tasks(
     chat_id: str | None = Query(default=None),
+    limit: int = Query(default=50, ge=1, le=500),
     task_service: TaskService = Depends(get_task_service),
 ) -> TaskListResponse:
     tasks = await list_tasks(task_service, chat_id=chat_id)
-    return TaskListResponse(items=[TaskResponse.model_validate(task) for task in tasks])
+    # Sort newest-first and apply limit
+    sorted_tasks = sorted(tasks, key=lambda t: t.created_at, reverse=True)[:limit]
+    return TaskListResponse(items=[TaskResponse.model_validate(task) for task in sorted_tasks])
 
 
 @router.get("/{task_id}", response_model=TaskResponse)

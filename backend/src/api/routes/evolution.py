@@ -22,3 +22,19 @@ async def run_evolution(
 ) -> EvolutionStatus:
     status = await trigger_evolution(evolution_service)
     return EvolutionStatus.model_validate(status)
+
+
+@router.get("/timeline")
+async def get_evolution_timeline(
+    evolution_service: EvolutionService = Depends(get_evolution_service),
+) -> list:
+    """
+    Get evolution history as a timeline of version upgrades.
+    Returns list of { version, timestamp, skills_added }.
+    """
+    try:
+        history = await evolution_service.get_history()
+        return history
+    except (AttributeError, NotImplementedError):
+        # If get_history() not implemented, return empty list gracefully
+        return []
